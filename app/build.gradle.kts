@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mvvm"
+    namespace = "com.example.nocket"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mvvm"
+        applicationId = "com.example.nocket"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -60,7 +60,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
+    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.hilt.android)
 //    kapt(libs.hilt.android.compiler)
