@@ -18,15 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(
-    navController: NavController,
+    navController: NavController = rememberNavController(),
     title: String,
     actions: @Composable RowScope.() -> Unit = {},
-    bottomContent: @Composable (() -> Unit)? = null
+    bottomContent: @Composable (() -> Unit)? = null,
+    showBackButton: Boolean = true
 ) {
     Column {
         CenterAlignedTopAppBar(
@@ -43,12 +45,20 @@ fun CommonTopBar(
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { navController.navigate(Screen.Home.route) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Quay lại",
-                        tint = Color.White
-                    )
+                if (showBackButton) {
+                    IconButton(onClick = { 
+                        if (navController.previousBackStackEntry != null) {
+                            navController.popBackStack()
+                        } else {
+                            navController.navigate(Screen.Home.route)
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
                 }
             },
             actions = actions,

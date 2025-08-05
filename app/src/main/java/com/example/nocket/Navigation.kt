@@ -1,11 +1,16 @@
 package com.example.nocket
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.preview.PlaceholderScreen
 import com.example.nocket.ui.screen.home.HomeScreen
+import com.example.nocket.ui.screen.message.MessageScreen
+import com.example.nocket.ui.screen.post.PostScreen
+import com.example.nocket.ui.screen.settings.SettingScreen
 
 sealed class Screen(val route: String) {  //enum
     object Home : Screen("home")
@@ -23,6 +28,7 @@ sealed class Screen(val route: String) {  //enum
 //https://developer.android.com/develop/ui/compose/libraries#hilt
 //https://github.com/android/architecture-samples
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
@@ -34,11 +40,11 @@ fun Navigation() {
         }
 
         composable(Screen.Message.route){
-            PlaceholderScreen(navController, "Messages")
+            MessageScreen(navController)
         }
 
         composable(Screen.Post.route) {
-            PlaceholderScreen(navController, "Posts")
+            PostScreen(navController)
         }
 
         composable(Screen.Profile.route) {
@@ -50,7 +56,7 @@ fun Navigation() {
         }
 
         composable(Screen.Setting.route) {
-            PlaceholderScreen(navController, "Settings")
+            SettingScreen(navController)
         }
 
     }

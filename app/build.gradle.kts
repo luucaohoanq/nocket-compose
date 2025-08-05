@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.nocket"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.nocket"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -22,6 +22,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.example.nocket"
     }
 
     buildTypes {
@@ -51,25 +53,61 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation (libs.play.services.auth) // hoặc bản mới nhất
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
-    implementation(libs.androidx.material.icons.extended)
 
-    implementation(libs.hilt.android)
-//    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.logging.interceptor)
+    implementation(libs.androidx.work.runtime.ktx)
+
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    implementation(libs.composeIcons.fontAwesome)
+
+    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.jackson.annotations)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+
+    implementation(libs.okhttp)
+
+    implementation(libs.gson)
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation(libs.okhttp.urlconnection)
+    implementation(libs.accompanist.pager)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.coil.compose)
+
+    implementation(libs.coil.network.okhttp)
+
+    // QR Code Scanning
+    implementation(libs.androidx.camera.view)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.view.v131)
+    implementation (libs.barcode.scanning)
+
+    implementation(libs.osmdroid.android)
+
+    implementation(libs.appauth)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.animation)
+    implementation("com.stripe:stripe-android:20.42.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
