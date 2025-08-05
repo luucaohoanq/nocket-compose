@@ -21,14 +21,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
@@ -47,59 +44,146 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
 
 val settingList = listOf<Setting>(
-    Setting(type = SettingType.WIDGET, title = "Widget Settings", description = "Customize your home screen widget"),
+    Setting(
+        type = SettingType.WIDGET,
+        title = "Widget Settings",
+        description = "Customize your home screen widget"
+    ),
 
-    Setting(type = SettingType.CUSTOMIZE, title = "App Icon", icon = "ICON_APP", description = "Choose from 12 beautiful app icons"),
-    Setting(type = SettingType.CUSTOMIZE, title = "Theme", icon = "ICON_THEME", description = "Switch between light, dark, or auto mode"),
-    Setting(type = SettingType.CUSTOMIZE, title = "Color Scheme", icon = "ICON_COLOR", description = "Personalize with your favorite colors"),
+    Setting(
+        type = SettingType.CUSTOMIZE,
+        title = "App Icon",
+        icon = "ICON_APP",
+        description = "Choose from 12 beautiful app icons"
+    ),
+    Setting(
+        type = SettingType.CUSTOMIZE,
+        title = "Theme",
+        icon = "ICON_THEME",
+        description = "Switch between light, dark, or auto mode"
+    ),
+    Setting(
+        type = SettingType.CUSTOMIZE,
+        title = "Streak on widget",
+        icon = "ICON_COLOR",
+        isToggleable = true,
+        isToggled = true
+    ),
 
-    Setting(type = SettingType.GENERAL, title = "Edit Profile Picture", description = "Update your profile photo"),
-    Setting(type = SettingType.GENERAL, title = "Edit Name", description = "Change your display name"),
-    Setting(type = SettingType.GENERAL, title = "Edit Birthday", description = "Set or update your birth date"),
-    Setting(type = SettingType.GENERAL, title = "Change Phone Number", description = "Update your contact number"),
-    Setting(type = SettingType.GENERAL, title = "Change Email Address", description = "Update your email address"),
-    Setting(type = SettingType.GENERAL, title = "Notification Settings", description = "Manage push notifications"),
-    Setting(type = SettingType.GENERAL, title = "Language & Region", description = "Change app language"),
-    Setting(type = SettingType.GENERAL, title = "Storage & Data", description = "Manage app storage usage"),
-    Setting(type = SettingType.GENERAL, title = "How to Add Widget", description = "Step-by-step widget setup guide"),
-    Setting(type = SettingType.GENERAL, title = "Restore Purchases", description = "Restore previous premium features"),
+    Setting(
+        type = SettingType.GENERAL,
+        title = "Edit Name",
+        description = "Change your display name"
+    ),
+    Setting(
+        type = SettingType.GENERAL,
+        title = "Edit Birthday",
+        description = "Set or update your birth date"
+    ),
+    Setting(
+        type = SettingType.GENERAL,
+        title = "Change Phone Number",
+        description = "Update your contact number"
+    ),
+    Setting(
+        type = SettingType.GENERAL,
+        title = "How to Add Widget",
+        description = "Step-by-step widget setup guide"
+    ),
+    Setting(
+        type = SettingType.GENERAL,
+        title = "Restore Purchases",
+        description = "Restore previous premium features"
+    ),
 
-    Setting(type = SettingType.PRIVACY_SAFETY, title = "Blocked Accounts", description = "View and manage blocked users"),
-    Setting(type = SettingType.PRIVACY_SAFETY, title = "Account Visibility", description = "Control who can find your profile"),
-    Setting(type = SettingType.PRIVACY_SAFETY, title = "Two-Factor Authentication", description = "Add extra security to your account"),
-    Setting(type = SettingType.PRIVACY_SAFETY, title = "Privacy Choices", description = "Manage data sharing preferences"),
-    Setting(type = SettingType.PRIVACY_SAFETY, title = "Download Your Data", description = "Export your personal data"),
+    Setting(
+        type = SettingType.PRIVACY_SAFETY,
+        title = "Blocked Accounts",
+        description = "View and manage blocked users"
+    ),
+    Setting(
+        type = SettingType.PRIVACY_SAFETY,
+        title = "Account Visibility",
+        description = "Control who can find your profile"
+    ),
+    Setting(
+        type = SettingType.PRIVACY_SAFETY,
+        title = "Privacy Choices",
+        description = "Manage data sharing preferences"
+    ),
 
-    Setting(type = SettingType.SUPPORT, title = "Report a Problem", description = "Get help with technical issues"),
-    Setting(type = SettingType.SUPPORT, title = "Make a Suggestion", description = "Share ideas for new features"),
-    Setting(type = SettingType.SUPPORT, title = "Contact Support", description = "Reach out to our support team"),
-    Setting(type = SettingType.SUPPORT, title = "FAQ & Help Center", description = "Find answers to common questions"),
+    Setting(
+        type = SettingType.SUPPORT,
+        title = "Report a Problem",
+        description = "Get help with technical issues"
+    ),
+    Setting(
+        type = SettingType.SUPPORT,
+        title = "Make a Suggestion",
+        description = "Share ideas for new features"
+    ),
 
-    Setting(type = SettingType.ABOUT, title = "Follow us on TikTok", description = "@nocketapp - Latest updates & tips"),
-    Setting(type = SettingType.ABOUT, title = "Follow us on Instagram", description = "@nocketapp - Behind the scenes"),
-    Setting(type = SettingType.ABOUT, title = "Follow us on Twitter", description = "@nocketapp - News & announcements"),
-    Setting(type = SettingType.ABOUT, title = "Share Nocket", description = "Invite friends to join Nocket"),
-    Setting(type = SettingType.ABOUT, title = "Rate Nocket", description = "Leave a review on your app store"),
-    Setting(type = SettingType.ABOUT, title = "What's New", description = "Check out latest features"),
-    Setting(type = SettingType.ABOUT, title = "Terms of Service", description = "Read our terms and conditions"),
-    Setting(type = SettingType.ABOUT, title = "Privacy Policy", description = "Understand how we protect your data"),
-    Setting(type = SettingType.ABOUT, title = "Open Source Licenses", description = "View third-party licenses"),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "TikTok",
+        description = "@nocketapp - Latest updates & tips"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Instagram",
+        description = "@nocketapp - Behind the scenes"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Twitter",
+        description = "@nocketapp - News & announcements"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Share Nocket",
+        description = "Invite friends to join Nocket"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Rate Nocket",
+        description = "Leave a review on your app store"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Terms of Service",
+        description = "Read our terms and conditions"
+    ),
+    Setting(
+        type = SettingType.ABOUT,
+        title = "Privacy Policy",
+        description = "Understand how we protect your data"
+    ),
 
-    Setting(type = SettingType.DANGER_ZONE, title = "Delete Account", description = "Permanently delete your account and all data"),
-    Setting(type = SettingType.DANGER_ZONE, title = "Sign Out", description = "Sign out from all devices"),
+    Setting(
+        type = SettingType.DANGER_ZONE,
+        title = "Delete Account",
+        description = "Permanently delete your account and all data"
+    ),
+    Setting(
+        type = SettingType.DANGER_ZONE,
+        title = "Sign Out",
+        description = "Sign out from all devices"
+    ),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    navController: NavHostController
+    navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
         topBar = {
@@ -119,19 +203,19 @@ fun SettingScreen(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
-            
+
             // Group settings by type
             val groupedSettings = settingList.groupBy { it.type }
-            
+
             groupedSettings.forEach { (settingType, settings) ->
                 item {
                     SettingSectionHeader(settingType = settingType)
                 }
-                
+
                 items(settings) { setting ->
                     SettingItem(setting = setting)
                 }
-                
+
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -143,15 +227,15 @@ fun SettingScreen(
 @Composable
 fun SettingSectionHeader(settingType: SettingType) {
     val title = when (settingType) {
-        SettingType.WIDGET -> "Widget"
-        SettingType.CUSTOMIZE -> "Customize"
-        SettingType.GENERAL -> "General"
-        SettingType.PRIVACY_SAFETY -> "Privacy & Safety"
-        SettingType.SUPPORT -> "Support"
-        SettingType.ABOUT -> "About"
-        SettingType.DANGER_ZONE -> "Danger Zone"
+        SettingType.WIDGET -> "😄 Widgets"
+        SettingType.CUSTOMIZE -> "😄 Customize"
+        SettingType.GENERAL -> "😄 General"
+        SettingType.PRIVACY_SAFETY -> "😄 Privacy & Safety"
+        SettingType.SUPPORT -> "😄 Support"
+        SettingType.ABOUT -> "😄 About"
+        SettingType.DANGER_ZONE -> "😄 Danger Zone"
     }
-    
+
     Text(
         text = title,
         style = MaterialTheme.typography.titleMedium,
@@ -163,20 +247,30 @@ fun SettingSectionHeader(settingType: SettingType) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingItem(setting: Setting) {
+fun SettingItem(
+    setting: Setting,
+    onToggleChanged: (Boolean) -> Unit = {}
+) {
     val isDangerZone = setting.type == SettingType.DANGER_ZONE
-    
+    var isToggled = setting.isToggled
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDangerZone) 
+            containerColor = if (isDangerZone)
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-            else 
+            else
                 MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(8.dp),
-        onClick = { /* Handle setting item click */ }
+        onClick = {
+            if (setting.isToggleable) {
+                isToggled = !isToggled
+                onToggleChanged(isToggled)
+            }
+            // Handle other settings click
+        }
     ) {
         Row(
             modifier = Modifier
@@ -189,9 +283,9 @@ fun SettingItem(setting: Setting) {
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = if (isDangerZone) 
+                        color = if (isDangerZone)
                             MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                        else 
+                        else
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                         shape = CircleShape
                     ),
@@ -200,16 +294,16 @@ fun SettingItem(setting: Setting) {
                 Icon(
                     imageVector = getSettingIcon(setting),
                     contentDescription = setting.title,
-                    tint = if (isDangerZone) 
+                    tint = if (isDangerZone)
                         MaterialTheme.colorScheme.error
-                    else 
+                    else
                         MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             // Setting details
             Column(
                 modifier = Modifier.weight(1f)
@@ -218,12 +312,12 @@ fun SettingItem(setting: Setting) {
                     text = setting.title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = if (isDangerZone) 
+                    color = if (isDangerZone)
                         MaterialTheme.colorScheme.error
-                    else 
+                    else
                         MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Text(
                     text = setting.description,
                     style = MaterialTheme.typography.bodySmall,
@@ -232,14 +326,24 @@ fun SettingItem(setting: Setting) {
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            
+
             // Arrow icon with subtle animation hint
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Navigate",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(16.dp)
-            )
+            if (setting.isToggleable) {
+                androidx.compose.material3.Switch(
+                    checked = isToggled,
+                    onCheckedChange = {
+                        isToggled = it
+                        onToggleChanged(it)
+                    }
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Navigate",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -263,4 +367,10 @@ fun getSettingIcon(setting: Setting): ImageVector {
         setting.title.contains("Sign out") -> Icons.AutoMirrored.Filled.Logout
         else -> Icons.Default.Settings
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingScreenPreview() {
+    SettingScreen()
 }
