@@ -8,11 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.pill.MessageInputPill
 import com.example.nocket.components.pill.UserListPillWithArrow
-import com.example.nocket.components.topbar.ListSettingTopBar
+import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.userList
 import com.example.nocket.ui.screen.home.HomeScreen
 
@@ -27,7 +26,7 @@ fun HomeScreenSamplePreview() {
 fun HomeScreenPreview() {
     Scaffold(
         topBar = {
-            ListSettingTopBar()
+            SettingScreenTopBar()
         }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize()) {
@@ -38,7 +37,7 @@ fun HomeScreenPreview() {
                 modifier = Modifier.padding(paddingValues)
             )
             MessageInputPill()
-            MainBottomBar()
+//            MainBottomBar()
         }
     }
 }

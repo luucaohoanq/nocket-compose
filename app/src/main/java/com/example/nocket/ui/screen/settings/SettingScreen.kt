@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.nocket.components.common.CommonTopBar
+import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
 
@@ -187,10 +187,7 @@ fun SettingScreen(
 ) {
     Scaffold(
         topBar = {
-            CommonTopBar(
-                navController = navController,
-                title = "Settings"
-            )
+            SettingScreenTopBar()
         }
     ) { paddingValues ->
         LazyColumn(

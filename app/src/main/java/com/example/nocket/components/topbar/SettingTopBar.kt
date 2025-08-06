@@ -7,7 +7,7 @@ import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.models.userList
 
 @Composable
-fun ListSettingTopBar() {
+fun SettingScreenTopBar() {
     CommonTopBar(
         user = userList[0],
         backButtonPosition = BackButtonPosition.End
@@ -17,5 +17,5 @@ fun ListSettingTopBar() {
 @Preview(showBackground = true)
 @Composable
 fun ListSettingTopBarPreview() {
-    ListSettingTopBar()
+    SettingScreenTopBar()
 }

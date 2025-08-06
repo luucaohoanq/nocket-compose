@@ -1,34 +1,32 @@
 package com.example.nocket.ui.screen.post
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,202 +38,107 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.common.CommonTopBar
+import com.example.nocket.components.grid.PostGrid
+import com.example.nocket.components.pill.MessageInputPill
+import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
-import com.example.nocket.models.userList
-
-val samplePosts = listOf(
-    Post(
-        user = userList[0],
-        postType = PostType.IMAGE,
-        caption = "Beautiful sunset at the beach! 🌅 Nothing beats the golden hour vibes. #sunset #beach #nature #photography",
-        thumbnailUrl = "https://picsum.photos/400/300?random=1"
-    ),
-    Post(
-        user = userList[1],
-        postType = PostType.TEXT,
-        caption = "Just finished reading an amazing book about space exploration! 🚀 The universe is truly fascinating and there's so much we still don't know. What's your favorite science book? ⭐️📚 #reading #science #space",
-        thumbnailUrl = null
-    ),
-    Post(
-        user = userList[2],
-        postType = PostType.VIDEO,
-        caption = "Check out this cool time-lapse of my art creation process! 🎨 Spent 5 hours on this piece and I'm really happy with how it turned out. Art is my passion! #art #timelapse #creative #painting",
-        thumbnailUrl = "https://picsum.photos/400/300?random=2"
-    ),
-    Post(
-        user = userList[3],
-        postType = PostType.IMAGE,
-        caption = "Morning coffee and coding session ☕️💻 Starting the day right with some fresh code and caffeine. Working on a new mobile app! #developer #coffee #coding #morning #productivity",
-        thumbnailUrl = "https://picsum.photos/400/300?random=3"
-    ),
-    Post(
-        user = userList[4],
-        postType = PostType.TEXT,
-        caption = "Grateful for all the wonderful people in my life! 💕 It's amazing how much brighter life becomes when you're surrounded by supportive friends and family. Thank you for being amazing! #gratitude #friendship #blessed #love",
-        thumbnailUrl = null
-    ),
-    Post(
-        user = userList[5],
-        postType = PostType.IMAGE,
-        caption = "Hiking adventure in the mountains! 🏔️ The view from the top was absolutely breathtaking. 10 miles round trip but totally worth every step! Nature is the best therapy. #hiking #mountains #adventure #nature #fitness",
-        thumbnailUrl = "https://picsum.photos/400/300?random=4"
-    ),
-    Post(
-        user = userList[6],
-        postType = PostType.VIDEO,
-        caption = "Cooking experiment: homemade pasta from scratch! 🍝 First time making fresh pasta and it turned out better than expected. The secret is patience and good olive oil! #cooking #pasta #homemade #foodie",
-        thumbnailUrl = "https://picsum.photos/400/300?random=5"
-    ),
-    Post(
-        user = userList[7],
-        postType = PostType.IMAGE,
-        caption = "New city, new adventures! 🏙️ Just moved here and already falling in love with the architecture and culture. Can't wait to explore more hidden gems! #travel #city #architecture #newbeginnings",
-        thumbnailUrl = "https://picsum.photos/400/300?random=6"
-    ),
-    Post(
-        user = userList[8],
-        postType = PostType.TEXT,
-        caption = "Meditation has been a game-changer for my mental health! 🧘‍♀️ Started with just 5 minutes a day and now I can't imagine my routine without it. Peace and mindfulness are so important in our busy world. #meditation #mindfulness #mentalhealth #wellness #peace",
-        thumbnailUrl = null
-    ),
-    Post(
-        user = userList[9],
-        postType = PostType.IMAGE,
-        caption = "Late night gaming session with the crew! 🎮 Nothing beats some quality time with friends, even if it's virtual. We conquered another dungeon tonight! #gaming #friends #latenight #fun #teamwork",
-        thumbnailUrl = "https://picsum.photos/400/300?random=7"
-    )
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
     navController: NavHostController
 ) {
-    Scaffold(
-        topBar = {
-            CommonTopBar(
-                navController = navController,
-                title = "Posts"
+    var showCameraMode by remember { mutableStateOf(false) }
+    var selectedPost by remember { mutableStateOf<Post?>(null) }
+
+    when {
+        selectedPost != null -> {
+            PostDetailScreen(
+                post = selectedPost!!,
+                onBack = { selectedPost = null }
             )
         }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            items(samplePosts) { post ->
-                PostItem(post = post)
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
+
+        showCameraMode -> {
+            CameraScreen(
+                onBack = { showCameraMode = false },
+                onPhotoTaken = { showCameraMode = false }
+            )
+        }
+
+        else -> {
+            Scaffold(
+                topBar = {
+                    CommonTopBar(
+                        navController = navController,
+                        title = "Posts"
+                    )
+                }
+            ) { paddingValues ->
+                PostGrid(
+                    posts = SampleData.samplePosts,
+                    onPostClick = { post -> selectedPost = post },
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostItem(post: Post) {
-    var isLiked by remember { mutableStateOf(false) }
-    var likeCount by remember { mutableStateOf((10..150).random()) }
-    
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+fun PostDetailScreen(
+    post: Post,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(post.user.username) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            // User info header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AsyncImage(
-                    model = post.user.avatar,
-                    contentDescription = "Profile picture",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                
-                Spacer(modifier = Modifier.width(12.dp))
-                
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = post.user.username,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "${post.postType.name.lowercase().replaceFirstChar { it.uppercase() }} • Just now",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                IconButton(onClick = { /* Handle menu */ }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Post content
-            post.caption?.let { caption ->
-                Text(
-                    text = caption,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 20.sp
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-            
-            // Media content (if available)
+            // Post image (full width)
             post.thumbnailUrl?.let { imageUrl ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .aspectRatio(1f)
                 ) {
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = "Post image",
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
+
                         contentScale = ContentScale.Crop
                     )
-                    
+
                     // Video indicator for video posts
                     if (post.postType == PostType.VIDEO) {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.Center)
-                                .size(56.dp)
+                                .size(72.dp)
                                 .background(
                                     color = Color.Black.copy(alpha = 0.6f),
                                     shape = CircleShape
@@ -243,62 +146,138 @@ fun PostItem(post: Post) {
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Share, // Using share as play icon substitute
+                                imageVector = Icons.Default.PlayArrow,
                                 contentDescription = "Play video",
                                 tint = Color.White,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                    }
+
+                    // Caption
+                    post.caption?.let { caption ->
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 24.dp) // Add padding to move it up from bottom
+                                .background(
+                                    Color.Black.copy(alpha = 0.5f),
+                                    shape = RoundedCornerShape(24.dp)
+                                )
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                //if the caption length is more than 30 characters, truncate it and add "..."
+                                text = caption.take(30) + if (caption.length > 30) "..." else "",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White,
+                                lineHeight = 20.sp,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
             }
-            
-            // Action buttons and stats
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+
+            // Post details
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
+                // User info and actions
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Like button with count
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp) // Consistent spacing between items
                     ) {
-                        IconButton(onClick = { 
-                            isLiked = !isLiked
-                            likeCount = if (isLiked) likeCount + 1 else likeCount - 1
-                        }) {
-                            Icon(
-                                imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = "Like",
-                                tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        AsyncImage(
+                            model = post.user.avatar,
+                            contentDescription = "Profile picture",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+
                         Text(
-                            text = likeCount.toString(),
+                            text = post.user.username,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "Just now",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+
                     }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    IconButton(onClick = { /* Handle share */ }) {
+                }
+
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                // Message Pill
+                MessageInputPill()
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CameraScreen(
+    onBack: () -> Unit,
+    onPhotoTaken: () -> Unit
+) {
+    // Placeholder camera screen - in a real app you'd integrate with CameraX
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Camera") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
                         )
                     }
                 }
-                
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color.Black),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Camera",
+                    tint = Color.White,
+                    modifier = Modifier.size(100.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "${(1..24).random()}h",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "Camera Preview",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Integrate with CameraX for actual camera functionality",
+                    color = Color.White.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
                 )
             }
         }

@@ -1,10 +1,19 @@
 package com.example.nocket.components.common
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +50,9 @@ fun CommonTopBar(
                 ) {
                     Text(
                         text = displayTitle,
-                        color = Color.White,
-                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
             },
@@ -58,7 +68,7 @@ fun CommonTopBar(
                 actions()
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Blue
+                containerColor = Color.Transparent
             )
         )
 
@@ -76,20 +86,23 @@ private fun BackButton(navController: NavController, backButtonPosition: BackBut
         }
     }) {
 
-        if (backButtonPosition == BackButtonPosition.Start) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        } else {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        }
+        when (backButtonPosition) {
+            BackButtonPosition.Start -> {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
+            BackButtonPosition.End -> {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
 
     }
 }

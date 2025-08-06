@@ -10,6 +10,35 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
+// Brown Dark Color Scheme
+private val BrownDarkColorScheme = darkColorScheme(
+    primary = BrownPrimary,
+    onPrimary = BrownOnPrimary,
+    primaryContainer = BrownPrimaryDark,
+    onPrimaryContainer = BrownOnBackground,
+    
+    secondary = BrownSecondary,
+    onSecondary = BrownOnSecondary,
+    secondaryContainer = BrownPrimaryDark,
+    onSecondaryContainer = BrownOnBackground,
+    
+    tertiary = BrownTertiary,
+    onTertiary = BrownOnPrimary,
+    tertiaryContainer = BrownPrimaryDark,
+    onTertiaryContainer = BrownOnBackground,
+    
+    background = BrownBackground,
+    onBackground = BrownOnBackground,
+    
+    surface = BrownSurface,
+    onSurface = BrownOnSurface,
+    surfaceVariant = BrownSurfaceVariant,
+    onSurfaceVariant = BrownOnSurfaceVariant,
+    
+    error = BrownError,
+    onError = BrownOnError
+)
+
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
@@ -34,20 +63,13 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun AppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true, // Force dark theme
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Disable dynamic colors to use our brown theme
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    // Always use brown dark theme
+    val colorScheme = BrownDarkColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

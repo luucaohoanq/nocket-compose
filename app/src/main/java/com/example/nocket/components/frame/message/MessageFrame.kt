@@ -72,7 +72,7 @@ fun BottomPreview(){
     MaterialTheme {
         Column() {
             MessageInputPill()
-            MainBottomBar()
+//            MainBottomBar()
         }
     }
 }

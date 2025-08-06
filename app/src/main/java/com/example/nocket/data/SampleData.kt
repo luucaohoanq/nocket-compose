@@ -95,7 +95,7 @@ object SampleData {
     )
     
     // Sample posts with rich content
-    val posts = listOf(
+    val samplePosts = listOf(
         Post(
             user = users[0],
             postType = PostType.IMAGE,
@@ -218,7 +218,7 @@ object SampleData {
     val stats = mapOf(
         "totalUsers" to users.size,
         "totalMessages" to messages.size,
-        "totalPosts" to posts.size,
+        "totalPosts" to samplePosts.size,
         "totalSettings" to settings.size,
         "appName" to "Nocket",
         "version" to "1.0.0",

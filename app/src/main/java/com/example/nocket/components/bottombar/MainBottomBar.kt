@@ -1,52 +1,187 @@
 package com.example.nocket.components.bottombar
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.GridOn
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Message
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.nocket.Screen
+
+data class BottomNavItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val route: String,
+    val isCenter: Boolean = false // flag để xác định button special (ví dụ camera)
+)
+
+private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavItem>, BottomNavItem?> {
+    val centerItem = original.firstOrNull { it.isCenter }
+    if (centerItem == null) return original to null
+
+    val withoutCenter = original.filter { !it.isCenter }
+    // Chia đều: firstHalf lấy ceil, secondHalf là phần còn lại
+    val splitIndex = (withoutCenter.size + 1) / 2
+    val firstHalf = withoutCenter.take(splitIndex)
+    val secondHalf = withoutCenter.drop(splitIndex)
+    val finalList = firstHalf + listOf(centerItem) + secondHalf
+    return finalList to centerItem
+}
 
 @Composable
-fun MainBottomBar(){
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,  horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceAround) {
-        IconButton(onClick = { /* Handle share */ }) {
-            Icon(
-                imageVector = Icons.Default.GridOn,
-                contentDescription = "Share",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        IconButton(onClick = { /* Handle share */ }) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Share",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+fun MainBottomBar(
+    navController: NavController = rememberNavController(),
+    currentRoute: String?,
+    items: List<BottomNavItem> = sampleItems2,
+    onCameraClick: () -> Unit = { navController.navigate(Screen.Camera.route) }
+) {
+    val (orderedItems, centerItem) = normalizeItems(items)
 
-        IconButton(onClick = { /* Handle share */ }) {
-            Icon(
-                imageVector = Icons.Default.Share,
-                contentDescription = "Share",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+    NavigationBar {
+        orderedItems.forEach { item ->
+            if (item == centerItem) {
+                // center special button (vd: camera)
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+//                        .background(
+//                            color = MaterialTheme.colorScheme.primary,
+//                            shape = CircleShape
+//                        )
+                        .clickable { onCameraClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = item.selectedIcon, // giả định icon lớn
+                        contentDescription = item.title,
+//                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            } else {
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = if (currentRoute == item.route) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = item.title
+                        )
+                    },
+                    selected = currentRoute == item.route,
+                    onClick = {
+                        if (item.route.isNotEmpty()) {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
+            }
         }
+    }
+}
+
+private val sampleItems = listOf(
+    BottomNavItem(
+        title = "Home",
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home,
+        route = Screen.Home.route
+    ),
+    BottomNavItem(
+        title = "Messages",
+        selectedIcon = Icons.Filled.Message,
+        unselectedIcon = Icons.Outlined.Message,
+        route = Screen.Message.route
+    ),
+    BottomNavItem(
+        title = "Camera",
+        selectedIcon = Icons.Filled.CameraAlt,
+        unselectedIcon = Icons.Filled.CameraAlt,
+        route = "",
+        isCenter = true
+    ),
+    BottomNavItem(
+        title = "Profile",
+        selectedIcon = Icons.Filled.Person,
+        unselectedIcon = Icons.Outlined.Person,
+        route = Screen.Profile.route
+    ),
+    BottomNavItem(
+        title = "Settings",
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings,
+        route = Screen.Setting.route
+    )
+)
+
+val sampleItems2 = listOf(
+    BottomNavItem(
+        title = "Home",
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home,
+        route = Screen.Home.route
+    ),
+    BottomNavItem(
+        title = "Camera",
+        selectedIcon = Icons.Filled.CameraAlt,
+        unselectedIcon = Icons.Filled.CameraAlt,
+        route = "",
+        isCenter = true
+    ),
+    BottomNavItem(
+        title = "Settings",
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings,
+        route = Screen.Setting.route
+    )
+)
+
+@Preview(showBackground = true)
+@Composable
+fun MainBottomBarPreview() {
+    MaterialTheme {
+        MainBottomBar(
+            navController = rememberNavController(),
+            currentRoute = Screen.Home.route,
+            items = sampleItems,
+            onCameraClick = { /* camera action */ }
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MainBottomBarPreview() {
-    MainBottomBar()
+fun MainBottomBar2Preview() {
+    MaterialTheme {
+        MainBottomBar(
+            navController = rememberNavController(),
+            currentRoute = Screen.Home.route,
+            items = sampleItems2,
+            onCameraClick = { /* camera action */ }
+        )
+    }
 }
