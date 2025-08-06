@@ -49,7 +49,6 @@ fun Navigation() {
     // Define routes where bottom bar should be hidden
     val hideBottomBarRoutes = setOf(
         Screen.Message.route,
-        // Screen.Camera.route, // No longer needed as we use local camera view
         Screen.Profile.route,
         Screen.Setting.route,
     )
@@ -109,14 +108,6 @@ fun Navigation() {
             composable(Screen.Detail.route) {
                 PlaceholderScreen(title = "Detail",navController =  navController)
             }
-
-            // Camera route is no longer needed as we use local camera view in PostDetailScreen
-            // composable(Screen.Camera.route) {
-            //     CameraScreen(
-            //         onBack = { navController.popBackStack() },
-            //         onPhotoTaken = { navController.popBackStack() }
-            //     )
-            // }
         }
     }
 
