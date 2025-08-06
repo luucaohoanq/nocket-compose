@@ -17,6 +17,7 @@ import com.example.nocket.ui.screen.home.HomeScreen
 import com.example.nocket.ui.screen.message.MessageScreen
 import com.example.nocket.ui.screen.post.CameraScreen
 import com.example.nocket.ui.screen.post.PostScreen
+import com.example.nocket.ui.screen.profile.UserProfile
 import com.example.nocket.ui.screen.settings.SettingScreen
 
 sealed class Screen(val route: String) {  //enum
@@ -67,7 +68,7 @@ fun Navigation() {
             }
 
             composable(Screen.Profile.route) {
-                PlaceholderScreen(title = "Profile", navController = navController)
+                UserProfile(navController = navController)
             }
 
             composable(Screen.Relationship.route) {

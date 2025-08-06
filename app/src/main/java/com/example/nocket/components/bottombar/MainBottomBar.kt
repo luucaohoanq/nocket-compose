@@ -9,10 +9,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.IosShare
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
@@ -33,8 +35,8 @@ import com.example.nocket.Screen
 
 data class BottomNavItem(
     val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    val selectedIcon: ImageVector? = null,
+    val unselectedIcon: ImageVector? = null,
     val route: String,
     val isCenter: Boolean = false // flag để xác định button special (ví dụ camera)
 )
@@ -86,10 +88,24 @@ fun MainBottomBar(
             } else {
                 NavigationBarItem(
                     icon = {
-                        Icon(
-                            imageVector = if (currentRoute == item.route) item.selectedIcon else item.unselectedIcon,
-                            contentDescription = item.title
-                        )
+                        if (item.selectedIcon != null || item.unselectedIcon != null) {
+                            // Determine which icon to use, defaulting to whichever is not null
+                            val iconToUse = when {
+                                currentRoute == item.route && item.selectedIcon != null -> item.selectedIcon
+                                item.unselectedIcon != null -> item.unselectedIcon
+                                else -> item.selectedIcon // Fallback (won't be null due to our condition)
+                            }
+
+                            // Only show icon if we have a non-null icon to display
+                            iconToUse?.let {
+                                Icon(
+                                    imageVector = it,
+                                    contentDescription = item.title,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(40.dp)
+                                )
+                            }
+                        }
                     },
                     selected = currentRoute == item.route,
                     onClick = {
@@ -143,6 +159,28 @@ private val sampleItems = listOf(
 val sampleItems2 = listOf(
     BottomNavItem(
         title = "Home",
+        selectedIcon = null,
+        unselectedIcon = null,
+        route = Screen.Home.route
+    ),
+    BottomNavItem(
+        title = "Camera",
+        selectedIcon = Icons.Filled.CameraAlt,
+        unselectedIcon = Icons.Filled.CameraAlt,
+        route = "",
+        isCenter = true
+    ),
+    BottomNavItem(
+        title = "Share",
+        selectedIcon = Icons.Filled.IosShare,
+        unselectedIcon = Icons.Outlined.IosShare,
+        route = Screen.Setting.route
+    )
+)
+
+val sampleItems3 = listOf(
+    BottomNavItem(
+        title = "Home",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
         route = Screen.Home.route
@@ -155,9 +193,9 @@ val sampleItems2 = listOf(
         isCenter = true
     ),
     BottomNavItem(
-        title = "Settings",
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings,
+        title = "Share",
+        selectedIcon = Icons.Filled.IosShare,
+        unselectedIcon = Icons.Outlined.IosShare,
         route = Screen.Setting.route
     )
 )
@@ -183,6 +221,19 @@ fun MainBottomBar2Preview() {
             navController = rememberNavController(),
             currentRoute = Screen.Home.route,
             items = sampleItems2,
+            onCameraClick = { /* camera action */ }
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
+@Composable
+fun MainBottomBar3Preview() {
+    MaterialTheme {
+        MainBottomBar(
+            navController = rememberNavController(),
+            currentRoute = Screen.Home.route,
+            items = sampleItems3,
             onCameraClick = { /* camera action */ }
         )
     }

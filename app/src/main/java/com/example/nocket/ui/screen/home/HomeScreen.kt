@@ -55,25 +55,6 @@ fun HomeScreen(
                     MyTopBar(
                         navController = navController,
                         user = SampleData.users[0],
-                        actions = {
-                            Row {
-                                Button(
-                                    onClick = { navController.navigate(Screen.Message.route) },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
-                                    modifier = Modifier.size(40.dp),
-                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.Message,
-                                        contentDescription = "Messages",
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-                        }
                     )
                 }
             ) { paddingValues ->

@@ -1,8 +1,11 @@
 package com.example.nocket.components.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,9 +36,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.nocket.Screen
 import com.example.nocket.models.User
 
 enum class BackButtonPosition {
@@ -85,62 +95,100 @@ fun CommonTopBar(
     }
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
+@Composable
+fun MyTopBarTitle(
+    user: User? = null
+) {
+    Box(
+        modifier = Modifier
+            .defaultMinSize(minWidth = 80.dp)
+            .wrapContentWidth()
+            .background(
+//                color = Color(0x66000000), // black với 40% opacity
+                color = Color(0xFF404137),
+                shape = RoundedCornerShape(50)
+            )
+            .clip(RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clickable { /* TODO: Handle click */ },
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 3.dp)
+        ) {
+            Text(
+                text = user?.username ?: "",
+                color = Color.White,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Icon(
+                imageVector = Icons.Filled.ExpandMore, // hoặc Icons.Filled.ExpandMore
+                contentDescription = "Dropdown",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTopBar(
     navController: NavController,
     title: String = "Nocket",
     user: User? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-    showBackButton: Boolean = true,
-    backButtonPosition: BackButtonPosition = BackButtonPosition.Start
 ) {
     val displayTitle = user?.username ?: title
 
 
-        CenterAlignedTopAppBar(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            title = {
-                Box(
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 80.dp)
-                        .wrapContentWidth()
-                        .border(
-                            width = 1.dp,
-                            color =  MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(50)
-                        )
-                        .clip(RoundedCornerShape(50))
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    contentAlignment = Alignment.Center
+    CenterAlignedTopAppBar(
+        modifier = Modifier.padding(horizontal = 20.dp),
+        title = {
+            MyTopBarTitle(user)
+        },
+        navigationIcon = {
+            // Avatar
+            AsyncImage(
+                model = user?.avatar,
+                contentDescription = "Profile picture",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .clickable{
+                        navController.navigate(Screen.Profile.route)
+                    }
+                ,
+                contentScale = ContentScale.Crop
+            )
+        },
+        actions = {
+            Row {
+                Button(
+                    onClick = { navController.navigate(Screen.Message.route) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF404137),
+                        ),
+                    modifier = Modifier.size(40.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                 ) {
-                    Text(
-                        text =  user?.username ?: "",
-                        color =  MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.Center),
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.titleLarge
+                    Icon(
+                        imageVector = Icons.Filled.ChatBubbleOutline,
+                        contentDescription = "Messages",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-            },
-            navigationIcon = {
-                // Avatar
-                AsyncImage(
-                    model = user?.avatar,
-                    contentDescription = "Profile picture",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            },
-            actions = {
-                actions()
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent
-            )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent
         )
+    )
 }
 
 @Composable
