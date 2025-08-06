@@ -1,11 +1,17 @@
 package com.example.nocket
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.preview.PlaceholderScreen
 import com.example.nocket.ui.screen.home.HomeScreen
 import com.example.nocket.ui.screen.message.MessageScreen
@@ -31,43 +37,58 @@ sealed class Screen(val route: String) {  //enum
 //https://developer.android.com/develop/ui/compose/libraries#hilt
 //https://github.com/android/architecture-samples
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
     //val viewModel = hiltViewModel<MainViewModel>()
 
-    NavHost(navController = navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) {
-            HomeScreen(navController)
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            MainBottomBar(navController = navController, currentRoute = navController.currentDestination?.route)
         }
+    ) {
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route
+        ) {
+            composable(Screen.Home.route) {
+                HomeScreen(navController)
+            }
 
-        composable(Screen.Message.route){
-            MessageScreen(navController)
+            composable(Screen.Message.route) {
+                MessageScreen(navController)
+            }
+
+            composable(Screen.Post.route) {
+                PostScreen(navController)
+            }
+
+            composable(Screen.Profile.route) {
+                PlaceholderScreen(title = "Profile", navController = navController)
+            }
+
+            composable(Screen.Relationship.route) {
+                PlaceholderScreen(title = "Relationships", navController =  navController)
+            }
+
+            composable(Screen.Setting.route) {
+                SettingScreen(navController)
+            }
+
+            composable(Screen.Detail.route) {
+                PlaceholderScreen(title = "Detail",navController =  navController)
+            }
+
+            composable(Screen.Camera.route) {
+                CameraScreen(
+                    onBack = { navController.popBackStack() },
+                    onPhotoTaken = { navController.popBackStack() }
+                )
+            }
         }
-
-        composable(Screen.Post.route) {
-            PostScreen(navController)
-        }
-
-        composable(Screen.Profile.route) {
-            PlaceholderScreen(navController, "Profile")
-        }
-
-        composable(Screen.Relationship.route) {
-            PlaceholderScreen(navController, "Relationships")
-        }
-
-        composable(Screen.Setting.route) {
-            SettingScreen(navController)
-        }
-
-        composable(Screen.Camera.route) {
-            CameraScreen(
-                onBack = { navController.popBackStack() },
-                onPhotoTaken = { navController.popBackStack() }
-            )
-        }
-
     }
+
 }
