@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,11 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -159,10 +166,9 @@ fun MyTopBar(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .clickable{
+                    .clickable {
                         navController.navigate(Screen.Profile.route)
-                    }
-                ,
+                    },
                 contentScale = ContentScale.Crop
             )
         },
@@ -172,13 +178,103 @@ fun MyTopBar(
                     onClick = { navController.navigate(Screen.Message.route) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF404137),
-                        ),
+                    ),
                     modifier = Modifier.size(40.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ChatBubbleOutline,
                         contentDescription = "Messages",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserProfileTopBar(
+    navController: NavController,
+) {
+    CenterAlignedTopAppBar(
+        modifier = Modifier.padding(horizontal = 20.dp),
+        title = {
+        },
+        navigationIcon = {
+            Box(
+                modifier = Modifier.fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ){
+                Card(
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(5.dp)
+                        ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    ),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Text(
+                        text = "Get Locket Gold",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        },
+        actions = {
+            Row(
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Button(
+                    onClick = { navController.navigate(Screen.Message.route) },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color.Transparent),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Group,
+                        contentDescription = "Friends",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Button(
+                    onClick = { navController.navigate(Screen.Setting.route) },
+                    modifier = Modifier.size(40.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Button(
+                    onClick = { navController.navigate(Screen.Home.route) },
+                    modifier = Modifier.size(40.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Home",
                         tint = Color.White,
                         modifier = Modifier.size(20.dp)
                     )
