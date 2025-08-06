@@ -58,10 +58,13 @@ private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavIt
  * Determines which bottom navigation items to show based on the current route
  */
 private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> {
+    // Note: The camera button's behavior is controlled by the onCameraClick parameter
+    // passed to MainBottomBar, not by the route in the BottomNavItem
     return when (currentRoute) {
         Screen.Home.route -> sampleItems2 // Use sampleItems2 for Home screen
         Screen.Profile.route -> sampleItems // Use full items for Profile screen
         Screen.Setting.route -> sampleItems3 // Use sampleItems3 for Settings screen
+        Screen.Post.route -> sampleItems2 // Use sampleItems2 for Post detail screen
         else -> sampleItems2 // Default to sampleItems2 for other screens
     }
 }
@@ -71,9 +74,11 @@ fun MainBottomBar(
     navController: NavController = rememberNavController(),
     currentRoute: String?,
     items: List<BottomNavItem>? = null, // Make items optional
-    onCameraClick: () -> Unit = { navController.navigate(Screen.Camera.route) }
+    onCameraClick: () -> Unit // No default - caller must provide the camera click behavior
 ) {
     // Use provided items or determine items based on current route
+    // The items determine which buttons are shown, but the onCameraClick parameter
+    // controls what happens when the camera button is clicked
     val navItems = items ?: getBottomNavItems(currentRoute)
     val (orderedItems, centerItem) = normalizeItems(navItems)
 
@@ -82,14 +87,19 @@ fun MainBottomBar(
     ) {
         orderedItems.forEach { item ->
             if (item == centerItem) {
-                // center special button (vd: camera)
+                // center special button (camera)
                 Box(
                     modifier = Modifier
                         .size(56.dp)
                         .align(Alignment.CenterVertically)
                         .background(color = Color.Transparent, shape = CircleShape)
                         .border(width = 2.dp, color = Color.Yellow, shape = CircleShape)
-                        .clickable { onCameraClick() },
+                        .clickable { 
+                            // Call the provided onCameraClick function instead of navigating
+                            // This will be either the default (navigate to Camera screen)
+                            // or a custom implementation (like setting localCameraMode = true)
+                            onCameraClick() 
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     // Vòng tròn trắng bên trong
@@ -153,7 +163,7 @@ private val sampleItems = listOf(
         title = "Camera",
         selectedIcon = Icons.Filled.CameraAlt,
         unselectedIcon = Icons.Filled.CameraAlt,
-        route = "",
+        route = "", // Empty route to prevent navigation and use onCameraClick instead
         isCenter = true
     ),
     BottomNavItem(
@@ -181,7 +191,7 @@ val sampleItems2 = listOf(
         title = "Camera",
         selectedIcon = Icons.Filled.CameraAlt,
         unselectedIcon = Icons.Filled.CameraAlt,
-        route = "",
+        route = "", // Empty route to prevent navigation and use onCameraClick instead
         isCenter = true
     ),
     BottomNavItem(
@@ -203,7 +213,7 @@ val sampleItems3 = listOf(
         title = "Camera",
         selectedIcon = Icons.Filled.CameraAlt,
         unselectedIcon = Icons.Filled.CameraAlt,
-        route = "",
+        route = "", // Empty route to prevent navigation and use onCameraClick instead
         isCenter = true
     ),
     BottomNavItem(

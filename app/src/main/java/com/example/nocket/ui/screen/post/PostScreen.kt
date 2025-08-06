@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,6 +29,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +50,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.nocket.Screen
+import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.pill.MessageInputPill
@@ -55,6 +59,17 @@ import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import java.time.LocalDateTime
+
+@RequiresApi(Build.VERSION_CODES.O)
+val post =  Post(
+    id = "camera",
+    user = SampleData.users[14], // Current user
+    caption = "Take a photo",
+    thumbnailUrl = "https://picsum.photos/400/300?random=56",
+    createdAt = LocalDateTime.now().toString(),
+    postType = PostType.IMAGE
+)
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +77,11 @@ import com.example.nocket.models.User
 fun PostScreen(
     navController: NavHostController
 ) {
-    var showCameraMode by remember { mutableStateOf(false) }
+    // Create a dummy post for camera mode
+    val dummyPost = remember { 
+       post
+    }
+    
     var selectedPost by remember { mutableStateOf<Post?>(null) }
 
     when {
@@ -70,14 +89,9 @@ fun PostScreen(
             PostDetailScreen(
                 post = selectedPost!!,
                 onBack = { selectedPost = null },
-                navController = navController
-            )
-        }
-
-        showCameraMode -> {
-            CameraScreen(
-                onBack = { showCameraMode = false },
-                onPhotoTaken = { showCameraMode = false }
+                navController = navController,
+                // Don't pass any onCameraClick parameter so PostDetailScreen uses its own local camera mode
+                // The default parameter in PostDetailScreen will handle it
             )
         }
 
@@ -87,6 +101,16 @@ fun PostScreen(
                     CommonTopBar(
                         navController = navController,
                         title = "Posts"
+                    )
+                },
+                bottomBar = {
+                    MainBottomBar(
+                        navController = navController,
+                        currentRoute = Screen.Post.route,
+                        onCameraClick = { 
+                            // Instead of navigating to a separate screen, show the camera in PostDetailScreen
+                            selectedPost = dummyPost
+                        }
                     )
                 }
             ) { paddingValues ->
@@ -105,14 +129,26 @@ fun PostScreen(
 fun PostDetailScreen(
     post: Post,
     onBack: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    onCameraClick: () -> Unit = { /* Empty default - we'll use our local handler */ }
 ) {
+    // Define localCameraMode state before using it in the Scaffold
+    // If the post has id "camera", automatically show camera mode
+    var localCameraMode by remember { mutableStateOf(post.id == "camera") }
+    
+    // Define camera click handler that will be used by MainBottomBar
+    // This overrides the default navigation behavior with local camera mode
+    // When this is called, it sets localCameraMode = true instead of navigating to Screen.Camera.route
+    val handleCameraClick = { 
+        localCameraMode = true 
+    }
 
     var showNotifications by remember { mutableStateOf(false) }
     var selectedUser by remember { mutableStateOf<User?>(User(id = "everyone", username = "Everyone", avatar = "")) }
+    // Use the passed onCameraClick instead of navigating to CameraXScreen
 
     val currentUser = SampleData.users[14]
-
+    
     Scaffold(
         topBar = {
             MainTopBar(
@@ -123,6 +159,14 @@ fun PostDetailScreen(
                 onNotificationClick = { showNotifications = true },
                 onUserSelected = { user -> selectedUser = user }
             )
+        },
+        bottomBar = {
+            MainBottomBar(
+                navController = navController,
+                currentRoute = Screen.Post.route,
+                onCameraClick = handleCameraClick, // Override default navigation with local camera mode
+                items = null // Use default items for this route
+            )
         }
     ) { paddingValues ->
         Column(
@@ -130,66 +174,174 @@ fun PostDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Post image (full width)
-            post.thumbnailUrl?.let { imageUrl ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
+            // Show camera view or post image based on the localCameraMode state
+    
+    if (localCameraMode) {
+        // Camera view with same dimensions as post image
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .background(Color.Black)
+        ) {
+            // Camera preview placeholder - this replaces the post image with camera view
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                // Camera preview content
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Post image",
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
-
-                        contentScale = ContentScale.Crop
+                    Icon(
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = "Camera",
+                        tint = Color.White,
+                        modifier = Modifier.size(72.dp)
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Camera Preview",
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+                
+                // Close button (top-left)
+                IconButton(
+                    onClick = { localCameraMode = false },
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Close Camera",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                
+                // Capture button (bottom-center)
+                IconButton(
+                    onClick = { 
+                        // Simulate taking a photo
+                        localCameraMode = false 
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 80.dp) // Position above the caption
+                        .size(64.dp)
+                        .background(Color.White, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CameraAlt,
+                        contentDescription = "Take Photo",
+                        tint = Color.Black,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+            
+            // Editable caption input at the bottom
+            var captionText by remember { mutableStateOf("") }
+            
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp)
+                    .background(
+                        Color.Black.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                TextField(
+                    value = captionText,
+                    onValueChange = { captionText = it },
+                    placeholder = {
+                        Text(
+                            text = "Add a caption...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.7f),
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    singleLine = true,
+                    modifier = Modifier.width(250.dp)
+                )
+            }
+        }
+    } else {
+        // Post image (full width)
+        post.thumbnailUrl?.let { imageUrl ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Post image",
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
+                    contentScale = ContentScale.Crop
+                )
 
-                    // Video indicator for video posts
-                    if (post.postType == PostType.VIDEO) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(72.dp)
-                                .background(
-                                    color = Color.Black.copy(alpha = 0.6f),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Play video",
-                                tint = Color.White,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
+                // Video indicator for video posts
+                if (post.postType == PostType.VIDEO) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(72.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.6f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Play video",
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp)
+                        )
                     }
+                }
 
-                    // Caption
-                    post.caption?.let { caption ->
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 24.dp) // Add padding to move it up from bottom
-                                .background(
-                                    Color.Black.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(24.dp)
-                                )
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                //if the caption length is more than 30 characters, truncate it and add "..."
-                                text = caption.take(30) + if (caption.length > 30) "..." else "",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White,
-                                lineHeight = 20.sp,
-                                textAlign = TextAlign.Center
+                // Caption
+                post.caption?.let { caption ->
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 24.dp) // Add padding to move it up from bottom
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(24.dp)
                             )
-                        }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            //if the caption length is more than 30 characters, truncate it and add "..."
+                            text = caption.take(30) + if (caption.length > 30) "..." else "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
+                            lineHeight = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
+        }
+    }
 
             // Post details
             Column(

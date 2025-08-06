@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.nocket.Screen
+import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
@@ -22,13 +23,13 @@ import com.example.nocket.models.Post
 import com.example.nocket.models.User
 import com.example.nocket.ui.screen.post.CameraScreen
 import com.example.nocket.ui.screen.post.PostDetailScreen
+import com.example.nocket.ui.screen.post.post
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavHostController
 ) {
-    var showCameraMode by remember { mutableStateOf(false) }
     var selectedPost by remember { mutableStateOf<Post?>(null) }
     var showNotifications by remember { mutableStateOf(false) }
     
@@ -37,6 +38,11 @@ fun HomeScreen(
     
     // Current user (for "You" option)
     val currentUser = SampleData.users[14]
+    
+    // Create a dummy post for camera mode
+    val dummyPost = remember { 
+        post
+    }
 
     when {
         selectedPost != null -> {
@@ -44,13 +50,6 @@ fun HomeScreen(
                 post = selectedPost!!,
                 onBack = { selectedPost = null },
                 navController = navController
-            )
-        }
-
-        showCameraMode -> {
-            CameraScreen(
-                onBack = { showCameraMode = false },
-                onPhotoTaken = { showCameraMode = false }
             )
         }
 
@@ -64,6 +63,16 @@ fun HomeScreen(
                         onProfileClick = { navController.navigate(Screen.Profile.route) },
                         onNotificationClick = { showNotifications = true },
                         onUserSelected = { user -> selectedUser = user }
+                    )
+                },
+                bottomBar = {
+                    MainBottomBar(
+                        navController = navController,
+                        currentRoute = Screen.Home.route,
+                        onCameraClick = { 
+                            // Instead of navigating to a separate screen, show the camera in PostDetailScreen
+                            selectedPost = dummyPost
+                        }
                     )
                 }
             ) { paddingValues ->
