@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nocket.components.pill.UserPill
 import com.example.nocket.components.pill.UserPillConfig
+import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
-import com.example.nocket.models.userList
 
 data class UserReaction(
     val user: User,
@@ -23,9 +23,9 @@ data class UserReaction(
 )
 
 val userReactions = listOf(
-    UserReaction(userList[0], "😄"),
-    UserReaction(userList[1], "❤️"),
-    UserReaction(userList[2], "🔥")
+    UserReaction(SampleData.users[0], "😄"),
+    UserReaction(SampleData.users[1], "❤️"),
+    UserReaction(SampleData.users[2], "🔥")
 )
 
 @Composable

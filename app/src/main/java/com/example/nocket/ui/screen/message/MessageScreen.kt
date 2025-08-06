@@ -40,64 +40,64 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.common.CommonTopBar
+import com.example.nocket.data.SampleData
 import com.example.nocket.models.Message
-import com.example.nocket.models.userList
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 val messageList = listOf<Message>(
     Message(
-        sender = userList[0],
-        recipient = userList[9],
+        sender = SampleData.users[0],
+        recipient = SampleData.users[9],
         previewContent = "Hey! How are you doing today? 😊",
         timeSent = LocalDateTime.now().minusMinutes(5).toString()
     ),
     Message(
-        sender = userList[1],
-        recipient = userList[9],
+        sender = SampleData.users[1],
+        recipient = SampleData.users[9],
         previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
         timeSent = LocalDateTime.now().minusMinutes(30).toString()
     ),
     Message(
-        sender = userList[2],
-        recipient = userList[9],
+        sender = SampleData.users[2],
+        recipient = SampleData.users[9],
         previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
         timeSent = LocalDateTime.now().minusHours(2).toString()
     ),
     Message(
-        sender = userList[3],
-        recipient = userList[9],
+        sender = SampleData.users[3],
+        recipient = SampleData.users[9],
         previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
         timeSent = LocalDateTime.now().minusHours(5).toString()
     ),
     Message(
-        sender = userList[4],
-        recipient = userList[9],
+        sender = SampleData.users[4],
+        recipient = SampleData.users[9],
         previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
         timeSent = LocalDateTime.now().minusDays(1).toString()
     ),
     Message(
-        sender = userList[5],
-        recipient = userList[9],
+        sender = SampleData.users[5],
+        recipient = SampleData.users[9],
         previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
         timeSent = LocalDateTime.now().minusDays(2).toString()
     ),
     Message(
-        sender = userList[6],
-        recipient = userList[9],
+        sender = SampleData.users[6],
+        recipient = SampleData.users[9],
         previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
         timeSent = LocalDateTime.now().minusDays(3).toString()
     ),
     Message(
-        sender = userList[7],
-        recipient = userList[9],
+        sender = SampleData.users[7],
+        recipient = SampleData.users[9],
         previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
         timeSent = LocalDateTime.now().minusDays(4).toString()
     ),
     Message(
-        sender = userList[8],
-        recipient = userList[9],
+        sender = SampleData.users[8],
+        recipient = SampleData.users[9],
         previewContent = "Check out this cool article I found about space exploration 🚀",
         timeSent = LocalDateTime.now().minusDays(5).toString()
     )

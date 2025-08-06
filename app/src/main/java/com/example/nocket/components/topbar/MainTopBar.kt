@@ -3,7 +3,7 @@ package com.example.nocket.components.topbar
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -15,9 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.nocket.Screen
 import com.example.nocket.components.common.CommonTopBar
-import com.example.nocket.components.pill.UserPill
 import com.example.nocket.components.pill.UserPillWithIcon
-import com.example.nocket.models.userList
+import com.example.nocket.data.SampleData
 
 @Composable
 fun MainTopBar(
@@ -38,7 +37,7 @@ fun MainTopBar(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Message,
+                        imageVector = Icons.AutoMirrored.Filled.Message,
                         contentDescription = "Messages",
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(20.dp)
@@ -60,7 +59,7 @@ fun MainTopBarPreview() {
 fun MainTopBarUserPillPreview(){
     MaterialTheme {
         UserPillWithIcon(
-            user = userList[0],
+            user = SampleData.users[0],
         )
     }
 }

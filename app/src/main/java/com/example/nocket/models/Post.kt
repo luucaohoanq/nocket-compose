@@ -7,7 +7,7 @@ data class Post(
     val user: User,
     val postType: PostType,
     val caption: String?,
-    val thumbnailUrl: String?,
+    val thumbnailUrl: String = "https://picsum.photos/400/300?random=${(0..1000).random()}",
     val isArchived: Boolean = false,
 )
 

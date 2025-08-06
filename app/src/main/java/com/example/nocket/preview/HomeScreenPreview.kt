@@ -12,7 +12,7 @@ import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.pill.MessageInputPill
 import com.example.nocket.components.pill.UserListWithArrows
 import com.example.nocket.components.topbar.SettingScreenTopBar
-import com.example.nocket.models.userList
+import com.example.nocket.data.SampleData
 import com.example.nocket.ui.screen.home.HomeScreen
 
 @Preview(showBackground = true)
@@ -32,7 +32,7 @@ fun HomeScreenPreview() {
         Column(modifier = Modifier.fillMaxSize()) {
 
 
-            UserListWithArrows(users = userList.take(3), showEveryone = true)
+            UserListWithArrows(users = SampleData.users.take(3), showEveryone = true)
             PostGrid(
                 modifier = Modifier.padding(paddingValues)
             )

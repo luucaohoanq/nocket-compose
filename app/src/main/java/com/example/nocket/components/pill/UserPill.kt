@@ -7,17 +7,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,8 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
-import com.example.nocket.models.userList
 
 enum class TextAlign {
     LEFT, RIGHT, CENTER
@@ -135,7 +133,7 @@ fun UserPillWithIcon(
             textAlign = TextAlign.CENTER,
             trailingContent = {
                 Icon(
-                    imageVector = Icons.Default.Message,
+                    imageVector = Icons.AutoMirrored.Filled.Message,
                     contentDescription = "Message",
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -224,7 +222,7 @@ fun UserListWithIcons(
         config = UserPillConfig(
             trailingContent = {
                 Icon(
-                    imageVector = Icons.Default.Message,
+                    imageVector = Icons.AutoMirrored.Filled.Message,
                     contentDescription = "Message",
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -253,7 +251,7 @@ fun UserListNoTrailing(
 @Composable
 fun UserPillPreview() {
     MaterialTheme {
-        UserPill(user = userList.first())
+        UserPill(user = SampleData.users.first())
     }
 }
 
@@ -261,7 +259,7 @@ fun UserPillPreview() {
 @Composable
 fun UserPillWithIconPreview() {
     MaterialTheme {
-        UserPillWithIcon(user = userList.first())
+        UserPillWithIcon(user = SampleData.users.first())
     }
 }
 
@@ -269,7 +267,7 @@ fun UserPillWithIconPreview() {
 @Composable
 fun UserPillNoTrailingPreview() {
     MaterialTheme {
-        UserPillNoTrailing(user = userList.first())
+        UserPillNoTrailing(user = SampleData.users.first())
     }
 }
 
@@ -277,7 +275,7 @@ fun UserPillNoTrailingPreview() {
 @Composable
 fun UserListPreview() {
     MaterialTheme {
-        UserListWithArrows(users = userList.take(3))
+        UserListWithArrows(users = SampleData.users.take(3))
     }
 }
 
@@ -285,7 +283,7 @@ fun UserListPreview() {
 @Composable
 fun UserListWithEveryonePreview() {
     MaterialTheme {
-        UserListWithArrows(users = userList.take(3), showEveryone = true)
+        UserListWithArrows(users = SampleData.users.take(3), showEveryone = true)
     }
 }
 
@@ -293,6 +291,6 @@ fun UserListWithEveryonePreview() {
 @Composable
 fun UserListWithIconsPreview() {
     MaterialTheme {
-        UserListWithIcons(users = userList.take(3), showEveryone = true)
+        UserListWithIcons(users = SampleData.users.take(3), showEveryone = true)
     }
 }

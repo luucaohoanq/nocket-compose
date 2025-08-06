@@ -1,9 +1,11 @@
 package com.example.nocket.components.bottombar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Home
@@ -15,17 +17,16 @@ import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
@@ -60,25 +61,26 @@ fun MainBottomBar(
 ) {
     val (orderedItems, centerItem) = normalizeItems(items)
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.Transparent
+    ) {
         orderedItems.forEach { item ->
             if (item == centerItem) {
                 // center special button (vd: camera)
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-//                        .background(
-//                            color = MaterialTheme.colorScheme.primary,
-//                            shape = CircleShape
-//                        )
+                        .align(Alignment.CenterVertically)
+                        .background(color = Color.Transparent, shape = CircleShape)
+                        .border(width = 2.dp, color = Color.Yellow, shape = CircleShape)
                         .clickable { onCameraClick() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = item.selectedIcon, // giả định icon lớn
-                        contentDescription = item.title,
-//                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(28.dp)
+                    // Vòng tròn trắng bên trong
+                    Box(
+                        modifier = Modifier
+                            .size(45.dp)
+                            .background(color = Color.White, shape = CircleShape)
                     )
                 }
             } else {
@@ -160,7 +162,7 @@ val sampleItems2 = listOf(
     )
 )
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
 fun MainBottomBarPreview() {
     MaterialTheme {
@@ -173,7 +175,7 @@ fun MainBottomBarPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
 fun MainBottomBar2Preview() {
     MaterialTheme {

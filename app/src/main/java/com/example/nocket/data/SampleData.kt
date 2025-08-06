@@ -15,7 +15,7 @@ import java.time.LocalDateTime
  * Contains mock data for users, messages, posts, and settings
  */
 object SampleData {
-    
+
     // Enhanced user sample data with diverse usernames
     val users = listOf(
         User(username = "hclw"),
@@ -34,7 +34,7 @@ object SampleData {
         User(username = "nina_rodriguez"),
         User(username = "kai_tanaka")
     )
-    
+
     // Sample messages with engaging content
     @RequiresApi(Build.VERSION_CODES.O)
     val messages = listOf(
@@ -93,7 +93,7 @@ object SampleData {
             timeSent = LocalDateTime.now().minusDays(5).toString()
         )
     )
-    
+
     // Sample posts with rich content
     val samplePosts = listOf(
         Post(
@@ -106,7 +106,7 @@ object SampleData {
             user = users[1],
             postType = PostType.TEXT,
             caption = "Just finished reading an amazing book about space exploration! 🚀 The universe is truly fascinating and there's so much we still don't know. What's your favorite science book? ⭐️📚 #reading #science #space",
-            thumbnailUrl = null
+            thumbnailUrl = "https://picsum.photos/400/300?random=101"
         ),
         Post(
             user = users[2],
@@ -124,7 +124,7 @@ object SampleData {
             user = users[4],
             postType = PostType.TEXT,
             caption = "Grateful for all the wonderful people in my life! 💕 It's amazing how much brighter life becomes when you're surrounded by supportive friends and family. Thank you for being amazing! #gratitude #friendship #blessed #love",
-            thumbnailUrl = null
+            thumbnailUrl = "https://picsum.photos/400/300?random=102"
         ),
         Post(
             user = users[5],
@@ -148,7 +148,7 @@ object SampleData {
             user = users[8],
             postType = PostType.TEXT,
             caption = "Meditation has been a game-changer for my mental health! 🧘‍♀️ Started with just 5 minutes a day and now I can't imagine my routine without it. Peace and mindfulness are so important in our busy world. #meditation #mindfulness #mentalhealth #wellness #peace",
-            thumbnailUrl = null
+            thumbnailUrl = "https://picsum.photos/400/300?random=103"
         ),
         Post(
             user = users[9],
@@ -167,9 +167,27 @@ object SampleData {
             postType = PostType.IMAGE,
             caption = "Homemade bread from scratch! 🍞 There's something magical about the smell of fresh bread in the morning. Recipe in comments! #baking #homemade #bread #cooking #yummy",
             thumbnailUrl = "https://picsum.photos/400/300?random=9"
+        ),
+        Post(
+            user = users[12],
+            postType = PostType.TEXT,
+            caption = "Volunteering at the local shelter today. 🐶🐱 Every little bit helps and these animals deserve all the love they can get. Adopt, don't shop! #volunteering #animals #shelter #adoptdontshop",
+            thumbnailUrl = "https://picsum.photos/400/300?random=104"
+        ),
+        Post(
+            user = users[13],
+            postType = PostType.VIDEO,
+            caption = "Exploring the underwater world while scuba diving! 🌊🐠 The colors and life down there are absolutely mesmerizing. Can't wait to go back! #scubadiving #ocean #adventure #nature",
+            thumbnailUrl = "https://picsum.photos/400/300?random=10"
+        ),
+        Post(
+            user = users[14],
+            postType = PostType.IMAGE,
+            caption = "Weekend getaway to the countryside! 🌾🏡 Fresh air, beautiful landscapes, and a break from the city hustle. Perfect way to recharge! #getaway #countryside #nature #relaxation",
+            thumbnailUrl = "https://picsum.photos/400/300?random=11"
         )
     )
-    
+
     // Comprehensive settings list
     val settings = listOf(
         Setting(type = SettingType.WIDGET, title = "Widget Settings", description = "Customize your home screen widget"),
@@ -213,8 +231,9 @@ object SampleData {
         Setting(type = SettingType.DANGER_ZONE, title = "Delete Account", description = "Permanently delete your account and all data"),
         Setting(type = SettingType.DANGER_ZONE, title = "Sign Out", description = "Sign out from all devices"),
     )
-    
+
     // Fun statistics for the app
+    @RequiresApi(Build.VERSION_CODES.O)
     val stats = mapOf(
         "totalUsers" to users.size,
         "totalMessages" to messages.size,

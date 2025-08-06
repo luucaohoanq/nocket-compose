@@ -3,7 +3,6 @@ package com.example.nocket.di
 import com.example.nocket.repositories.MainLog
 import com.example.nocket.repositories.MainLogImpl
 import com.example.nocket.repositories.Store
-import com.example.nocket.repositories.StoreImpl
 import com.example.nocket.repositories.StoreImpl2
 import dagger.Binds
 import dagger.Module
