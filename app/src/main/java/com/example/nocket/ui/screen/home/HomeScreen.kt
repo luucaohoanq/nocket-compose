@@ -32,8 +32,10 @@ import androidx.navigation.NavHostController
 import com.example.nocket.Screen
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.grid.PostGrid
+import com.example.nocket.components.pill.UserPillWithIcon
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
+import com.example.nocket.models.userList
 import com.example.nocket.ui.screen.post.CameraScreen
 import com.example.nocket.ui.screen.post.PostDetailScreen
 
@@ -91,6 +93,10 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
+                    UserPillWithIcon(
+                        user = userList[0],
+                    )
+
                     // Post Grid as main content
                     Box(
                         modifier = Modifier

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nocket.components.pill.UserPill
+import com.example.nocket.components.pill.UserPillConfig
 import com.example.nocket.models.User
 import com.example.nocket.models.userList
 
@@ -45,12 +46,15 @@ fun ReactionPill(
         reactions.forEach { reaction ->
             UserPill(
                 user = reaction.user,
-                trailingContent = {
-                    Text(
-                        text = reaction.emoji,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                config = UserPillConfig(
+                    trailingContent = {
+                        Text(
+                            text = reaction.emoji,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                )
+
             )
         }
     }

@@ -31,7 +31,7 @@ enum class BackButtonPosition {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(
-    navController: NavController = rememberNavController(),
+    navController: NavController,
     title: String = "Nocket",
     user: User? = null,
     actions: @Composable RowScope.() -> Unit = {},
@@ -81,9 +81,8 @@ private fun BackButton(navController: NavController, backButtonPosition: BackBut
     IconButton(onClick = {
         if (navController.previousBackStackEntry != null) {
             navController.popBackStack()
-        } else {
-            navController.navigate(Screen.Home.route)
         }
+        // If no previous entry, do nothing (let the system handle it)
     }) {
 
         when (backButtonPosition) {

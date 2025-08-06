@@ -26,7 +26,7 @@ fun MessageInputPill(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+//            .padding(8.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(24.dp)

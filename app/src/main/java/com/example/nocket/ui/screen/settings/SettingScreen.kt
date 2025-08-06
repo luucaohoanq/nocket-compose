@@ -187,7 +187,7 @@ fun SettingScreen(
 ) {
     Scaffold(
         topBar = {
-            SettingScreenTopBar()
+            SettingScreenTopBar(navController)
         }
     ) { paddingValues ->
         LazyColumn(

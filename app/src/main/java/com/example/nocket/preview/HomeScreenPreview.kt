@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.pill.MessageInputPill
-import com.example.nocket.components.pill.UserListPillWithArrow
+import com.example.nocket.components.pill.UserListWithArrows
 import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.userList
 import com.example.nocket.ui.screen.home.HomeScreen
@@ -26,13 +26,13 @@ fun HomeScreenSamplePreview() {
 fun HomeScreenPreview() {
     Scaffold(
         topBar = {
-            SettingScreenTopBar()
+            SettingScreenTopBar(rememberNavController())
         }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize()) {
 
 
-            UserListPillWithArrow(users = userList.take(3), everyOne = true)
+            UserListWithArrows(users = userList.take(3), showEveryone = true)
             PostGrid(
                 modifier = Modifier.padding(paddingValues)
             )

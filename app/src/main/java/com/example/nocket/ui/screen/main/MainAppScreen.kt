@@ -47,9 +47,7 @@ fun MainAppScreen() {
     } else {
         Scaffold(
             modifier = Modifier
-                .fillMaxSize()
-//                .windowInsetsPadding(WindowInsets.systemBars),
-                    ,
+                .fillMaxSize(),
             bottomBar = {
                 MainBottomBar(
                     navController = navController,
