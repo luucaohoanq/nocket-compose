@@ -30,6 +30,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +39,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.nocket.Screen
+import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 enum class BackButtonPosition {
     Start, End
@@ -100,191 +107,6 @@ fun CommonTopBar(
 
         bottomContent?.invoke()
     }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
-@Composable
-fun MyTopBarTitle(
-    user: User? = null
-) {
-    Box(
-        modifier = Modifier
-            .defaultMinSize(minWidth = 80.dp)
-            .wrapContentWidth()
-            .background(
-//                color = Color(0x66000000), // black với 40% opacity
-                color = Color(0xFF404137),
-                shape = RoundedCornerShape(50)
-            )
-            .clip(RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .clickable { /* TODO: Handle click */ },
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 3.dp)
-        ) {
-            Text(
-                text = user?.username ?: "",
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Icon(
-                imageVector = Icons.Filled.ExpandMore, // hoặc Icons.Filled.ExpandMore
-                contentDescription = "Dropdown",
-                tint = Color.White,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyTopBar(
-    navController: NavController,
-    title: String = "Nocket",
-    user: User? = null,
-) {
-    val displayTitle = user?.username ?: title
-
-
-    CenterAlignedTopAppBar(
-        modifier = Modifier.padding(horizontal = 20.dp),
-        title = {
-            MyTopBarTitle(user)
-        },
-        navigationIcon = {
-            // Avatar
-            AsyncImage(
-                model = user?.avatar,
-                contentDescription = "Profile picture",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        navController.navigate(Screen.Profile.route)
-                    },
-                contentScale = ContentScale.Crop
-            )
-        },
-        actions = {
-            Row {
-                Button(
-                    onClick = { navController.navigate(Screen.Message.route) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF404137),
-                    ),
-                    modifier = Modifier.size(40.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ChatBubbleOutline,
-                        contentDescription = "Messages",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent
-        )
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserProfileTopBar(
-    navController: NavController,
-) {
-    CenterAlignedTopAppBar(
-        modifier = Modifier.padding(horizontal = 20.dp),
-        title = {
-        },
-        navigationIcon = {
-            Box(
-                modifier = Modifier.fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ){
-                Card(
-                    modifier = Modifier
-                        .padding(bottom = 10.dp)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(5.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                    ),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Text(
-                        text = "Get Locket Gold",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-        },
-        actions = {
-            Row(
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 8.dp)
-            ) {
-                Button(
-                    onClick = { navController.navigate(Screen.Message.route) },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.Transparent),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Group,
-                        contentDescription = "Friends",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Button(
-                    onClick = { navController.navigate(Screen.Setting.route) },
-                    modifier = Modifier.size(40.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Settings",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Button(
-                    onClick = { navController.navigate(Screen.Home.route) },
-                    modifier = Modifier.size(40.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Home",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent
-        )
-    )
 }
 
 @Composable

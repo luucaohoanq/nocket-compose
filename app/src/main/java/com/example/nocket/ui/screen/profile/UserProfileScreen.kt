@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,14 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.example.nocket.components.common.UserProfileTopBar
+import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.ui.screen.post.PostDetailScreen
 import java.time.LocalDate
-import kotlin.div
-import kotlin.times
-import androidx.compose.material3.VerticalDivider
 
 enum class Month(
     val displayName: String
