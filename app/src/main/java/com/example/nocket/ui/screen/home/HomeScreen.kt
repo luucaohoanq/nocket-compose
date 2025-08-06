@@ -1,5 +1,7 @@
 package com.example.nocket.ui.screen.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,32 +14,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.example.nocket.Screen
+import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
+import com.example.nocket.models.User
 import com.example.nocket.ui.screen.post.CameraScreen
 import com.example.nocket.ui.screen.post.PostDetailScreen
+import com.example.nocket.ui.screen.post.post
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavHostController
 ) {
-    var showCameraMode by remember { mutableStateOf(false) }
     var selectedPost by remember { mutableStateOf<Post?>(null) }
+    var showNotifications by remember { mutableStateOf(false) }
+    
+    // Track the selected user for filtering posts
+    var selectedUser by remember { mutableStateOf<User?>(User(id = "everyone", username = "Everyone", avatar = "")) }
+    
+    // Current user (for "You" option)
+    val currentUser = SampleData.users[14]
+    
+    // Create a dummy post for camera mode
+    val dummyPost = remember { 
+        post
+    }
 
     when {
         selectedPost != null -> {
             PostDetailScreen(
                 post = selectedPost!!,
-                onBack = { selectedPost = null }
-            )
-        }
-
-        showCameraMode -> {
-            CameraScreen(
-                onBack = { showCameraMode = false },
-                onPhotoTaken = { showCameraMode = false }
+                onBack = { selectedPost = null },
+                navController = navController
             )
         }
 
@@ -46,7 +58,21 @@ fun HomeScreen(
                 topBar = {
                     MainTopBar(
                         navController = navController,
-                        user = SampleData.users[0],
+                        user = currentUser, // Using user 14 as the current user
+                        onMessageClick = { navController.navigate(Screen.Message.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) },
+                        onNotificationClick = { showNotifications = true },
+                        onUserSelected = { user -> selectedUser = user }
+                    )
+                },
+                bottomBar = {
+                    MainBottomBar(
+                        navController = navController,
+                        currentRoute = Screen.Home.route,
+                        onCameraClick = { 
+                            // Instead of navigating to a separate screen, show the camera in PostDetailScreen
+                            selectedPost = dummyPost
+                        }
                     )
                 }
             ) { paddingValues ->
@@ -61,8 +87,18 @@ fun HomeScreen(
                             .fillMaxSize()
                             .weight(1f)
                     ) {
+                        // Filter posts based on selected user
+                        val filteredPosts = when (selectedUser?.id) {
+                            "everyone" -> SampleData.samplePosts // Show all posts
+                            "you" -> SampleData.samplePosts.filter { it.user.id == currentUser.id } // Show only current user's posts
+                            else -> SampleData.samplePosts.filter { it.user.id == selectedUser?.id } // Show selected user's posts
+                        }
+                        
+                        // Sort posts by creation time (newest first)
+                        val sortedPosts = filteredPosts.sortedByDescending { it.createdAt }
+                        
                         PostGrid(
-                            posts = SampleData.samplePosts,
+                            posts = sortedPosts,
                             onPostClick = { post -> selectedPost = post },
                         )
                     }

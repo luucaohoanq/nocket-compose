@@ -11,4 +11,5 @@ data class Message @RequiresApi(Build.VERSION_CODES.O) constructor(
     val recipient: User,
     val previewContent: String = "", //one line preview of the message content
     val timeSent: String = LocalDateTime.now().toString(), //ISO 8601 format
+    val isRead: Boolean = false
 )

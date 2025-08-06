@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,65 +48,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-val messageList = listOf<Message>(
-    Message(
-        sender = SampleData.users[0],
-        recipient = SampleData.users[9],
-        previewContent = "Hey! How are you doing today? 😊",
-        timeSent = LocalDateTime.now().minusMinutes(5).toString()
-    ),
-    Message(
-        sender = SampleData.users[1],
-        recipient = SampleData.users[9],
-        previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
-        timeSent = LocalDateTime.now().minusMinutes(30).toString()
-    ),
-    Message(
-        sender = SampleData.users[2],
-        recipient = SampleData.users[9],
-        previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
-        timeSent = LocalDateTime.now().minusHours(2).toString()
-    ),
-    Message(
-        sender = SampleData.users[3],
-        recipient = SampleData.users[9],
-        previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
-        timeSent = LocalDateTime.now().minusHours(5).toString()
-    ),
-    Message(
-        sender = SampleData.users[4],
-        recipient = SampleData.users[9],
-        previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
-        timeSent = LocalDateTime.now().minusDays(1).toString()
-    ),
-    Message(
-        sender = SampleData.users[5],
-        recipient = SampleData.users[9],
-        previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
-        timeSent = LocalDateTime.now().minusDays(2).toString()
-    ),
-    Message(
-        sender = SampleData.users[6],
-        recipient = SampleData.users[9],
-        previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
-        timeSent = LocalDateTime.now().minusDays(3).toString()
-    ),
-    Message(
-        sender = SampleData.users[7],
-        recipient = SampleData.users[9],
-        previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
-        timeSent = LocalDateTime.now().minusDays(4).toString()
-    ),
-    Message(
-        sender = SampleData.users[8],
-        recipient = SampleData.users[9],
-        previewContent = "Check out this cool article I found about space exploration 🚀",
-        timeSent = LocalDateTime.now().minusDays(5).toString()
-    )
-)
-
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageScreen(
     navController: NavHostController
@@ -133,14 +76,10 @@ fun MessageScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            items(messageList) { message ->
+            items(SampleData.messageList) { message ->
                 MessageItem(message = message)
             }
-            
+
             item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -153,8 +92,8 @@ fun MessageScreen(
 fun MessageItem(message: Message) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -173,21 +112,21 @@ fun MessageItem(message: Message) {
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-                
+
                 // Online indicator
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(
-                            color = if ((0..1).random() == 1) Color.Green else Color.Gray,
-                            shape = CircleShape
-                        )
-                        .align(Alignment.BottomEnd)
-                )
+//                Box(
+//                    modifier = Modifier
+//                        .size(12.dp)
+//                        .background(
+//                            color = if ((0..1).random() == 1) Color.Green,
+//                            shape = CircleShape
+//                        )
+//                        .align(Alignment.BottomEnd)
+//                )
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             // Message content
             Column(
                 modifier = Modifier.weight(1f)
@@ -195,25 +134,26 @@ fun MessageItem(message: Message) {
                 // Sender name and time
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = message.sender.username,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     Text(
                         text = formatTime(message.timeSent),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 // Message preview
                 Text(
                     text = message.previewContent,
@@ -223,41 +163,18 @@ fun MessageItem(message: Message) {
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(8.dp))
-            
+
             // Unread indicator and message count
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val hasUnread = (0..1).random() == 1
-                if (hasUnread) {
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = (1..9).random().toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                color = Color.Transparent,
-                                shape = CircleShape
-                            )
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -268,14 +185,16 @@ fun formatTime(timeString: String): String {
     return try {
         val time = LocalDateTime.parse(timeString)
         val now = LocalDateTime.now()
-        
+
         when {
             time.toLocalDate() == now.toLocalDate() -> {
                 time.format(DateTimeFormatter.ofPattern("HH:mm"))
             }
+
             time.toLocalDate() == now.toLocalDate().minusDays(1) -> {
                 "Yesterday"
             }
+
             else -> {
                 time.format(DateTimeFormatter.ofPattern("MMM d"))
             }

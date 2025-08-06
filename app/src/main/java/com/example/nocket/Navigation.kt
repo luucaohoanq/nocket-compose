@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.preview.PlaceholderScreen
@@ -44,11 +45,37 @@ sealed class Screen(val route: String) {  //enum
 fun Navigation() {
     val navController = rememberNavController()
     //val viewModel = hiltViewModel<MainViewModel>()
+    
+    // Define routes where bottom bar should be hidden
+    val hideBottomBarRoutes = setOf(
+        Screen.Message.route,
+        // Screen.Camera.route, // No longer needed as we use local camera view
+        Screen.Profile.route,
+        Screen.Setting.route,
+    )
+    
+    // Track current route as state that updates with navigation changes
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+    
+    // Check if bottom bar should be shown for current route
+    val showBottomBar = currentRoute !in hideBottomBarRoutes
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            MainBottomBar(navController = navController, currentRoute = navController.currentDestination?.route)
+            if (showBottomBar) {
+                MainBottomBar(
+                    navController = navController, 
+                    currentRoute = currentRoute,
+                    onCameraClick = {
+                        // Navigate to Home and then trigger camera mode there
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
         }
     ) {
         NavHost(
@@ -83,12 +110,13 @@ fun Navigation() {
                 PlaceholderScreen(title = "Detail",navController =  navController)
             }
 
-            composable(Screen.Camera.route) {
-                CameraScreen(
-                    onBack = { navController.popBackStack() },
-                    onPhotoTaken = { navController.popBackStack() }
-                )
-            }
+            // Camera route is no longer needed as we use local camera view in PostDetailScreen
+            // composable(Screen.Camera.route) {
+            //     CameraScreen(
+            //         onBack = { navController.popBackStack() },
+            //         onPhotoTaken = { navController.popBackStack() }
+            //     )
+            // }
         }
     }
 
