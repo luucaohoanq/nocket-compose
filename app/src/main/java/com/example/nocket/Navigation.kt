@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.preview.PlaceholderScreen
@@ -44,11 +45,26 @@ sealed class Screen(val route: String) {  //enum
 fun Navigation() {
     val navController = rememberNavController()
     //val viewModel = hiltViewModel<MainViewModel>()
+    
+    // Define routes where bottom bar should be hidden
+    val hideBottomBarRoutes = setOf(
+        Screen.Message.route,
+        Screen.Camera.route
+    )
+    
+    // Track current route as state that updates with navigation changes
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+    
+    // Check if bottom bar should be shown for current route
+    val showBottomBar = currentRoute !in hideBottomBarRoutes
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            MainBottomBar(navController = navController, currentRoute = navController.currentDestination?.route)
+            if (showBottomBar) {
+                MainBottomBar(navController = navController, currentRoute = currentRoute)
+            }
         }
     ) {
         NavHost(

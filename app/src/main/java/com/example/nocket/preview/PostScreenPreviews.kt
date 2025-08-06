@@ -1,5 +1,7 @@
 package com.example.nocket.preview
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -7,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.grid.CameraButton
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.grid.PostGridItem
@@ -55,13 +58,15 @@ fun CameraButtonPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Post Detail Screen", showBackground = true)
 @Composable
 fun PostDetailScreenPreview() {
     AppTheme {
         PostDetailScreen(
             post = SampleData.samplePosts.first { it.thumbnailUrl != null },
-            onBack = {}
+            onBack = {},
+            navController = rememberNavController()
         )
     }
 }
@@ -77,6 +82,7 @@ fun CameraScreenPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Post Grid Without Camera", showBackground = true)
 @Composable
 fun PostGridWithoutCameraPreview() {

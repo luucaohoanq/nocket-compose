@@ -42,7 +42,8 @@ fun HomeScreen(
         selectedPost != null -> {
             PostDetailScreen(
                 post = selectedPost!!,
-                onBack = { selectedPost = null }
+                onBack = { selectedPost = null },
+                navController = navController
             )
         }
 

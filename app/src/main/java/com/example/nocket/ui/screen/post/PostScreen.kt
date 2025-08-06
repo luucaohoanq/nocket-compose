@@ -1,5 +1,7 @@
 package com.example.nocket.ui.screen.post
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,15 +43,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.example.nocket.Screen
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.pill.MessageInputPill
+import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
+import com.example.nocket.models.User
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
@@ -62,7 +69,8 @@ fun PostScreen(
         selectedPost != null -> {
             PostDetailScreen(
                 post = selectedPost!!,
-                onBack = { selectedPost = null }
+                onBack = { selectedPost = null },
+                navController = navController
             )
         }
 
@@ -92,24 +100,28 @@ fun PostScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostDetailScreen(
     post: Post,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    navController: NavController
 ) {
+
+    var showNotifications by remember { mutableStateOf(false) }
+    var selectedUser by remember { mutableStateOf<User?>(User(id = "everyone", username = "Everyone", avatar = "")) }
+
+    val currentUser = SampleData.users[14]
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(post.user.username) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            MainTopBar(
+                navController = navController,
+                user = currentUser, // Using user 14 as the current user
+                onMessageClick = { navController.navigate(Screen.Message.route) },
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
+                onNotificationClick = { showNotifications = true },
+                onUserSelected = { user -> selectedUser = user }
             )
         }
     ) { paddingValues ->

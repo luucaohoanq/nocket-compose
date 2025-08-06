@@ -54,14 +54,28 @@ private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavIt
     return finalList to centerItem
 }
 
+/**
+ * Determines which bottom navigation items to show based on the current route
+ */
+private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> {
+    return when (currentRoute) {
+        Screen.Home.route -> sampleItems2 // Use sampleItems2 for Home screen
+        Screen.Profile.route -> sampleItems // Use full items for Profile screen
+        Screen.Setting.route -> sampleItems3 // Use sampleItems3 for Settings screen
+        else -> sampleItems2 // Default to sampleItems2 for other screens
+    }
+}
+
 @Composable
 fun MainBottomBar(
     navController: NavController = rememberNavController(),
     currentRoute: String?,
-    items: List<BottomNavItem> = sampleItems2,
+    items: List<BottomNavItem>? = null, // Make items optional
     onCameraClick: () -> Unit = { navController.navigate(Screen.Camera.route) }
 ) {
-    val (orderedItems, centerItem) = normalizeItems(items)
+    // Use provided items or determine items based on current route
+    val navItems = items ?: getBottomNavItems(currentRoute)
+    val (orderedItems, centerItem) = normalizeItems(navItems)
 
     NavigationBar(
         containerColor = Color.Transparent
@@ -234,6 +248,19 @@ fun MainBottomBar3Preview() {
             navController = rememberNavController(),
             currentRoute = Screen.Home.route,
             items = sampleItems3,
+            onCameraClick = { /* camera action */ }
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
+@Composable
+fun MainBottomBarAutoItemsPreview() {
+    MaterialTheme {
+        MainBottomBar(
+            navController = rememberNavController(),
+            currentRoute = Screen.Home.route,
+            items = null, // Test auto-selection of items
             onCameraClick = { /* camera action */ }
         )
     }
