@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,11 +42,13 @@ import coil3.compose.AsyncImage
 import com.example.nocket.Screen
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.submitPhotoBar
+import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import kotlin.div
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -163,6 +168,20 @@ fun SubmitPhotoScreen(
                 items = submitPhotoBar
             )
 
+            // Center-aligned friend list with selection capability
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                FriendList(
+                    user = currentUser,
+                    selectedFriendId = selectedUser?.id ?: "everyone",
+                    onFriendSelected = { user -> 
+                        selectedUser = user
+                    }
+                )
+            }
         }
     }
 

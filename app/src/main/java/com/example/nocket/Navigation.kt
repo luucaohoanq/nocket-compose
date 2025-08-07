@@ -63,7 +63,7 @@ fun Navigation() {
     ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Post.route
+            startDestination = Screen.SubmitPhoto.route
         ) {
             composable(Screen.Message.route) {
                 MessageScreen(navController)
