@@ -51,7 +51,7 @@ import coil3.compose.AsyncImage
 import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
-import com.example.nocket.ui.screen.post.PostDetailScreen
+import com.example.nocket.ui.screen.postdetail.PostDetailScreen
 import java.time.LocalDate
 
 enum class Month(

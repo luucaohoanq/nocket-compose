@@ -13,12 +13,12 @@ import com.example.nocket.components.pill.MessageInputPill
 import com.example.nocket.components.pill.UserListWithArrows
 import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.data.SampleData
-import com.example.nocket.ui.screen.home.HomeScreen
+import com.example.nocket.ui.screen.post.PostScreen
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenSamplePreview() {
-    HomeScreen(rememberNavController())
+    PostScreen(rememberNavController())
 }
 
 @Preview(showBackground = true)

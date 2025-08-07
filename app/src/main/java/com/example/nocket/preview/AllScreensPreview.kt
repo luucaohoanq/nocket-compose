@@ -18,9 +18,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.example.nocket.ui.screen.home.HomeScreen
-import com.example.nocket.ui.screen.message.MessageScreen
 import com.example.nocket.ui.screen.post.PostScreen
+import com.example.nocket.ui.screen.message.MessageScreen
 import com.example.nocket.ui.screen.settings.SettingScreen
 import com.example.nocket.ui.theme.AppTheme
 
@@ -43,7 +42,7 @@ fun AllScreensPreview(
         val navController = rememberNavController()
         
         when (screenType) {
-            "Home" -> HomeScreen(navController)
+            "Home" -> PostScreen(navController)
             "Messages" -> MessageScreen(navController)
             "Posts" -> PostScreen(navController)
             "Settings" -> SettingScreen(navController)

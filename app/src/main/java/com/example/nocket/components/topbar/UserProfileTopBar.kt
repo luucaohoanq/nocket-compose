@@ -101,7 +101,7 @@ fun UserProfileTopBar(
                 }
 
                 Button(
-                    onClick = { navController.navigate(Screen.Home.route) },
+                    onClick = { navController.navigate(Screen.Post.route) },
                     modifier = Modifier.size(40.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                 ) {
