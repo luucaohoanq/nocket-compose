@@ -58,55 +58,61 @@ fun FriendList(
     }
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
         modifier = androidx.compose.ui.Modifier
-            .fillMaxWidth()
-            .horizontalScroll(androidx.compose.foundation.rememberScrollState())
-            .padding(16.dp)
+            .padding(horizontal = 4.dp) // Small padding on edges
+            .padding(end = 16.dp) // Extra padding at the end for better scrolling
     ) {
         friends.forEach { friend ->
             Column(
                 horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = androidx.compose.ui.Modifier.padding(horizontal = 8.dp)
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
 
-                Circle(
-                    outerSize = 56.dp,
-                    gap = 5.dp,
-                    backgroundColor = Color(0xFF404137),
-                    borderColor = if (friend?.id == selectedFriendId) Color.Yellow else Color(
-                        0xFFB8B8B8
-                    ),
-                    onClick = { friend?.let { onFriendSelected(it) } },
-                    innerContent = {
-                        // Use alternative approach for preview compatibility
-                        if (androidx.compose.ui.platform.LocalInspectionMode.current) {
-                            // In preview mode, use Box with background color instead
-                            androidx.compose.foundation.Canvas(
-                                modifier = androidx.compose.ui.Modifier.fillMaxSize()
-                            ) {
-                                drawCircle(color = Color.Gray)
-                            }
-                        } else {
-                            // In real app, use AsyncImage with the correct avatar source
-                            AsyncImage(
-                                model = friend?.avatar?.ifEmpty { R.drawable.ic_launcher_background },
-                                contentDescription = "Avatar",
-                                contentScale = ContentScale.Crop,
-                            )
-                        }
-                    }
+                if (user == null) return
+
+                FriendItem(
+                    user = user,
+                    isSelected = friend?.id == selectedFriendId,
+                    onClick = { onFriendSelected(friend) }
                 )
 
                 Text(
-                    text = friend?.username ?: "Unknown",
+                    text = trimUsername(friend?.username ?: "Unknown"),
                     color = Color.White,
                 )
-
-
             }
         }
+    }
+}
+
+@Composable
+fun FriendItem(
+    user: User,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Circle(
+        outerSize = 56.dp,
+        gap = 5.dp,
+        backgroundColor = Color(0xFF404137),
+        borderColor = if (isSelected) Color.Yellow else Color(0xFFB8B8B8),
+        onClick = onClick,
+        innerContent = {
+            AsyncImage(
+                model = user.avatar.ifEmpty { R.drawable.ic_launcher_background },
+                contentDescription = "Avatar",
+                contentScale = ContentScale.Crop,
+            )
+        }
+    )
+}
+
+private fun trimUsername(username: String): String {
+    return if (username.length > 10) {
+        username.take(6) + "..."
+    } else {
+        username
     }
 }
 

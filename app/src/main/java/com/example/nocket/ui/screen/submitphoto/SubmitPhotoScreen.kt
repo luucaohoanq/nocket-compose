@@ -3,6 +3,7 @@ package com.example.nocket.ui.screen.submitphoto
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,13 +46,17 @@ import coil3.compose.AsyncImage
 import com.example.nocket.Screen
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.submitPhotoBar
+import com.example.nocket.components.list.FriendItem
 import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import kotlin.compareTo
 import kotlin.div
+
+val submitButtonSize = 80.dp
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -168,19 +176,37 @@ fun SubmitPhotoScreen(
                 items = submitPhotoBar
             )
 
-            // Center-aligned friend list with selection capability
+            // Friend list centered with submit button
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxWidth()
             ) {
-                FriendList(
-                    user = currentUser,
-                    selectedFriendId = selectedUser?.id ?: "everyone",
-                    onFriendSelected = { user -> 
-                        selectedUser = user
+                var containerWidth by remember { mutableIntStateOf(0) }
+                var itemWidth by remember { mutableIntStateOf(0) }
+                val scrollState = rememberScrollState()
+                val density = LocalDensity.current
+
+                LaunchedEffect(containerWidth, itemWidth) {
+                    if (containerWidth > 0 && itemWidth > 0) {
+                        val scrollOffset = (containerWidth / 2f - itemWidth / 2f).toInt()
+                        scrollState.scrollTo(scrollOffset)
                     }
-                )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            containerWidth = coordinates.size.width
+                        }
+                        .horizontalScroll(scrollState)
+                ) {
+
+                    FriendList(
+                        user = currentUser,
+                        selectedFriendId = selectedUser?.id ?: "everyone",
+                        onFriendSelected = { selectedUser = it }
+                    )
+                }
             }
         }
     }
