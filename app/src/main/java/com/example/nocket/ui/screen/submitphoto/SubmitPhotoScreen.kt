@@ -46,6 +46,7 @@ import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.submitPhotoBar
 import com.example.nocket.components.common.BackButtonPosition
 import com.example.nocket.components.common.CommonTopBar
+import com.example.nocket.components.indicator.PageIndicator
 import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
@@ -166,6 +167,14 @@ fun SubmitPhotoScreen(
                     }
                 }
             }
+
+            PageIndicator(
+                totalPages = 5,
+                currentPage = 2,
+                modifier = Modifier.size(100.dp),
+                inactiveColor = Color.Gray.copy(alpha = 0.3f)
+            )
+
             MainBottomBar(
                 navController,
                 items = submitPhotoBar
