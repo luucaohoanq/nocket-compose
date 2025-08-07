@@ -29,3 +29,5 @@ val BrownOnSurfaceVariant = Color(0xFFD4A574) // Light brown for variant text
 
 val BrownError = Color(0xFFCF6679)         // Error color
 val BrownOnError = Color(0xFF1C1611)       // Text on error
+
+val BackgroundPreview = Color(0xFF404137)

@@ -14,10 +14,11 @@ import com.example.nocket.components.grid.CameraButton
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.grid.PostGridItem
 import com.example.nocket.data.SampleData
-import com.example.nocket.ui.screen.post.CameraScreen
-import com.example.nocket.ui.screen.post.PostDetailScreen
+import com.example.nocket.ui.screen.camera.CameraScreen
+import com.example.nocket.ui.screen.postdetail.PostDetailScreen
 import com.example.nocket.ui.theme.AppTheme
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Post Grid", showBackground = true)
 @Composable
 fun PostGridPreview() {
@@ -31,6 +32,7 @@ fun PostGridPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Post Grid Item", showBackground = true)
 @Composable
 fun PostGridItemPreview() {
@@ -71,13 +73,13 @@ fun PostDetailScreenPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Camera Screen", showBackground = true)
 @Composable
 fun CameraScreenPreview() {
     AppTheme {
         CameraScreen(
-            onBack = {},
-            onPhotoTaken = {}
+            rememberNavController()
         )
     }
 }
@@ -96,6 +98,7 @@ fun PostGridWithoutCameraPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(name = "Post Grid Dark Theme", showBackground = true)
 @Composable
 fun PostGridDarkPreview() {
