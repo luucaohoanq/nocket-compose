@@ -62,6 +62,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.nocket.Screen
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
@@ -326,14 +328,16 @@ fun MainTopBar(
         },
         navigationIcon = {
             // Avatar
-            AsyncImage(
-                model = user?.avatar,
-                contentDescription = "Profile picture",
-                modifier = Modifier
-                    .size(avatarWidth)
-                    .clip(CircleShape)
-                    .clickable { onProfileClick() },
-                contentScale = ContentScale.Crop
+            Circle(
+                imageSetting = ImageSetting(
+                    imageUrl = user?.avatar,
+                    contentDescription = "Profile picture"
+                ),
+                gap = 0.dp,
+                outerSize = avatarWidth,
+                backgroundColor = Color(0xFF404137),
+                borderColor = Color(0xFFB8B8B8),
+                onClick = onProfileClick
             )
         },
         actions = {

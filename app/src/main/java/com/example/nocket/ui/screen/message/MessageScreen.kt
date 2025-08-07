@@ -41,7 +41,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.common.CommonTopBar
+import com.example.nocket.components.topbar.avatarWidth
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Message
 import java.time.LocalDateTime
@@ -57,6 +60,7 @@ fun MessageScreen(
             CommonTopBar(
                 navController = navController,
                 title = "Messages",
+                titleColor = Color.White,
                 actions = {
                     IconButton(onClick = { /* Handle search */ }) {
                         Icon(
@@ -99,18 +103,20 @@ fun MessageItem(message: Message) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Profile picture with online indicator
             Box {
-                AsyncImage(
-                    model = message.sender.avatar,
-                    contentDescription = "Profile picture",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                Circle(
+                    imageSetting = ImageSetting(
+                        imageUrl = message.sender.avatar,
+                        contentDescription = "Profile picture"
+                    ),
+                    gap = 0.dp,
+                    outerSize = 50.dp,
+                    backgroundColor = Color(0xFF404137),
+                    onClick = {}
                 )
 
                 // Online indicator
@@ -158,7 +164,7 @@ fun MessageItem(message: Message) {
                 Text(
                     text = message.previewContent,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.Gray,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
