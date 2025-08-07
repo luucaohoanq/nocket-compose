@@ -66,6 +66,7 @@ enum class BackButtonPosition {
 fun CommonTopBar(
     navController: NavController,
     title: String = "Nocket",
+    titleColor: Color = MaterialTheme.colorScheme.onBackground,
     user: User? = null,
     actions: @Composable RowScope.() -> Unit = {},
     bottomContent: @Composable (() -> Unit)? = null,
@@ -83,7 +84,7 @@ fun CommonTopBar(
                 ) {
                     Text(
                         text = displayTitle,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = titleColor,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.titleLarge
                     )
