@@ -21,10 +21,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -56,6 +58,8 @@ import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.compose.rememberNavController
 
 enum class BackButtonPosition {
     Start, End
@@ -71,7 +75,8 @@ fun CommonTopBar(
     actions: @Composable RowScope.() -> Unit = {},
     bottomContent: @Composable (() -> Unit)? = null,
     showBackButton: Boolean = true,
-    backButtonPosition: BackButtonPosition = BackButtonPosition.Start
+    backButtonPosition: BackButtonPosition = BackButtonPosition.Start,
+    backButtonIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
 ) {
     val displayTitle = user?.username ?: title
 
@@ -92,12 +97,12 @@ fun CommonTopBar(
             },
             navigationIcon = {
                 if (showBackButton && backButtonPosition == BackButtonPosition.Start) {
-                    BackButton(navController, backButtonPosition)
+                    BackButton(navController, backButtonPosition, backButtonIcon)
                 }
             },
             actions = {
                 if (showBackButton && backButtonPosition == BackButtonPosition.End) {
-                    BackButton(navController, backButtonPosition)
+                    BackButton(navController, backButtonPosition, backButtonIcon)
                 }
                 actions()
             },
@@ -111,7 +116,10 @@ fun CommonTopBar(
 }
 
 @Composable
-private fun BackButton(navController: NavController, backButtonPosition: BackButtonPosition) {
+private fun BackButton(
+    navController: NavController, backButtonPosition: BackButtonPosition,
+    backButtonIcon: ImageVector
+) {
     IconButton(onClick = {
         if (navController.previousBackStackEntry != null) {
             navController.popBackStack()
@@ -122,7 +130,7 @@ private fun BackButton(navController: NavController, backButtonPosition: BackBut
         when (backButtonPosition) {
             BackButtonPosition.Start -> {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = backButtonIcon,
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -130,7 +138,7 @@ private fun BackButton(navController: NavController, backButtonPosition: BackBut
 
             BackButtonPosition.End -> {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    imageVector = backButtonIcon,
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -138,4 +146,15 @@ private fun BackButton(navController: NavController, backButtonPosition: BackBut
         }
 
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun CommonTopBarPreview() {
+    CommonTopBar(
+        navController = rememberNavController(),
+        title = "Send to...",
+        backButtonPosition = BackButtonPosition.End,
+        backButtonIcon = Icons.Outlined.Download
+    )
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,6 +44,8 @@ import coil3.compose.AsyncImage
 import com.example.nocket.Screen
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.submitPhotoBar
+import com.example.nocket.components.common.BackButtonPosition
+import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
@@ -85,13 +88,11 @@ fun SubmitPhotoScreen(
 
     Scaffold(
         topBar = {
-            MainTopBar(
+            CommonTopBar(
                 navController = navController,
-                user = currentUser, // Using user 14 as the current user
-                onMessageClick = { navController.navigate(Screen.Message.route) },
-                onProfileClick = { navController.navigate(Screen.Profile.route) },
-                onNotificationClick = { showNotifications = true },
-                onUserSelected = { user -> selectedUser = user }
+                title = "Send to...",
+                backButtonPosition = BackButtonPosition.End,
+                backButtonIcon = Icons.Outlined.Download
             )
         }
     ) { paddingValues ->
