@@ -92,6 +92,7 @@ fun MainBottomBar(
     // Use provided items or determine items based on current route
     val (orderedItems, centerItem) = normalizeItems(items)
     val centerIconNavigation = items.find { it.isCenter }?.route ?: Screen.Post.route
+    
     NavigationBar(
         containerColor = Color.Transparent,
         modifier = modifier
@@ -116,7 +117,11 @@ fun MainBottomBar(
                             else Color.Yellow,
                             shape = CircleShape
                         )
-                        .clickable { navController.navigate(centerIconNavigation) },
+                        .clickable { 
+                            if (centerIconNavigation.isNotEmpty()) {
+                                navController.navigate(centerIconNavigation)
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -275,7 +280,7 @@ val takePhotoBar = listOf(
         title = "Take a picture",
         selectedIcon = null,
         unselectedIcon = null,
-        route = Screen.SubmitPhoto.route,
+        route = "submit_photo",  // Using string directly to ensure consistency
         customSizeCenter = 80.dp,
         isCenter = true
     ),
