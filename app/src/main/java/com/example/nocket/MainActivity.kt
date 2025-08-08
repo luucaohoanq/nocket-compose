@@ -2,6 +2,7 @@ package com.example.nocket
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,7 +18,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nocket.extensions.edgeToEdgeWithStyle
 import com.example.nocket.ui.theme.AppTheme
+import com.example.nocket.viewmodels.AppwriteViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,10 +29,9 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
-
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
+        edgeToEdgeWithStyle()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent { NocketApp() }
@@ -37,12 +40,17 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NocketApp() {
+fun NocketApp(
+    viewModel: AppwriteViewModel = viewModel(),
+) {
+    val projectInfo = viewModel.getProjectInfo()
+
     AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
+//            Log.d("NocketApp", "Project Info: $projectInfo")
             Navigation()
         }
     }
