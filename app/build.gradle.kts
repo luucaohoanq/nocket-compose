@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -24,6 +26,24 @@ android {
         }
 
         manifestPlaceholders["appAuthRedirectScheme"] = "com.example.nocket"
+
+        // Read from local.properties
+        val properties = Properties()
+        if (rootProject.file("local.properties").exists()) {
+            properties.load(project.rootProject.file("local.properties").inputStream())
+        } else {
+            throw RuntimeException("local.properties file not found")
+        }
+
+        // Define BuildConfig fields without revealing fallback values
+        buildConfigField("String", "APPWRITE_VERSION",
+        "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException("appwrite.version not found in local.properties")}\"")
+        buildConfigField("String", "APPWRITE_PROJECT_ID",
+        "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException("appwrite.project.id not found in local.properties")}\"")
+        buildConfigField("String", "APPWRITE_PROJECT_NAME",
+        "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException("appwrite.project.name not found in local.properties")}\"")
+        buildConfigField("String", "APPWRITE_PUBLIC_ENDPOINT",
+        "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException("appwrite.endpoint not found in local.properties")}\"")
     }
 
     buildTypes {
@@ -44,6 +64,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -58,7 +79,11 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation (libs.play.services.auth) // hoặc bản mới nhất
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // compose platform
     implementation(platform(libs.androidx.compose.bom))
+
+    // ui, preview & material
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -102,7 +127,11 @@ dependencies {
     implementation (libs.androidx.camera.view.v131)
     implementation (libs.barcode.scanning)
 
-    implementation(libs.osmdroid.android)
+    // appwrite
+    implementation(libs.appwrite)
+
+    // splashscreen
+    implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.appauth)
     implementation(libs.androidx.browser)
@@ -114,6 +143,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // debug libraries
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

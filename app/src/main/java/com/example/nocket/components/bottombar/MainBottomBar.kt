@@ -33,11 +33,14 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.material.icons.outlined.ViewCozy
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
+import kotlinx.coroutines.launch
 
 data class BottomNavItem(
     val title: String? = null,
@@ -55,7 +59,8 @@ data class BottomNavItem(
     val unselectedIcon: ImageVector? = null,
     val route: String,
     val isCenter: Boolean = false, // flag để xác định button special (ví dụ camera)
-    val customSizeCenter: Dp = 56.dp // Kích thước tùy chỉnh cho button center
+    val customSizeCenter: Dp = 56.dp, // Kích thước tùy chỉnh cho button center
+    val onClick: (() -> Unit)? = null // Callback khi nhấn vào item
 )
 
 private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavItem>, BottomNavItem?> {
@@ -83,16 +88,22 @@ private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainBottomBar(
     navController: NavController,
     items: List<BottomNavItem>,
     modifier: Modifier = Modifier,
+    onItemClick: (BottomNavItem) -> Unit = { }
 ) {
     // Use provided items or determine items based on current route
     val (orderedItems, centerItem) = normalizeItems(items)
     val centerIconNavigation = items.find { it.isCenter }?.route ?: Screen.Post.route
-    
+
+    //bottom sheet
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
     NavigationBar(
         containerColor = Color.Transparent,
         modifier = modifier
@@ -308,10 +319,10 @@ val submitPhotoBar = listOf(
         isCenter = true
     ),
     BottomNavItem(
-        title = "Share",
+        title = "Captions List",
         selectedIcon = Icons.Filled.MotionPhotosAuto,
         unselectedIcon = Icons.Outlined.MotionPhotosAuto,
-        route = ""
+        route = "",
     )
 )
 
