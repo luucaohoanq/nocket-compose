@@ -1,7 +1,5 @@
 package com.example.nocket.repositories
 
-import android.content.Context
-import com.example.nocket.constants.AppwriteConfig
 import com.example.nocket.models.appwrite.Log
 import io.appwrite.Client
 import io.appwrite.exceptions.AppwriteException
@@ -12,6 +10,8 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * [AppwriteRepository] is responsible for handling network interactions with the Appwrite server.
@@ -21,15 +21,14 @@ import java.util.Locale
  * **NOTE: This repository will be removed once the Appwrite SDK includes a native `client.ping()` method.**\
  * TODO: remove this repository once sdk has `client.ping()`
  */
-class AppwriteRepository private constructor(context: Context) {
+@Singleton
+class AppwriteRepository @Inject constructor(
+    private val client: Client,
+    private val account: Account,
+    private val databases: Databases
+) {
 
     // Appwrite Client and Services
-    private val client = Client(context.applicationContext)
-        .setProject(AppwriteConfig.APPWRITE_PROJECT_ID)
-        .setEndpoint(AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT)
-
-    private val account: Account = Account(client)
-    private val databases: Databases = Databases(client)
 
     /**
      * Pings the Appwrite server.
@@ -42,14 +41,7 @@ class AppwriteRepository private constructor(context: Context) {
 
         return try {
             val response = withContext(Dispatchers.IO) { client.ping() }
-
-            Log(
-                date = date,
-                status = "200",
-                method = "GET",
-                path = "/ping",
-                response = response
-            )
+            Log(date = date, status = "200", method = "GET", path = "/ping", response = response)
         } catch (exception: AppwriteException) {
             Log(
                 date = date,
@@ -69,20 +61,5 @@ class AppwriteRepository private constructor(context: Context) {
     private fun getCurrentDate(): String {
         val formatter = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
         return formatter.format(Date())
-    }
-
-    companion object {
-        @Volatile
-        private var INSTANCE: AppwriteRepository? = null
-
-        /**
-         * Singleton factory method to get the instance of AppwriteRepository.
-         * Ensures thread safety
-         */
-        fun getInstance(context: Context): AppwriteRepository {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AppwriteRepository(context).also { INSTANCE = it }
-            }
-        }
     }
 }
