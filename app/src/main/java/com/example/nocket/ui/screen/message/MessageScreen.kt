@@ -43,6 +43,7 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
+import com.example.nocket.components.circle.ImageSource
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.topbar.avatarWidth
 import com.example.nocket.data.SampleData

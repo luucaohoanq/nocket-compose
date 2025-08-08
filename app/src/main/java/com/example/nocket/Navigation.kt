@@ -6,8 +6,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nocket.models.auth.AuthState
+import com.example.nocket.ui.screen.auth.LoginScreen
+import com.example.nocket.viewmodels.AuthViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,6 +27,7 @@ import com.example.nocket.ui.screen.submitphoto.SubmitPhotoScreen
 import com.example.nocket.viewmodels.AppwriteViewModel
 
 sealed class Screen(val route: String) {  //enum
+    object Login : Screen("login")
     object Message : Screen("message")
     object Post: Screen("post")
     object SubmitPhoto: Screen("submit_photo")
@@ -43,16 +49,18 @@ sealed class Screen(val route: String) {  //enum
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(
-    viewModel: AppwriteViewModel = viewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
-    //val viewModel = hiltViewModel<MainViewModel>()
+    val authState by authViewModel.authState.collectAsState()
     
     // Define routes where bottom bar should be hidden
     val hideBottomBarRoutes = setOf(
         Screen.Message.route,
         Screen.Profile.route,
         Screen.Setting.route,
+        Screen.Login.route,
     )
     
     // Track current route as state that updates with navigation changes
@@ -62,13 +70,31 @@ fun Navigation(
     // Check if bottom bar should be shown for current route
     val showBottomBar = currentRoute !in hideBottomBarRoutes
 
+    // Determine start destination based on auth state
+    val startDestination = when (authState) {
+        is AuthState.Authenticated -> Screen.Post.route
+        is AuthState.Unauthenticated -> Screen.Login.route
+        is AuthState.Loading -> Screen.Login.route // Show login while loading
+        is AuthState.Error -> Screen.Login.route
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.SubmitPhoto.route
+            startDestination = startDestination
         ) {
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    onLoginSuccess = {
+                        navController.navigate(Screen.Post.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable(Screen.Message.route) {
                 MessageScreen(navController)
             }
@@ -86,7 +112,7 @@ fun Navigation(
             }
 
             composable(Screen.Setting.route) {
-                SettingScreen(navController, viewModel)
+                SettingScreen(navController, appwriteViewModel, authViewModel)
             }
 
             composable(Screen.Camera.route){
@@ -102,5 +128,4 @@ fun Navigation(
             }
         }
     }
-
 }

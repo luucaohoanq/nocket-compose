@@ -18,7 +18,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 import com.example.nocket.extensions.edgeToEdgeWithStyle
 import com.example.nocket.ui.theme.AppTheme
 import com.example.nocket.viewmodels.AppwriteViewModel
@@ -41,9 +42,10 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NocketApp(
-    viewModel: AppwriteViewModel = viewModel(),
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val projectInfo = viewModel.getProjectInfo()
+    val projectInfo = appwriteViewModel.getProjectInfo()
 
     AppTheme {
         Surface(
@@ -51,7 +53,7 @@ fun NocketApp(
             color = MaterialTheme.colorScheme.background
         ) {
 //            Log.d("NocketApp", "Project Info: $projectInfo")
-            Navigation(viewModel)
+            Navigation(appwriteViewModel, authViewModel)
         }
     }
 }

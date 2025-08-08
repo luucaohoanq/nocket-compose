@@ -32,6 +32,11 @@ data class IconSetting(
     val contentDescription: String? = null
 )
 
+sealed class ImageSource {
+    data class Url(val value: String? = "https://images.unsplash.com/photo-1710987812255-f8aaa57b96eb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") : ImageSource()
+    data class Resource(val resId: Int) : ImageSource()
+}
+
 data class ImageSetting(
     val imageUrl: String? = "https://images.unsplash.com/photo-1710987812255-f8aaa57b96eb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     val contentDescription: String? = null
