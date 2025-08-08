@@ -18,16 +18,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,14 +51,17 @@ import com.example.nocket.components.common.BackButtonPosition
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.indicator.PageIndicator
 import com.example.nocket.components.list.FriendList
+import com.example.nocket.components.sheet.CaptionBottomSheet
 import com.example.nocket.components.topbar.MainTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import kotlinx.coroutines.launch
 
 val submitButtonSize = 80.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SubmitPhotoScreen(
@@ -85,6 +91,11 @@ fun SubmitPhotoScreen(
     }
     // Use the passed onCameraClick instead of navigating to CameraXScreen
 
+    // Add bottom sheet state
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    var showCaptionSheet by remember { mutableStateOf(false) }
+
     val currentUser = SampleData.users[14]
 
     Scaffold(
@@ -97,8 +108,20 @@ fun SubmitPhotoScreen(
             )
         }
     ) { paddingValues ->
+        // Add CaptionBottomSheet when needed
+        if (showCaptionSheet) {
+            CaptionBottomSheet(
+                sheetState = sheetState,
+                onDismiss = {
+                    showCaptionSheet = false
+                    coroutineScope.launch { sheetState.hide() }
+                }
+            )
+        }
+
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -177,7 +200,13 @@ fun SubmitPhotoScreen(
 
             MainBottomBar(
                 navController,
-                items = submitPhotoBar
+                items = submitPhotoBar,
+                onItemClick = { item ->
+                    if (item.title == "Captions List") {
+                        showCaptionSheet = true
+                        coroutineScope.launch { sheetState.show() }
+                    }
+                }
             )
 
             // Friend list centered with submit button
