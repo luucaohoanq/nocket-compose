@@ -1,6 +1,6 @@
 # 📸 Nocket App
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blue?logo=kotlin)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue?logo=kotlin)](https://kotlinlang.org/)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
 [![Hilt](https://img.shields.io/badge/Hilt-DI-FF6F00?logo=dagger)](https://dagger.dev/hilt/)
 [![Appwrite](https://img.shields.io/badge/Appwrite-Cloud-F02E65?logo=appwrite)](https://appwrite.io/)
