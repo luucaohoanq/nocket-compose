@@ -11,6 +11,7 @@ data class Message @RequiresApi(Build.VERSION_CODES.O) constructor(
     val senderId: String,
     val recipientId: String,
     val previewContent: String = "", //one line preview of the message content
+    var content: String = "", //full message content, can be empty for preview
     val timeSent: String = LocalDateTime.now().toString(), //ISO 8601 format
     val isRead: Boolean = false
 ){
@@ -22,6 +23,7 @@ data class Message @RequiresApi(Build.VERSION_CODES.O) constructor(
                 senderId = data["senderId"] as? String ?: "",
                 recipientId = data["recipientId"] as? String ?: "",
                 previewContent = data["previewContent"] as? String ?: "",
+                content = data["content"] as? String ?: "",
                 timeSent = data["\$createdAt"] as? String ?: LocalDateTime.now().toString(),
                 isRead = data["isRead"] as? Boolean ?: false
             )

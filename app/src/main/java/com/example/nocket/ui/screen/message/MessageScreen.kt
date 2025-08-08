@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -116,26 +117,65 @@ fun MessageScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(groupedConversations) { message ->
-                MessageItem(
-                    message = message,
-                    sender = users[message.senderId],
-                    onClick = {
-                        // Navigate to chat detail screen with this sender
-                        navController.navigate("chat/${message.senderId}")
-                    }
+        if (groupedConversations.isEmpty()) {
+            // Empty state when no conversations are available
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "No messages",
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
-            }
-
-            item {
+                
                 Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "No messages yet",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "Your conversations will appear here",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                // Remove test conversation card since we're in production mode
+            }
+        } else {
+            // Show list of conversations
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(groupedConversations) { message ->
+                    MessageItem(
+                        message = message,
+                        sender = users[message.senderId],
+                        onClick = {
+                            // Navigate to chat detail screen with this sender
+                            navController.navigate("chat/${message.senderId}")
+                        }
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
@@ -169,7 +209,7 @@ fun MessageItem(
             Box {
                 Circle(
                     imageSetting = ImageSetting(
-                        imageUrl = senderAvatar.ifEmpty { SampleData.users.first().avatar },
+                        imageUrl = senderAvatar.ifEmpty { SampleData.imageNotAvailable },
                         contentDescription = "Profile picture"
                     ),
                     gap = 0.dp,
@@ -233,7 +273,14 @@ fun MessageItem(
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatTime(timeString: String): String {
     return try {
-        val time = LocalDateTime.parse(timeString)
+        val time = if (timeString.contains("T")) {
+            LocalDateTime.parse(timeString)
+        } else {
+            // Handle ISO-8601 format without T separator
+            val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            LocalDateTime.parse(timeString, formatter)
+        }
+        
         val now = LocalDateTime.now()
 
         when {
@@ -245,11 +292,16 @@ fun formatTime(timeString: String): String {
                 "Yesterday"
             }
 
-            else -> {
+            time.year == now.year -> {
                 time.format(DateTimeFormatter.ofPattern("MMM d"))
+            }
+
+            else -> {
+                time.format(DateTimeFormatter.ofPattern("yyyy MMM d"))
             }
         }
     } catch (e: Exception) {
+        // If we can't parse the time string, just return "Now"
         "Now"
     }
 }
