@@ -48,24 +48,27 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
 import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
     navController: NavHostController = rememberNavController(),
-    viewModel: AppwriteViewModel
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     // Collect data from viewModel
-    val settings by viewModel.settings.collectAsState()
+    val settings by appwriteViewModel.settings.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getAllSetting()
+        appwriteViewModel.getAllSetting()
     }
 
     // Render UI with collected data
@@ -73,7 +76,10 @@ fun SettingScreen(
         settings = settings,
         navController = navController,
         onToggleChanged = { settingId, isToggled ->
-            viewModel.updateSettingToggle(settingId, isToggled)
+            appwriteViewModel.updateSettingToggle(settingId, isToggled)
+        },
+        onLogout = {
+            authViewModel.logout()
         }
     )
 }
@@ -83,7 +89,8 @@ fun SettingScreen(
 fun SettingScreenContent(
     settings: List<Setting>,
     navController: NavHostController = rememberNavController(),
-    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> }
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
+    onLogout: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -112,7 +119,8 @@ fun SettingScreenContent(
                 items(settingItems) { setting ->
                     SettingItem(
                         setting = setting,
-                        onToggleChanged = onToggleChanged
+                        onToggleChanged = onToggleChanged,
+                        onLogout = if (setting.title.contains("Sign out", ignoreCase = true)) onLogout else null
                     )
                 }
 
@@ -149,7 +157,8 @@ fun SettingSectionHeader(settingType: SettingType) {
 @Composable
 fun SettingItem(
     setting: Setting,
-    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> }
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
+    onLogout: (() -> Unit)? = null
 ) {
     val isDangerZone = setting.type == SettingType.DANGER_ZONE
     var isToggled = setting.isToggled
@@ -168,6 +177,9 @@ fun SettingItem(
             if (setting.isToggleable) {
                 // Pass both the setting ID and the new toggle state (opposite of current)
                 onToggleChanged(setting.id, !setting.isToggled)
+            } else if (setting.title.contains("Sign out", ignoreCase = true) && onLogout != null) {
+                // Handle logout
+                onLogout()
             }
             // Handle other settings click
         }

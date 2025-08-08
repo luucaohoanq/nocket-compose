@@ -64,6 +64,7 @@ import coil3.compose.AsyncImage
 import com.example.nocket.Screen
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
+import com.example.nocket.components.circle.ImageSource
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
@@ -330,8 +331,7 @@ fun MainTopBar(
             // Avatar
             Circle(
                 imageSetting = ImageSetting(
-                    imageUrl = user?.avatar,
-                    contentDescription = "Profile picture"
+                    ImageSource.Url(user?.avatar)
                 ),
                 gap = 0.dp,
                 outerSize = avatarWidth,

@@ -3,6 +3,7 @@ package com.example.nocket.di
 
 import android.content.Context
 import com.example.nocket.constants.AppwriteConfig
+import com.example.nocket.repositories.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,5 +38,14 @@ object AppwriteModule {
     @Singleton
     fun provideDatabases(client: Client): Databases {
         return Databases(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        account: Account,
+        @ApplicationContext context: Context
+    ): AuthRepository {
+        return AuthRepository(account, context)
     }
 }
