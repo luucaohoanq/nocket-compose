@@ -121,7 +121,11 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation(libs.okhttp.urlconnection)
+
+    // accompanist
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.pager)
+
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.coil.compose)
 

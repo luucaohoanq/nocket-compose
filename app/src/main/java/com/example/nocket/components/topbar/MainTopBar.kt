@@ -331,7 +331,8 @@ fun MainTopBar(
             // Avatar
             Circle(
                 imageSetting = ImageSetting(
-                    ImageSource.Url(user?.avatar)
+                    imageUrl = user?.avatar,
+                    contentDescription = "Profile picture"
                 ),
                 gap = 0.dp,
                 outerSize = avatarWidth,

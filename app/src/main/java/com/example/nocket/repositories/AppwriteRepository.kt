@@ -6,6 +6,7 @@ import com.example.nocket.models.SettingType
 import com.example.nocket.models.appwrite.Log
 import com.example.nocket.utils.mapToResponse
 import io.appwrite.Client
+import io.appwrite.Query
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.DocumentList
 import io.appwrite.services.Account
@@ -36,8 +37,13 @@ class AppwriteRepository @Inject constructor(
     suspend fun getAllSetting(): List<Setting> {
         val res: DocumentList<Map<String, Any>> = databases.listDocuments(
             databaseId = DBConfig.DATABASE_ID,
-            collectionId = DBConfig.SETTINGS_COLLECTION_ID
+            collectionId = DBConfig.SETTINGS_COLLECTION_ID,
+            queries =  listOf(
+                Query.limit(50)
+            )
         )
+
+        android.util.Log.d("AppwriteRepository", "Fetched settings: ${res.documents.size} documents")
 
         return mapToResponse(res) { data ->
             Setting(

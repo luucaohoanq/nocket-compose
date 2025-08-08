@@ -3,6 +3,7 @@ package com.example.nocket
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -29,8 +30,8 @@ import com.example.nocket.viewmodels.AppwriteViewModel
 sealed class Screen(val route: String) {  //enum
     object Login : Screen("login")
     object Message : Screen("message")
-    object Post: Screen("post")
-    object SubmitPhoto: Screen("submit_photo")
+    object Post : Screen("post")
+    object SubmitPhoto : Screen("submit_photo")
     object PostDetail : Screen("post_detail/{postId}")
     object Profile : Screen("profile")
     object Relationship : Screen("relationship")
@@ -54,7 +55,7 @@ fun Navigation(
 ) {
     val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsState()
-    
+
     // Define routes where bottom bar should be hidden
     val hideBottomBarRoutes = setOf(
         Screen.Message.route,
@@ -62,11 +63,11 @@ fun Navigation(
         Screen.Setting.route,
         Screen.Login.route,
     )
-    
+
     // Track current route as state that updates with navigation changes
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-    
+
     // Check if bottom bar should be shown for current route
     val showBottomBar = currentRoute !in hideBottomBarRoutes
 
@@ -76,10 +77,12 @@ fun Navigation(
         is AuthState.Unauthenticated -> Screen.Login.route
         is AuthState.Loading -> Screen.Login.route // Show login while loading
         is AuthState.Error -> Screen.Login.route
+        AuthState.PasswordResetSent -> TODO()
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) {
         NavHost(
             navController = navController,
@@ -108,23 +111,23 @@ fun Navigation(
             }
 
             composable(Screen.Relationship.route) {
-                PlaceholderScreen(title = "Relationships", navController =  navController)
+                PlaceholderScreen(title = "Relationships", navController = navController)
             }
 
             composable(Screen.Setting.route) {
                 SettingScreen(navController, appwriteViewModel, authViewModel)
             }
 
-            composable(Screen.Camera.route){
+            composable(Screen.Camera.route) {
                 CameraScreen(navController = navController)
             }
 
-            composable(Screen.SubmitPhoto.route){
+            composable(Screen.SubmitPhoto.route) {
                 SubmitPhotoScreen(navController)
             }
 
             composable(Screen.Detail.route) {
-                PlaceholderScreen(title = "Detail",navController =  navController)
+                PlaceholderScreen(title = "Detail", navController = navController)
             }
         }
     }

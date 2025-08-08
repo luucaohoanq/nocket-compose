@@ -35,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,12 +47,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
+import com.example.nocket.models.auth.AuthState
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
+import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
 
 enum class Month(
@@ -91,9 +95,28 @@ fun calculateDaysOfMonthInYear(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserProfile(
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val user = SampleData.users[0] // Current user
+    // Get current authenticated user
+    val authState by authViewModel.authState.collectAsState()
+
+    // Use authState.user if authenticated, fallback to sample data if not
+    val currentUser = when (authState) {
+        is AuthState.Authenticated -> (authState as AuthState.Authenticated).user
+        else -> null
+    }
+
+    // If user is authenticated, display their profile
+    // Otherwise, use sample data (for development/preview)
+    val user = currentUser?.let {
+        // Map AuthUser to User model that the UI expects
+        com.example.nocket.models.User(
+            id = it.id,
+            username = it.name ?: "User",
+        )
+    } ?: SampleData.users[0]  // Fallback to sample data if no authenticated user
+
     val posts = SampleData.samplePosts.filter { it.user.id == user.id }
     var selectedPost by remember { mutableStateOf<Post?>(null) }
 
@@ -150,7 +173,16 @@ fun UserProfile(
 }
 
 @Composable
-private fun ProfileHeader(user: com.example.nocket.models.User) {
+private fun ProfileHeader(
+    user: com.example.nocket.models.User,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
+    // Get current authenticated user to access email (not in User model)
+    val authState by authViewModel.authState.collectAsState()
+    val authUser = if (authState is AuthState.Authenticated) {
+        (authState as AuthState.Authenticated).user
+    } else null
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -170,14 +202,22 @@ private fun ProfileHeader(user: com.example.nocket.models.User) {
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Email (only if authenticated)
+            authUser?.email?.let { email ->
+                Text(
+                    text = email,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Handle with link icon
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "@lcaohoanq",
+                    text = "@${user.username}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -14,7 +14,7 @@ import com.example.nocket.data.SampleData
 fun SettingScreenTopBar(navController: NavController) {
     CommonTopBar(
         navController = navController,
-        user = SampleData.users[0],
+        title = "Settings",
         backButtonPosition = BackButtonPosition.End,
         backButtonIcon = Icons.AutoMirrored.Filled.ArrowForward
     )
