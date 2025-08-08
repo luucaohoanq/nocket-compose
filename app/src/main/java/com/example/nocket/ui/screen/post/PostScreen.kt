@@ -6,45 +6,47 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.nocket.Screen
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.sampleItems2
 import com.example.nocket.components.grid.PostGrid
 import com.example.nocket.components.topbar.MainTopBar
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
-import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import com.example.nocket.models.auth.AuthState
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
-import java.time.LocalDateTime
-
-@RequiresApi(Build.VERSION_CODES.O)
-val post = Post(
-    id = "camera",
-    user = SampleData.users[14], // Current user
-    caption = "Take a photo",
-    thumbnailUrl = "https://picsum.photos/400/300?random=56",
-    createdAt = LocalDateTime.now().toString(),
-    postType = PostType.IMAGE
-)
-
+import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    appwriteViewModel: AppwriteViewModel = hiltViewModel()
 ) {
+    val authState by authViewModel.authState.collectAsState()
+    val posts by appwriteViewModel.posts.collectAsState()
+    
     var selectedPost by remember { mutableStateOf<Post?>(null) }
     var showNotifications by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     // Track the selected user for filtering posts
     var selectedUser by remember {
@@ -57,12 +59,24 @@ fun PostScreen(
         )
     }
 
-    // Current user (for "You" option)
-    val currentUser = SampleData.users[14]
-
-    // Create a dummy post for camera mode
-    val dummyPost = remember {
-        post
+    // Get current user from auth state
+    val currentUser = if (authState is AuthState.Authenticated) {
+        val authUser = (authState as AuthState.Authenticated).user
+        User(
+            id = authUser.id,
+            username = authUser.name ?: "You",
+            avatar = authUser.avatar
+        )
+    } else null
+    
+    // Fetch posts when authenticated
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Authenticated) {
+            isLoading = true
+            val user = (authState as AuthState.Authenticated).user
+            appwriteViewModel.getAllPostsOfUserAndFriends(user)
+            isLoading = false
+        }
     }
 
     when {
@@ -81,11 +95,33 @@ fun PostScreen(
                     topBar = {
                         MainTopBar(
                             navController = navController,
-                            user = currentUser, // Using user 14 as the current user
+                            user = currentUser ?: User(id = "", username = "Guest", avatar = ""),
                             onMessageClick = { navController.navigate(Screen.Message.route) },
                             onProfileClick = { navController.navigate(Screen.Profile.route) },
                             onNotificationClick = { showNotifications = true },
-                            onUserSelected = { user -> selectedUser = user }
+                            onUserSelected = { user -> 
+                                selectedUser = user
+                                // Null safety: only proceed if user is not null
+                                user?.let { nonNullUser ->
+                                    // Fetch posts for selected user if it's not "everyone"
+                                    if (nonNullUser.id != "everyone" && nonNullUser.id != "you" && authState is AuthState.Authenticated) {
+                                        appwriteViewModel.getPostsForUser(nonNullUser.id)
+                                    } else if (nonNullUser.id == "you" && currentUser != null) {
+                                        // Fetch current user's posts
+                                        appwriteViewModel.getPostsForUser(currentUser.id)
+                                    } else if (authState is AuthState.Authenticated) {
+                                        // Fetch all posts
+                                        val authUser = (authState as AuthState.Authenticated).user
+                                        appwriteViewModel.getAllPostsOfUserAndFriends(authUser)
+                                    }
+                                } ?: run {
+                                    // Handle case where user is null - default to showing all posts
+                                    if (authState is AuthState.Authenticated) {
+                                        val authUser = (authState as AuthState.Authenticated).user
+                                        appwriteViewModel.getAllPostsOfUserAndFriends(authUser)
+                                    }
+                                }
+                            }
                         )
                     },
                 ) { paddingValues ->
@@ -98,29 +134,38 @@ fun PostScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .weight(1f)
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
                         ) {
-                            // Filter posts based on selected user
-                            val filteredPosts = when (selectedUser?.id) {
-                                "everyone" -> SampleData.samplePosts // Show all posts
-                                "you" -> SampleData.samplePosts.filter { it.user.id == currentUser.id } // Show only current user's posts
-                                else -> SampleData.samplePosts.filter { it.user.id == selectedUser?.id } // Show selected user's posts
+                            if (isLoading) {
+                                CircularProgressIndicator()
+                            } else if (posts.isEmpty()) {
+                                // Show empty state
+                                Text(
+                                    text = "No posts yet.\nPosts from you and your friends will appear here.",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            } else {
+                                // Filter posts based on selected user
+                                val filteredPosts = when (selectedUser?.id) {
+                                    "everyone" -> posts // Show all posts
+                                    "you" -> posts.filter { it.user.id == currentUser?.id } // Show only current user's posts
+                                    null -> posts // Show all posts if selectedUser is null
+                                    else -> posts.filter { it.user.id == selectedUser!!.id } // Show selected user's posts
+                                }
+
+                                PostGrid(
+                                    posts = filteredPosts,
+                                    onPostClick = { post -> selectedPost = post },
+                                )
                             }
-
-                            // Sort posts by creation time (newest first)
-                            val sortedPosts = filteredPosts.sortedByDescending { it.createdAt }
-
-                            PostGrid(
-                                posts = sortedPosts,
-                                onPostClick = { post -> selectedPost = post },
-                            )
                         }
                     }
                 }
 
                 MainBottomBar(navController, modifier = Modifier.align(Alignment.BottomCenter), items = sampleItems2)
             }
-
         }
     }
 }

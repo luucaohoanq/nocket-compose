@@ -9,8 +9,11 @@ import com.example.nocket.constants.DBConfig
 import com.example.nocket.models.Message
 import com.example.nocket.models.Notification
 import com.example.nocket.models.NotificationType
+import com.example.nocket.models.Post
+import com.example.nocket.models.PostType
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
+import com.example.nocket.models.User
 import com.example.nocket.models.appwrite.Log
 import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.utils.mapToResponse
@@ -110,20 +113,79 @@ class AppwriteRepository @Inject constructor(
         return mapToResponse(res, Message::fromMap)
     }
 
-    suspend fun getAllPostsOfUserAndFriends(user: AuthUser): List<Map<String, Any>> {
-        val res: DocumentList<Map<String, Any>> = databases.listDocuments(
-            databaseId = DBConfig.DATABASE_ID,
-            collectionId = DBConfig.POSTS_COLLECTION_ID,
-            queries = listOf(
-                Query.equal("userId", user.id),
-                Query.limit(50)
+    /**
+     * Get all posts from a user and their friends, sorted by creation date (descending)
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAllPostsOfUserAndFriends(user: AuthUser): List<Post> {
+        try {
+            // First, get all friendships where the user is either user1 or user2 and status is ACCEPTED
+            val friendships = databases.listDocuments(
+                databaseId = DBConfig.DATABASE_ID,
+                collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
+                queries = listOf(
+                    Query.or(listOf(
+                        Query.equal("user1Id", user.id),
+                        Query.equal("user2Id", user.id)
+                    )),
+                    Query.equal("status", "ACCEPTED"),
+                    Query.limit(100)
+                )
             )
-        )
+            
+            // Extract friend IDs from friendships
+            val friendIds = friendships.documents.map { doc ->
+                val user1Id = doc.data["user1Id"] as String
+                val user2Id = doc.data["user2Id"] as String
+                if (user1Id == user.id) user2Id else user1Id
+            }
+            
+            // Create a list with the user's ID and all friend IDs
+            val userAndFriendIds = listOf(user.id) + friendIds
+            
+            // Fetch posts from the user and all friends
+            val posts = databases.listDocuments(
+                databaseId = DBConfig.DATABASE_ID,
+                collectionId = DBConfig.POSTS_COLLECTION_ID,
+                queries = listOf(
+                    Query.or(userAndFriendIds.map { userId ->
+                        Query.equal("userId", userId)
+                    }),
+                    Query.equal("isArchived", false),
+                    Query.orderDesc("\$createdAt"),
+                    Query.limit(50)
+                )
+            )
+            
+            android.util.Log.d("AppwriteRepository", "Fetched ${posts.documents.size} posts for user ${user.id} and ${friendIds.size} friends")
+            
+            // Convert documents to Post objects
+            return posts.documents.mapNotNull { doc ->
+                try {
+                    val userId = doc.data["userId"] as String
+                    val postUser = getUserById(userId) ?: return@mapNotNull null
 
-        android.util.Log.d("AppwriteRepository", "Fetched posts: ${res.documents.size} documents")
-
-        return mapToResponse(res) { data ->
-            data
+                    Post(
+                        id = doc.id,
+                        user = User(
+                            id = postUser.id,
+                            username = postUser.name ?: "Unknown",
+                            avatar = postUser.avatar
+                        ),
+                        postType = PostType.valueOf((doc.data["postType"] as? String) ?: "IMAGE"),
+                        caption = doc.data["caption"] as? String,
+                        thumbnailUrl = (doc.data["thumbnailUrl"] as? String) ?: "",
+                        isArchived = (doc.data["isArchived"] as? Boolean) ?: false,
+                        createdAt = doc.data["\$createdAt"] as String
+                    )
+                } catch (e: Exception) {
+                    android.util.Log.e("AppwriteRepository", "Error mapping post document: ${e.message}")
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AppwriteRepository", "Error fetching posts: ${e.message}")
+            return emptyList()
         }
     }
 

@@ -29,8 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
+import com.example.nocket.models.PostType
+import com.example.nocket.models.User
 
 @Composable
 fun PostGrid(
@@ -136,8 +137,20 @@ fun CameraButton(
 @Preview(showBackground = true)
 @Composable
 fun PostGridPreview() {
+    // Create sample posts for preview
+    val sampleUser = User(id = "1", username = "User1", avatar = "")
+    val samplePosts = List(6) { index ->
+        Post(
+            id = index.toString(),
+            user = sampleUser,
+            postType = PostType.IMAGE,
+            caption = "Sample post $index",
+            thumbnailUrl = "https://picsum.photos/400/300?random=$index"
+        )
+    }
+    
     PostGrid(
-        posts = SampleData.samplePosts,
+        posts = samplePosts,
         onPostClick = {},
     )
 }
