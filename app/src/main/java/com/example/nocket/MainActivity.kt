@@ -51,7 +51,7 @@ fun NocketApp(
             color = MaterialTheme.colorScheme.background
         ) {
 //            Log.d("NocketApp", "Project Info: $projectInfo")
-            Navigation()
+            Navigation(viewModel)
         }
     }
 }

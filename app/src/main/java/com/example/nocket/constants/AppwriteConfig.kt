@@ -29,3 +29,18 @@ object AppwriteConfig {
      */
     const val APPWRITE_PUBLIC_ENDPOINT = BuildConfig.APPWRITE_PUBLIC_ENDPOINT
 }
+
+object DBConfig {
+
+    /**
+     * Appwrite database id.
+     */
+    const val DATABASE_ID = BuildConfig.DATABASE_ID
+
+    /**
+     * Appwrite collection id for settings.
+     */
+    const val SETTINGS_COLLECTION_ID = BuildConfig.SETTINGS_COLLECTION_ID
+
+
+}
