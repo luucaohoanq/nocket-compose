@@ -35,15 +35,22 @@ android {
             throw RuntimeException("local.properties file not found")
         }
 
+        val error = "variable not found in local.properties"
+
         // Define BuildConfig fields without revealing fallback values
         buildConfigField("String", "APPWRITE_VERSION",
-        "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException("appwrite.version not found in local.properties")}\"")
+        "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException(error)}\"")
         buildConfigField("String", "APPWRITE_PROJECT_ID",
-        "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException("appwrite.project.id not found in local.properties")}\"")
+        "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException(error)}\"")
         buildConfigField("String", "APPWRITE_PROJECT_NAME",
-        "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException("appwrite.project.name not found in local.properties")}\"")
+        "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException(error)}\"")
         buildConfigField("String", "APPWRITE_PUBLIC_ENDPOINT",
-        "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException("appwrite.endpoint not found in local.properties")}\"")
+        "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException(error)}\"")
+
+        buildConfigField("String", "DATABASE_ID",
+            "\"${properties.getProperty("appwrite.database.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "SETTINGS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.settings.collection.id") ?: throw RuntimeException(error)}\"")
     }
 
     buildTypes {

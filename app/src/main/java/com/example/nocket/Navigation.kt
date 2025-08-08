@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -18,6 +19,7 @@ import com.example.nocket.ui.screen.post.PostScreen
 import com.example.nocket.ui.screen.profile.UserProfile
 import com.example.nocket.ui.screen.settings.SettingScreen
 import com.example.nocket.ui.screen.submitphoto.SubmitPhotoScreen
+import com.example.nocket.viewmodels.AppwriteViewModel
 
 sealed class Screen(val route: String) {  //enum
     object Message : Screen("message")
@@ -40,7 +42,9 @@ sealed class Screen(val route: String) {  //enum
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigation() {
+fun Navigation(
+    viewModel: AppwriteViewModel = viewModel()
+) {
     val navController = rememberNavController()
     //val viewModel = hiltViewModel<MainViewModel>()
     
@@ -82,7 +86,7 @@ fun Navigation() {
             }
 
             composable(Screen.Setting.route) {
-                SettingScreen(navController)
+                SettingScreen(navController, viewModel)
             }
 
             composable(Screen.Camera.route){

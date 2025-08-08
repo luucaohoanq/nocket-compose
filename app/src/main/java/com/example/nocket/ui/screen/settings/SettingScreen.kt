@@ -39,151 +39,51 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
-
-val settingList = listOf<Setting>(
-    Setting(
-        type = SettingType.WIDGET,
-        title = "Widget Settings",
-        description = "Customize your home screen widget"
-    ),
-
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "App Icon",
-        icon = "ICON_APP",
-        description = "Choose from 12 beautiful app icons"
-    ),
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "Theme",
-        icon = "ICON_THEME",
-        description = "Switch between light, dark, or auto mode"
-    ),
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "Streak on widget",
-        icon = "ICON_COLOR",
-        isToggleable = true,
-        isToggled = true
-    ),
-
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Edit Name",
-        description = "Change your display name"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Edit Birthday",
-        description = "Set or update your birth date"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Change Phone Number",
-        description = "Update your contact number"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "How to Add Widget",
-        description = "Step-by-step widget setup guide"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Restore Purchases",
-        description = "Restore previous premium features"
-    ),
-
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Blocked Accounts",
-        description = "View and manage blocked users"
-    ),
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Account Visibility",
-        description = "Control who can find your profile"
-    ),
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Privacy Choices",
-        description = "Manage data sharing preferences"
-    ),
-
-    Setting(
-        type = SettingType.SUPPORT,
-        title = "Report a Problem",
-        description = "Get help with technical issues"
-    ),
-    Setting(
-        type = SettingType.SUPPORT,
-        title = "Make a Suggestion",
-        description = "Share ideas for new features"
-    ),
-
-    Setting(
-        type = SettingType.ABOUT,
-        title = "TikTok",
-        description = "@nocketapp - Latest updates & tips"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Instagram",
-        description = "@nocketapp - Behind the scenes"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Twitter",
-        description = "@nocketapp - News & announcements"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Share Nocket",
-        description = "Invite friends to join Nocket"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Rate Nocket",
-        description = "Leave a review on your app store"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Terms of Service",
-        description = "Read our terms and conditions"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Privacy Policy",
-        description = "Understand how we protect your data"
-    ),
-
-    Setting(
-        type = SettingType.DANGER_ZONE,
-        title = "Delete Account",
-        description = "Permanently delete your account and all data"
-    ),
-    Setting(
-        type = SettingType.DANGER_ZONE,
-        title = "Sign Out",
-        description = "Sign out from all devices"
-    ),
-)
+import com.example.nocket.viewmodels.AppwriteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    viewModel: AppwriteViewModel
+) {
+    // Collect data from viewModel
+    val settings by viewModel.settings.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllSetting()
+    }
+
+    // Render UI with collected data
+    SettingScreenContent(
+        settings = settings,
+        navController = navController,
+        onToggleChanged = { settingId, isToggled ->
+            viewModel.updateSettingToggle(settingId, isToggled)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingScreenContent(
+    settings: List<Setting>,
+    navController: NavHostController = rememberNavController(),
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     Scaffold(
         topBar = {
@@ -202,15 +102,18 @@ fun SettingScreen(
             }
 
             // Group settings by type
-            val groupedSettings = settingList.groupBy { it.type }
+            val groupedSettings = settings.groupBy { it.type }
 
-            groupedSettings.forEach { (settingType, settings) ->
+            groupedSettings.forEach { (settingType, settingItems) ->
                 item {
                     SettingSectionHeader(settingType = settingType)
                 }
 
-                items(settings) { setting ->
-                    SettingItem(setting = setting)
+                items(settingItems) { setting ->
+                    SettingItem(
+                        setting = setting,
+                        onToggleChanged = onToggleChanged
+                    )
                 }
 
                 item {
@@ -246,7 +149,7 @@ fun SettingSectionHeader(settingType: SettingType) {
 @Composable
 fun SettingItem(
     setting: Setting,
-    onToggleChanged: (Boolean) -> Unit = {}
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     val isDangerZone = setting.type == SettingType.DANGER_ZONE
     var isToggled = setting.isToggled
@@ -263,8 +166,8 @@ fun SettingItem(
         shape = RoundedCornerShape(8.dp),
         onClick = {
             if (setting.isToggleable) {
-                isToggled = !isToggled
-                onToggleChanged(isToggled)
+                // Pass both the setting ID and the new toggle state (opposite of current)
+                onToggleChanged(setting.id, !setting.isToggled)
             }
             // Handle other settings click
         }
@@ -327,10 +230,9 @@ fun SettingItem(
             // Arrow icon with subtle animation hint
             if (setting.isToggleable) {
                 androidx.compose.material3.Switch(
-                    checked = isToggled,
+                    checked = setting.isToggled,
                     onCheckedChange = {
-                        isToggled = it
-                        onToggleChanged(it)
+                        onToggleChanged(setting.id, it)
                     }
                 )
             } else {
@@ -364,10 +266,4 @@ fun getSettingIcon(setting: Setting): ImageVector {
         setting.title.contains("Sign out") -> Icons.AutoMirrored.Filled.Logout
         else -> Icons.Default.Settings
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingScreenPreview() {
-    SettingScreen()
 }
