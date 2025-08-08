@@ -51,6 +51,20 @@ android {
             "\"${properties.getProperty("appwrite.database.id") ?: throw RuntimeException(error)}\"")
         buildConfigField("String", "SETTINGS_COLLECTION_ID",
             "\"${properties.getProperty("appwrite.settings.collection.id") ?: throw RuntimeException(error)}\"")
+
+        //NOTIFICATIONS_COLLECTION_ID
+        //MESSAGES_COLLECTION_ID
+        //FRIENDSHIPS_COLLECTION_ID
+        //POSTS_COLLECTION_ID
+
+        buildConfigField("String", "NOTIFICATIONS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.notifications.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "MESSAGES_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.messages.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "FRIENDSHIPS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.friendships.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "POSTS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.posts.collection.id") ?: throw RuntimeException(error)}\"")
     }
 
     buildTypes {

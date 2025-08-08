@@ -1,10 +1,15 @@
 package com.example.nocket.viewmodels
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nocket.constants.AppwriteConfig
+import com.example.nocket.models.Message
 import com.example.nocket.models.Setting
 import com.example.nocket.models.appwrite.Log
+import com.example.nocket.models.auth.AuthUser
+import  android.util.Log as AndroidLog
 import com.example.nocket.repositories.AppwriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appwrite.starterkit.data.models.ProjectInfo
@@ -33,6 +38,49 @@ class AppwriteViewModel @Inject constructor(
 
     private val _settings = MutableStateFlow<List<Setting>>(emptyList())
     val settings: StateFlow<List<Setting>> = _settings
+
+    private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    val messages: StateFlow<List<Message>> = _messages.asStateFlow()
+
+
+    // Add these properties to AppwriteViewModel
+    private val _users = MutableStateFlow<Map<String, AuthUser?>>(emptyMap())
+    val users: StateFlow<Map<String, AuthUser?>> = _users.asStateFlow()
+
+    fun getUserById(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Skip if already in cache
+                if (_users.value.containsKey(userId)) return@launch
+
+                val user = repository.getUserById(userId)
+                _users.value = _users.value + (userId to user)
+            } catch (e: Exception) {
+                AndroidLog.d("AppwriteViewModel", "Error fetching user: ${e.message}")
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getAllMessagesOfUser(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Don't throw exception for guest, handle it gracefully
+                if (userId == "guest") {
+                    _messages.value = emptyList() // Set empty list for guests
+                    return@launch
+                }
+
+                val messages = repository.getAllMessagesOfUser(userId)
+                _messages.value = messages // Update the state flow with fetched messages
+                AndroidLog.d("AppwriteViewModel", "Fetched ${messages.size} messages")
+            } catch (e: Exception) {
+                AndroidLog.d("AppwriteViewModel", "Error fetching messages: ${e.message}")
+                e.printStackTrace()
+                _messages.value = emptyList() // Reset to empty list on error
+            }
+        }
+    }
 
     fun getAllSetting() {
         viewModelScope.launch {

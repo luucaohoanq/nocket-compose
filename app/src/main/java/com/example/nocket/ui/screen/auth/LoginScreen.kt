@@ -32,6 +32,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -406,14 +408,22 @@ fun LoginScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Divider(modifier = Modifier.weight(1f))
+                                HorizontalDivider(
+                                    modifier = Modifier.weight(1f),
+                                    thickness = DividerDefaults.Thickness,
+                                    color = DividerDefaults.color
+                                )
                                 Text(
                                     text = "OR",
                                     modifier = Modifier.padding(horizontal = 8.dp),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Divider(modifier = Modifier.weight(1f))
+                                HorizontalDivider(
+                                    modifier = Modifier.weight(1f),
+                                    thickness = DividerDefaults.Thickness,
+                                    color = DividerDefaults.color
+                                )
                             }
                             
                             Spacer(modifier = Modifier.height(16.dp))

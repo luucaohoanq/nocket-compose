@@ -134,7 +134,7 @@ fun MainTopBar(
 
     // Get unread messages count
     val unreadMessages = SampleData.messages.count {
-        it.recipient.id == user?.id && !it.isRead
+        it.recipientId == user?.id && !it.isRead
     }
 
     var titleWidth by remember { mutableIntStateOf(0) }
