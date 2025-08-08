@@ -28,13 +28,3 @@ data class AuthUser(
         }
     }
 }
-
-/**
- * Authentication state
- */
-sealed class AuthState {
-    object Loading : AuthState()
-    object Unauthenticated : AuthState()
-    data class Authenticated(val user: AuthUser) : AuthState()
-    data class Error(val message: String) : AuthState()
-}

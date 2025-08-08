@@ -27,6 +27,8 @@ import java.time.LocalDateTime
  */
 object SampleData {
 
+    val imageNotAvailable = "https://images.unsplash.com/photo-1610513320995-1ad4bbf25e55?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+
     // Enhanced user sample data with diverse usernames
     val users = listOf(
         User(username = "hclw"),
@@ -50,64 +52,64 @@ object SampleData {
     @RequiresApi(Build.VERSION_CODES.O)
     val messages = listOf(
         Message(
-            sender = users[0],
-            recipient = users[14],
+            senderId = users[0].id,
+            recipientId = users[14].id,
             previewContent = "Hey! How are you doing today? 😊",
             timeSent = LocalDateTime.now().minusMinutes(5).toString(),
             isRead = true
         ),
         Message(
-            sender = users[1],
-            recipient = users[14],
+            senderId = users[1].id,
+            recipientId = users[14].id,
             previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
             timeSent = LocalDateTime.now().minusMinutes(30).toString(),
             isRead = true
         ),
         Message(
-            sender = users[2],
-            recipient = users[14],
+            senderId = users[2].id,
+            recipientId = users[14].id,
             previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
             timeSent = LocalDateTime.now().minusHours(2).toString(),
             isRead = false
         ),
         Message(
-            sender = users[3],
-            recipient = users[14],
+            senderId = users[3].id,
+            recipientId = users[14].id,
             previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
             timeSent = LocalDateTime.now().minusHours(5).toString(),
             isRead = true
         ),
         Message(
-            sender = users[4],
-            recipient = users[14],
+            senderId = users[4].id,
+            recipientId = users[14].id,
             previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
             timeSent = LocalDateTime.now().minusDays(1).toString(),
             isRead = false
         ),
         Message(
-            sender = users[5],
-            recipient = users[14],
+            senderId = users[5].id,
+            recipientId = users[14].id,
             previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
             timeSent = LocalDateTime.now().minusDays(2).toString(),
             isRead = true
         ),
         Message(
-            sender = users[6],
-            recipient = users[14],
+            senderId = users[6].id,
+            recipientId = users[14].id,
             previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
             timeSent = LocalDateTime.now().minusDays(3).toString(),
             isRead = false
         ),
         Message(
-            sender = users[7],
-            recipient = users[14],
+            senderId = users[7].id,
+            recipientId = users[14].id,
             previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
             timeSent = LocalDateTime.now().minusDays(4).toString(),
             isRead = true
         ),
         Message(
-            sender = users[8],
-            recipient = users[14],
+            senderId = users[8].id,
+            recipientId = users[14].id,
             previewContent = "Check out this cool article I found about space exploration 🚀",
             timeSent = LocalDateTime.now().minusDays(5).toString(),
             isRead = false
@@ -427,61 +429,61 @@ object SampleData {
     @RequiresApi(Build.VERSION_CODES.O)
     val messageList = listOf(
         Message(
-            sender = users[0],
-            recipient = users[9],
+            senderId = users[0].id,
+            recipientId = users[9].id,
             previewContent = "Hey! How are you doing today? 😊",
             timeSent = LocalDateTime.now().minusMinutes(5).toString()
         ),
         Message(
-            sender = users[1],
-            recipient = users[9],
+            senderId = users[1].id,
+            recipientId = users[9].id,
             previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
             timeSent = LocalDateTime.now().minusMinutes(30).toString()
         ),
         Message(
-            sender = users[2],
-            recipient = users[9],
+            senderId = users[2].id,
+            recipientId = users[9].id,
             previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
             timeSent = LocalDateTime.now().minusHours(2).toString()
         ),
         Message(
-            sender = users[3],
-            recipient = users[9],
+            senderId = users[3].id,
+            recipientId = users[9].id,
             previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
             timeSent = LocalDateTime.now().minusHours(5).toString()
         ),
         Message(
-            sender = users[4],
-            recipient = users[9],
+            senderId = users[4].id,
+            recipientId = users[9].id,
             previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
             timeSent = LocalDateTime.now().minusDays(1).toString()
         ),
         Message(
-            sender = users[5],
-            recipient = users[9],
+            senderId = users[5].id,
+            recipientId = users[9].id,
             previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
             timeSent = LocalDateTime.now().minusDays(2).toString()
         ),
         Message(
-            sender = users[6],
-            recipient = users[9],
+            senderId = users[6].id,
+            recipientId = users[9].id,
             previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
             timeSent = LocalDateTime.now().minusDays(3).toString()
         ),
         Message(
-            sender = users[7],
-            recipient = users[9],
+            senderId = users[7].id,
+            recipientId = users[9].id,
             previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
             timeSent = LocalDateTime.now().minusDays(4).toString()
         ),
         Message(
-            sender = users[8],
-            recipient = users[9],
+            senderId = users[8].id,
+            recipientId = users[9].id,
             previewContent = "Check out this cool article I found about space exploration 🚀",
             timeSent = LocalDateTime.now().minusDays(5).toString()
         )
     )
-    
+
     // Sample friendships data
     val friendships = listOf(
         Friendship(
@@ -550,7 +552,7 @@ object SampleData {
             status = FriendshipStatus.ACCEPTED
         )
     )
-    
+
     // Fun statistics for the app
     @RequiresApi(Build.VERSION_CODES.O)
     val stats = mapOf(

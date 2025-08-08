@@ -147,4 +147,69 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Unauthenticated
         }
     }
+
+    /**
+     * Register a new user with email and password
+     */
+    fun register(email: String, password: String, name: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                _authState.value = AuthState.Loading
+                val user = authRepository.register(email, password, name)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Registration failed")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Registration failed: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Login with email and password
+     */
+    fun login(email: String, password: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                _authState.value = AuthState.Loading
+                val user = authRepository.login(email, password)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Login failed")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Login failed: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Request password reset
+     */
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val success = authRepository.resetPassword(email)
+                if (success) {
+                    _authState.value = AuthState.PasswordResetSent
+                } else {
+                    _authState.value = AuthState.Error("Failed to send password reset")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Password reset failed: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }

@@ -24,6 +24,7 @@ object AppwriteModule {
         @ApplicationContext context: Context
     ): Client {
         return Client(context.applicationContext)
+            .setSelfSigned(true)
             .setProject(AppwriteConfig.APPWRITE_PROJECT_ID)
             .setEndpoint(AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT)
     }

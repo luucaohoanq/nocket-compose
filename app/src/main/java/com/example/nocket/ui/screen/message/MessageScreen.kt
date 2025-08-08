@@ -31,14 +31,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.circle.Circle
@@ -48,14 +53,52 @@ import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.topbar.avatarWidth
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Message
+import com.example.nocket.models.auth.AuthState
+import com.example.nocket.models.auth.AuthUser
+import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.text.get
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MessageScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    appWriteViewModel: AppwriteViewModel = hiltViewModel()
 ) {
+    val authState by authViewModel.authState.collectAsState()
+    val messages by appWriteViewModel.messages.collectAsState()
+    val users by appWriteViewModel.users.collectAsState()
+
+    // Group messages by sender and get most recent one for each conversation
+    val groupedConversations = messages
+        .groupBy { it.senderId }
+        .map { (_, messagesFromSender) ->
+            // Get the most recent message from this sender
+            messagesFromSender.maxByOrNull { it.timeSent }
+        }
+        .filterNotNull()
+        .sortedByDescending { it.timeSent }
+
+    // Fetch messages when authenticated
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Authenticated) {
+            val user = (authState as AuthState.Authenticated).user
+            appWriteViewModel.getAllMessagesOfUser(user.id)
+        } else {
+            appWriteViewModel.getAllMessagesOfUser("")
+        }
+    }
+
+    // Fetch user details for message senders
+    LaunchedEffect(messages) {
+        messages.forEach { message ->
+            appWriteViewModel.getUserById(message.senderId)
+        }
+    }
+
     Scaffold(
         topBar = {
             CommonTopBar(
@@ -74,32 +117,87 @@ fun MessageScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(SampleData.messageList) { message ->
-                MessageItem(message = message)
-            }
-
-            item {
+        if (groupedConversations.isEmpty()) {
+            // Empty state when no conversations are available
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "No messages",
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                )
+                
                 Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "No messages yet",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "Your conversations will appear here",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                // Remove test conversation card since we're in production mode
+            }
+        } else {
+            // Show list of conversations
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(groupedConversations) { message ->
+                    MessageItem(
+                        message = message,
+                        sender = users[message.senderId],
+                        onClick = {
+                            // Navigate to chat detail screen with this sender
+                            navController.navigate("chat/${message.senderId}")
+                        }
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MessageItem(message: Message) {
+fun MessageItem(
+    message: Message,
+    sender: AuthUser? = null,
+    onClick: () -> Unit = {}
+) {
+    val senderName = sender?.name ?: "Unknown User"
+    val senderAvatar = sender?.avatar ?: ""
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -111,25 +209,14 @@ fun MessageItem(message: Message) {
             Box {
                 Circle(
                     imageSetting = ImageSetting(
-                        imageUrl = message.sender.avatar,
+                        imageUrl = senderAvatar.ifEmpty { SampleData.imageNotAvailable },
                         contentDescription = "Profile picture"
                     ),
                     gap = 0.dp,
                     outerSize = 50.dp,
                     backgroundColor = Color(0xFF404137),
-                    onClick = {}
+                    onClick = onClick
                 )
-
-                // Online indicator
-//                Box(
-//                    modifier = Modifier
-//                        .size(12.dp)
-//                        .background(
-//                            color = if ((0..1).random() == 1) Color.Green,
-//                            shape = CircleShape
-//                        )
-//                        .align(Alignment.BottomEnd)
-//                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -145,7 +232,7 @@ fun MessageItem(message: Message) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = message.sender.username,
+                        text = senderName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -173,16 +260,12 @@ fun MessageItem(message: Message) {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Unread indicator and message count
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            // Arrow indicator
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = "Open conversation",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
@@ -190,7 +273,14 @@ fun MessageItem(message: Message) {
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatTime(timeString: String): String {
     return try {
-        val time = LocalDateTime.parse(timeString)
+        val time = if (timeString.contains("T")) {
+            LocalDateTime.parse(timeString)
+        } else {
+            // Handle ISO-8601 format without T separator
+            val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            LocalDateTime.parse(timeString, formatter)
+        }
+        
         val now = LocalDateTime.now()
 
         when {
@@ -202,11 +292,16 @@ fun formatTime(timeString: String): String {
                 "Yesterday"
             }
 
-            else -> {
+            time.year == now.year -> {
                 time.format(DateTimeFormatter.ofPattern("MMM d"))
+            }
+
+            else -> {
+                time.format(DateTimeFormatter.ofPattern("yyyy MMM d"))
             }
         }
     } catch (e: Exception) {
+        // If we can't parse the time string, just return "Now"
         "Now"
     }
 }

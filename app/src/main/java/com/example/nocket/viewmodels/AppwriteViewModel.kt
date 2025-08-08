@@ -1,10 +1,17 @@
 package com.example.nocket.viewmodels
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nocket.constants.AppwriteConfig
+import com.example.nocket.models.Message
+import com.example.nocket.models.Post
 import com.example.nocket.models.Setting
+import com.example.nocket.models.User
 import com.example.nocket.models.appwrite.Log
+import com.example.nocket.models.auth.AuthUser
+import  android.util.Log as AndroidLog
 import com.example.nocket.repositories.AppwriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appwrite.starterkit.data.models.ProjectInfo
@@ -33,6 +40,56 @@ class AppwriteViewModel @Inject constructor(
 
     private val _settings = MutableStateFlow<List<Setting>>(emptyList())
     val settings: StateFlow<List<Setting>> = _settings
+
+    private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    val messages: StateFlow<List<Message>> = _messages.asStateFlow()
+
+    private val _posts = MutableStateFlow<List<Post>>(emptyList())
+    val posts: StateFlow<List<Post>> = _posts.asStateFlow()
+
+
+    // Add these properties to AppwriteViewModel
+    private val _users = MutableStateFlow<Map<String, AuthUser?>>(emptyMap())
+    val users: StateFlow<Map<String, AuthUser?>> = _users.asStateFlow()
+
+    // Friends StateFlow
+    private val _friends = MutableStateFlow<List<User>>(emptyList())
+    val friends: StateFlow<List<User>> = _friends.asStateFlow()
+
+    fun getUserById(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Skip if already in cache
+                if (_users.value.containsKey(userId)) return@launch
+
+                val user = repository.getUserById(userId)
+                _users.value = _users.value + (userId to user)
+            } catch (e: Exception) {
+                AndroidLog.d("AppwriteViewModel", "Error fetching user: ${e.message}")
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getAllMessagesOfUser(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Don't throw exception for guest, handle it gracefully
+                if (userId == "guest") {
+                    _messages.value = emptyList() // Set empty list for guests
+                    return@launch
+                }
+
+                val messages = repository.getAllMessagesOfUser(userId)
+                _messages.value = messages // Update the state flow with fetched messages
+                AndroidLog.d("AppwriteViewModel", "Fetched ${messages.size} messages")
+            } catch (e: Exception) {
+                AndroidLog.d("AppwriteViewModel", "Error fetching messages: ${e.message}")
+                e.printStackTrace()
+                _messages.value = emptyList() // Reset to empty list on error
+            }
+        }
+    }
 
     fun getAllSetting() {
         viewModelScope.launch {
@@ -106,6 +163,74 @@ class AppwriteViewModel @Inject constructor(
                 Status.Success
             } else {
                 Status.Error
+            }
+        }
+    }
+
+    /**
+     * Fetches all posts from the current user and their friends
+     * Posts are sorted by creation date (newest first)
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getAllPostsOfUserAndFriends(user: AuthUser) {
+        viewModelScope.launch {
+            try {
+                AndroidLog.d("AppwriteViewModel", "Fetching posts for user: ${user.id}")
+                val result = repository.getAllPostsOfUserAndFriends(user)
+                
+                // Update the posts state with results from database
+                _posts.value = result
+                AndroidLog.d("AppwriteViewModel", "Fetched ${result.size} posts for user")
+            } catch (e: Exception) {
+                AndroidLog.e("AppwriteViewModel", "Error fetching posts: ${e.message}", e)
+                // Just log the error, UI will handle empty state
+            }
+        }
+    }
+
+    /**
+     * Fetches posts from a specific user
+     * Used when viewing a single user's profile
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getPostsForUser(userId: String) {
+        viewModelScope.launch {
+            try {
+                AndroidLog.d("AppwriteViewModel", "Fetching posts for specific user: $userId")
+                
+                // Create a temporary user object to pass to the repository
+                val userObj = AuthUser(
+                    id = userId,
+                    name = "",
+                    email = "",
+                    avatar = ""
+                )
+                
+                val allPosts = repository.getAllPostsOfUserAndFriends(userObj)
+                
+                // Filter to only include posts from this specific user
+                val userPosts = allPosts.filter { it.user.id == userId }
+                
+                // Update the posts state with filtered results
+                _posts.value = userPosts
+                AndroidLog.d("AppwriteViewModel", "Fetched ${userPosts.size} posts for user $userId")
+            } catch (e: Exception) {
+                AndroidLog.e("AppwriteViewModel", "Error fetching posts for user $userId: ${e.message}", e)
+                // Just log the error, UI will handle empty state
+            }
+        }
+    }
+
+    /**
+     * Fetch friends of the given user and update StateFlow
+     */
+    fun fetchFriendsOfUser(user: AuthUser) {
+        viewModelScope.launch {
+            try {
+                val result = repository.getFriendsOfUser(user)
+                _friends.value = result
+            } catch (e: Exception) {
+                _friends.value = emptyList()
             }
         }
     }
