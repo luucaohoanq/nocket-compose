@@ -124,48 +124,32 @@ fun MainTopBar(
     navController: NavController? = null,
     title: String = "Nocket",
     user: User? = null,
+    friends: List<User> = emptyList(),
+    unreadMessages: Int = 0,
+    unreadNotifications: Int = 0,
     onMessageClick: () -> Unit = { navController?.navigate(Screen.Message.route) },
     onProfileClick: () -> Unit = { navController?.navigate(Screen.Profile.route) },
     onNotificationClick: () -> Unit = {},
     onUserSelected: (User?) -> Unit = {}
 ) {
-    // Get unread notifications count
-    val unreadNotifications = SampleData.notifications.count { !it.isRead }
-
-    // Get unread messages count
-    val unreadMessages = SampleData.messages.count {
-        it.recipientId == user?.id && !it.isRead
-    }
-
     var titleWidth by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current.density
 
     // Friend selection dropdown state
     var showFriendDropdown by remember { mutableStateOf(false) }
 
-    // Get list of friends for current user
-    val friends = remember(user) {
+    // Create the final list with "Everyone" at top and "You" at bottom
+    val friendsList = remember(friends, user) {
+        val result = mutableListOf<User>()
+        // Add "Everyone" as first item
+        result.add(User(id = "everyone", username = "Everyone", avatar = ""))
+        // Add actual friends in the middle
+        result.addAll(friends)
+        // Add current user as last item if available
         if (user != null) {
-            val friendships = SampleData.friendships.filter {
-                (it.user1Id == user.id || it.user2Id == user.id) &&
-                        it.status == FriendshipStatus.ACCEPTED
-            }
-
-            val friendIds = friendships.map {
-                if (it.user1Id == user.id) it.user2Id else it.user1Id
-            }
-
-            val friendsList = SampleData.users.filter { it.id in friendIds }
-
-            // Create the final list with "Everyone" at top and "You" at bottom
-            val result = mutableListOf<User?>()
-            result.add(User(id = "everyone", username = "Everyone", avatar = ""))
-            result.addAll(friendsList)
             result.add(User(id = "you", username = "You", avatar = user.avatar))
-            result
-        } else {
-            listOf()
         }
+        result
     }
 
     // Currently selected friend (default to "Everyone")
@@ -173,7 +157,7 @@ fun MainTopBar(
         mutableStateOf<User?>(
             User(
                 id = "everyone",
-                username = "Everyone",
+                username = "Everyone", 
                 avatar = ""
             )
         )
@@ -243,7 +227,7 @@ fun MainTopBar(
                             shape = RoundedCornerShape(24.dp)
                         ),
                 ) {
-                    friends.forEachIndexed { index, friend ->
+                    friendsList.forEachIndexed { index, friend ->
                         DropdownMenuItem(
                             modifier = Modifier
                                 .padding(vertical = 5.dp)
@@ -256,7 +240,7 @@ fun MainTopBar(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
 
-                                    if (friend?.avatar?.isNotEmpty() == true) {
+                                    if (friend.avatar.isNotEmpty()) {
                                         Box(
                                             modifier = Modifier
                                                 .size(avatarWidth)
@@ -270,13 +254,14 @@ fun MainTopBar(
                                                 modifier = Modifier.size(avatarWidth)
                                             )
                                         }
-                                    } else if (friend?.username == "Everyone") {
+                                    } else if (friend.id == "everyone") {
                                         Button(
                                             onClick = { },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFF4B6EAF)
+                                            ),
                                             modifier = Modifier.size(avatarWidth),
-                                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                                0.dp
-                                            )
+                                            contentPadding = PaddingValues(0.dp)
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.Group,
@@ -285,13 +270,65 @@ fun MainTopBar(
                                                 modifier = Modifier.size(20.dp)
                                             )
                                         }
+                                    } else if (friend.id == "you") {
+                                        // "You" item - show user avatar or fallback icon
+                                        if (user?.avatar?.isNotEmpty() == true) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(avatarWidth)
+                                                    .clip(CircleShape)
+                                                    .background(Color.LightGray)
+                                            ) {
+                                                AsyncImage(
+                                                    model = user.avatar,
+                                                    contentDescription = "Your Avatar",
+                                                    contentScale = ContentScale.Crop,
+                                                    modifier = Modifier.size(avatarWidth)
+                                                )
+                                            }
+                                        } else {
+                                            Button(
+                                                onClick = { },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color(0xFF6AAF4B)
+                                                ),
+                                                modifier = Modifier.size(avatarWidth),
+                                                contentPadding = PaddingValues(0.dp)
+                                            ) {
+                                                Text(
+                                                    text = "You",
+                                                    color = Color.White,
+                                                    style = MaterialTheme.typography.labelMedium
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        // Fallback for friends with empty avatars
+                                        Button(
+                                            onClick = { },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFF404137)
+                                            ),
+                                            modifier = Modifier.size(avatarWidth),
+                                            contentPadding = PaddingValues(0.dp)
+                                        ) {
+                                            Text(
+                                                text = friend.username?.take(1)?.uppercase() ?: "?",
+                                                color = Color.White,
+                                                style = MaterialTheme.typography.titleMedium
+                                            )
+                                        }
                                     }
 
                                     Spacer(modifier = Modifier.width(8.dp))
 
-                                    // Username
+                                    // Username text with special handling for "Everyone" and "You"
                                     Text(
-                                        text = friend?.username ?: "",
+                                        text = when (friend.id) {
+                                            "everyone" -> "Everyone"
+                                            "you" -> "You"
+                                            else -> friend.username ?: "Unknown"
+                                        },
                                         color = Color.White,
                                         fontWeight = FontWeight.Medium,
                                         style = MaterialTheme.typography.titleMedium
@@ -316,7 +353,7 @@ fun MainTopBar(
                             }
                         )
                         // Add divider after each item except the last one
-                        if (index < friends.size - 1) {
+                        if (index < friendsList.size - 1) {
                             HorizontalDivider(
                                 modifier = Modifier.fillMaxWidth(),
                                 thickness = 1.dp,
@@ -399,9 +436,22 @@ fun MainTopBar(
 @Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
 fun MainTopBarPreview() {
+    // Create sample data for preview
+    val previewUser = User(id = "preview_user", username = "Preview User", avatar = "https://i.pravatar.cc/150?img=3")
+    val previewFriends = List(3) { index ->
+        User(
+            id = "friend_$index", 
+            username = "Friend ${index + 1}", 
+            avatar = if (index % 2 == 0) "https://i.pravatar.cc/150?img=${index + 5}" else ""
+        )
+    }
+    
     MainTopBar(
         navController = rememberNavController(),
-        user = SampleData.users[14],
+        user = previewUser,
+        friends = previewFriends,
+        unreadMessages = 5,
+        unreadNotifications = 3,
         onMessageClick = {},
         onProfileClick = {},
         onNotificationClick = {},

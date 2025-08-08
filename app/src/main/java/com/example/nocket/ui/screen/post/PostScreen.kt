@@ -43,6 +43,7 @@ fun PostScreen(
 ) {
     val authState by authViewModel.authState.collectAsState()
     val posts by appwriteViewModel.posts.collectAsState()
+    val friends by appwriteViewModel.friends.collectAsState()
     
     var selectedPost by remember { mutableStateOf<Post?>(null) }
     var showNotifications by remember { mutableStateOf(false) }
@@ -69,12 +70,13 @@ fun PostScreen(
         )
     } else null
     
-    // Fetch posts when authenticated
+    // Fetch posts and friends when authenticated
     LaunchedEffect(authState) {
         if (authState is AuthState.Authenticated) {
             isLoading = true
             val user = (authState as AuthState.Authenticated).user
             appwriteViewModel.getAllPostsOfUserAndFriends(user)
+            appwriteViewModel.fetchFriendsOfUser(user)
             isLoading = false
         }
     }
@@ -84,7 +86,8 @@ fun PostScreen(
             PostDetailScreen(
                 post = selectedPost!!,
                 onBack = { selectedPost = null },
-                navController = navController
+                navController = navController,
+                friends = friends
             )
         }
 
@@ -96,6 +99,7 @@ fun PostScreen(
                         MainTopBar(
                             navController = navController,
                             user = currentUser ?: User(id = "", username = "Guest", avatar = ""),
+                            friends = friends,
                             onMessageClick = { navController.navigate(Screen.Message.route) },
                             onProfileClick = { navController.navigate(Screen.Profile.route) },
                             onNotificationClick = { showNotifications = true },

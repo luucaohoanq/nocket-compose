@@ -310,4 +310,42 @@ class AppwriteRepository @Inject constructor(
         val formatter = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
         return formatter.format(Date())
     }
+
+    /**
+     * Fetch all friends of a user (ACCEPTED friendships only)
+     */
+    suspend fun getFriendsOfUser(user: AuthUser): List<User> {
+        return try {
+            val friendships = databases.listDocuments(
+                databaseId = DBConfig.DATABASE_ID,
+                collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
+                queries = listOf(
+                    Query.or(listOf(
+                        Query.equal("user1Id", user.id),
+                        Query.equal("user2Id", user.id)
+                    )),
+                    Query.equal("status", "ACCEPTED"),
+                    Query.limit(100)
+                )
+            )
+            val friendIds = friendships.documents.map { doc ->
+                val user1Id = doc.data["user1Id"] as String
+                val user2Id = doc.data["user2Id"] as String
+                if (user1Id == user.id) user2Id else user1Id
+            }
+            friendIds.mapNotNull { friendId ->
+                val friend = getUserById(friendId)
+                friend?.let {
+                    User(
+                        id = it.id,
+                        username = it.name ?: "Unknown",
+                        avatar = it.avatar
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AppwriteRepository", "Error fetching friends: ${e.message}")
+            emptyList()
+        }
+    }
 }

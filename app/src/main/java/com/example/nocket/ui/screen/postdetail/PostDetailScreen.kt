@@ -60,6 +60,7 @@ fun PostDetailScreen(
     post: Post,
     onBack: () -> Unit,
     navController: NavController,
+    friends: List<User> = emptyList(),
 ) {
     // Define localCameraMode state before using it in the Scaffold
     // If the post has id "camera", automatically show camera mode
@@ -76,6 +77,7 @@ fun PostDetailScreen(
                 MainTopBar(
                     navController = navController,
                     user = currentUser, // Using user 14 as the current user
+                    friends = friends,
                     onMessageClick = { navController.navigate(Screen.Message.route) },
                     onProfileClick = { navController.navigate(Screen.Profile.route) },
                     onNotificationClick = { showNotifications = true },

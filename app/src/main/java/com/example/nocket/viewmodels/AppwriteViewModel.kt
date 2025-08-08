@@ -8,6 +8,7 @@ import com.example.nocket.constants.AppwriteConfig
 import com.example.nocket.models.Message
 import com.example.nocket.models.Post
 import com.example.nocket.models.Setting
+import com.example.nocket.models.User
 import com.example.nocket.models.appwrite.Log
 import com.example.nocket.models.auth.AuthUser
 import  android.util.Log as AndroidLog
@@ -50,6 +51,10 @@ class AppwriteViewModel @Inject constructor(
     // Add these properties to AppwriteViewModel
     private val _users = MutableStateFlow<Map<String, AuthUser?>>(emptyMap())
     val users: StateFlow<Map<String, AuthUser?>> = _users.asStateFlow()
+
+    // Friends StateFlow
+    private val _friends = MutableStateFlow<List<User>>(emptyList())
+    val friends: StateFlow<List<User>> = _friends.asStateFlow()
 
     fun getUserById(userId: String) {
         viewModelScope.launch {
@@ -212,6 +217,20 @@ class AppwriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching posts for user $userId: ${e.message}", e)
                 // Just log the error, UI will handle empty state
+            }
+        }
+    }
+
+    /**
+     * Fetch friends of the given user and update StateFlow
+     */
+    fun fetchFriendsOfUser(user: AuthUser) {
+        viewModelScope.launch {
+            try {
+                val result = repository.getFriendsOfUser(user)
+                _friends.value = result
+            } catch (e: Exception) {
+                _friends.value = emptyList()
             }
         }
     }

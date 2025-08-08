@@ -24,37 +24,19 @@ import com.example.nocket.models.User
 @Composable
 fun FriendList(
     user: User? = null,
+    friends: List<User> = emptyList(),
     selectedFriendId: String = "everyone",
     onFriendSelected: (User?) -> Unit = {}
 ) {
-
-    val friends = remember(user) {
+    val friendsList = remember(user, friends) {
+        // Create the final list with "Everyone" at top and "You" at bottom
+        val result = mutableListOf<User?>()
+        result.add(User(id = "everyone", username = "Everyone", avatar = ""))
+        result.addAll(friends)
         if (user != null) {
-            val friendships = SampleData.friendships.filter {
-                (it.user1Id == user.id || it.user2Id == user.id) &&
-                        it.status == FriendshipStatus.ACCEPTED
-            }
-
-            val friendIds = friendships.map {
-                if (it.user1Id == user.id) it.user2Id else it.user1Id
-            }
-
-            val friendsList = SampleData.users.filter { it.id in friendIds }
-
-            // Create the final list with "Everyone" at top and "You" at bottom
-            val result = mutableListOf<User?>()
-            result.add(User(id = "everyone", username = "Everyone", avatar = ""))
-            result.addAll(friendsList)
             result.add(User(id = "you", username = "You", avatar = user.avatar))
-            result
-        } else {
-            // Return a default list with just "Everyone" and the current user
-            // This prevents crashes when no user is provided
-            mutableListOf(
-                User(id = "everyone", username = "Everyone", avatar = ""),
-                User(id = "you", username = "You", avatar = "")
-            )
         }
+        result
     }
 
     Row(
@@ -63,24 +45,23 @@ fun FriendList(
             .padding(horizontal = 4.dp) // Small padding on edges
             .padding(end = 16.dp) // Extra padding at the end for better scrolling
     ) {
-        friends.forEach { friend ->
+        friendsList.forEach { friend ->
             Column(
                 horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
+                if (friend != null) {
+                    FriendItem(
+                        user = friend,
+                        isSelected = friend.id == selectedFriendId,
+                        onClick = { onFriendSelected(friend) }
+                    )
 
-                if (user == null) return
-
-                FriendItem(
-                    user = user,
-                    isSelected = friend?.id == selectedFriendId,
-                    onClick = { onFriendSelected(friend) }
-                )
-
-                Text(
-                    text = trimUsername(friend?.username ?: "Unknown"),
-                    color = Color.White,
-                )
+                    Text(
+                        text = trimUsername(friend.username ?: "Unknown"),
+                        color = Color.White,
+                    )
+                }
             }
         }
     }
@@ -100,7 +81,9 @@ fun FriendItem(
         onClick = onClick,
         innerContent = {
             AsyncImage(
-                model = user.avatar.ifEmpty { R.drawable.ic_launcher_background },
+                model = user.avatar.ifEmpty { 
+                    "https://i.pravatar.cc/150?img=${user.id.hashCode() % 70}" 
+                },
                 contentDescription = "Avatar",
                 contentScale = ContentScale.Crop,
             )
