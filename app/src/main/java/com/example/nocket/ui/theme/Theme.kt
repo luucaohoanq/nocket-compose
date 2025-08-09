@@ -8,31 +8,31 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 // Brown Dark Color Scheme
 private val BrownDarkColorScheme = darkColorScheme(
-    primary = BrownPrimary,
-    onPrimary = BrownOnPrimary,
-    primaryContainer = BrownPrimaryDark,
-    onPrimaryContainer = BrownOnBackground,
+    primary = GrayPrimary,
+    onPrimary = GrayOnPrimary,
+    primaryContainer = GrayPrimaryDark,
+    onPrimaryContainer = GrayOnBackground,
 
-    secondary = BrownSecondary,
-    onSecondary = BrownOnSecondary,
-    secondaryContainer = BrownPrimaryDark,
-    onSecondaryContainer = BrownOnBackground,
+    secondary = GraySecondary,
+    onSecondary = GrayOnSecondary,
+    secondaryContainer = GrayPrimaryDark,
+    onSecondaryContainer = GrayOnBackground,
 
-    tertiary = BrownTertiary,
-    onTertiary = BrownOnPrimary,
-    tertiaryContainer = BrownPrimaryDark,
-    onTertiaryContainer = BrownOnBackground,
+    tertiary = GrayTertiary,
+    onTertiary = GrayOnPrimary,
+    tertiaryContainer = GrayPrimaryDark,
+    onTertiaryContainer = GrayOnBackground,
 
-    background = BrownBackground,
-    onBackground = BrownOnBackground,
+    background = GrayBackground,
+    onBackground = GrayOnBackground,
 
-    surface = BrownSurface,
-    onSurface = BrownOnSurface,
-    surfaceVariant = BrownSurfaceVariant,
-    onSurfaceVariant = BrownOnSurfaceVariant,
+    surface = GraySurface,
+    onSurface = GrayOnSurface,
+    surfaceVariant = GraySurfaceVariant,
+    onSurfaceVariant = GrayOnSurfaceVariant,
 
-    error = BrownError,
-    onError = BrownOnError
+    error = GrayError,
+    onError = GrayOnError
 )
 
 @Composable

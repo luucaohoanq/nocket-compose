@@ -3,6 +3,7 @@ package com.example.nocket.data
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
@@ -370,7 +371,7 @@ object SampleData {
             description = "${users[2].username} commented on your post: 'This is amazing!'",
             time = LocalDateTime.now().minusHours(1).toString(),
             isRead = false,
-            icon = Icons.Default.Message,
+            icon = Icons.AutoMirrored.Filled.Message,
             iconColor = Color(0xFF2196F3),
             userId = users[2].id
         ),
@@ -400,7 +401,7 @@ object SampleData {
             description = "${users[5].username} sent you a message",
             time = LocalDateTime.now().minusHours(8).toString(),
             isRead = true,
-            icon = Icons.Default.Message,
+            icon = Icons.AutoMirrored.Filled.Message,
             iconColor = Color(0xFF009688),
             userId = users[5].id
         ),

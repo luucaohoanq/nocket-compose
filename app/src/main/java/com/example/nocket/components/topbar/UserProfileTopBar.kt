@@ -1,5 +1,6 @@
 package com.example.nocket.components.topbar
 
+import android.R
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -141,6 +142,7 @@ fun UserProfileTopBar(
                         Text(
                             text = "Get Locket Gold",
                             style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFFFFD700),
                             fontWeight = FontWeight.Bold,
                         )
                     }

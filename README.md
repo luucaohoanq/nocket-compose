@@ -7,7 +7,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 > **A modern Android prototype** of a social camera app built with Kotlin and Jetpack Compose.  
-> Features a clean Material 3 UI, smooth navigation, previewable components, and an Appwrite-backed data layer.
+> Features a clean Material 3 UI, smooth navigation, previewable components, and an Appwrite-backed
+> data layer.
 
 <div style="
     display: flex;
@@ -16,106 +17,106 @@
     gap: 12px;
     font-family: 'Segoe UI', Roboto, sans-serif;
 ">
-  
-  <a href="#-highlights" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
-      ✨ Highlights
-  </a>
+
+<a href="#-highlights" style="
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+✨ Highlights
+</a>
 
 <a href="#-screens" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
 🖼 Screens
 </a>
 
 <a href="#-project-structure" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
 📂 Project Structure
 </a>
 
 <a href="#-tech-stack" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
 🛠 Tech Stack
 </a>
 
 <a href="#-appwrite-setup" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
 ⚙ Appwrite Setup
 </a>
 
 <a href="#-roadmap-ideas" style="
-      flex: 1 1 calc(50% - 12px);
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 12px;
-      text-decoration: none;
-      color: #2b6cb0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-  " onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
+flex: 1 1 calc(50% - 12px);
+background: #ffffff;
+border: 1px solid #e0e0e0;
+border-radius: 10px;
+padding: 12px;
+text-decoration: none;
+color: #2b6cb0;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+font-weight: 500;
+" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='#ffffff'">
 🚀 Roadmap Ideas
 </a>
 
@@ -135,20 +136,25 @@
   <table>
     <tr><th colspan="3">📱 Screen Previews</th></tr>
     <tr>
-      <td align="center"><img src="Sources/assets/posts_screen.png" alt="Posts" width="240"/><br/>Posts</td>
+      <td align="center"><img src="Sources/assets/post_screen.png" alt="Posts" width="240"/><br/>Posts</td>
       <td align="center"><img src="Sources/assets/post_screen_list_friend_component.png" alt="Friend List Component" width="240"/><br/>Friend List</td>
-      <td align="center"><img src="Sources/assets/take_photo_screen.png" alt="Camera" width="240"/><br/>Camera</td>
+      <td align="center"><img src="Sources/assets/post_detail_screen.png" alt="Post Detail" width="240"/><br/>Post Detail</td>
     </tr>
     <tr>
-      <td align="center"><img src="Sources/assets/submit_photo_screen.png" alt="Submit Photo" width="240"/><br/>Submit Photo</td>
-      <td align="center"><img src="Sources/assets/messages_screen.png" alt="Messages" width="240"/><br/>Messages</td>
       <td align="center"><img src="Sources/assets/my_profile_screen.png" alt="Profile" width="240"/><br/>Profile</td>
+      <td align="center"><img src="Sources/assets/take_photo_screen.png" alt="Camera" width="240"/><br/>Camera</td>
+      <td align="center"><img src="Sources/assets/submit_photo_screen.png" alt="Submit Photo" width="240"/><br/>Submit Photo</td>
     </tr>
     <tr>
+      <td align="center"><img src="Sources/assets/one_to_one_message_screen.png" alt="Post Detail" width="240"/><br/>Chat</td>
+      <td align="center"><img src="Sources/assets/messages_screen.png" alt="Messages" width="240"/><br/>Messages</td>
       <td align="center"><img src="Sources/assets/settings_screen.png" alt="Settings" width="240"/><br/>Settings</td>
+    </tr>
+
+<tr>
       <td align="center"><img src="Sources/assets/logo.png" alt="Logo" width="240"/><br/>Logo</td>
       <td align="center"><img src="Sources/assets/splash_screen.png" alt="Splash Screen" width="240"/><br/>Splash Screen</td>
-    </tr>
+</tr>
   </table>
 </div>
 
@@ -170,7 +176,7 @@ constants/      → AppwriteConfig.kt bridges BuildConfig to the app
 ## 🛠 Tech Stack
 
 | Layer          | Technology                   |
-| -------------- | ---------------------------- |
+|----------------|------------------------------|
 | **Language**   | Kotlin                       |
 | **UI**         | Jetpack Compose + Material 3 |
 | **Navigation** | Navigation Compose           |
@@ -183,7 +189,8 @@ constants/      → AppwriteConfig.kt bridges BuildConfig to the app
 
 ## ⚙ Appwrite Setup
 
-This project reads Appwrite settings from `local.properties` and exposes them as `BuildConfig` fields.
+This project reads Appwrite settings from `local.properties` and exposes them as `BuildConfig`
+fields.
 
 **Required Keys:**
 

@@ -12,9 +12,8 @@ import androidx.compose.ui.graphics.toArgb
  */
 fun ComponentActivity.edgeToEdgeWithStyle() {
     enableEdgeToEdge(
-        statusBarStyle = SystemBarStyle.light(
-            scrim = Color.Black.copy(alpha = 0.15f).toArgb(),
-            darkScrim = Color.Black.copy(alpha = 0.15f).toArgb()
+        statusBarStyle = SystemBarStyle.dark(
+            scrim = Color.Red.copy(alpha = 0.15f).toArgb(),
         )
     )
 }

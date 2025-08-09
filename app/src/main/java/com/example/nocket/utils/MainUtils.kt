@@ -36,3 +36,11 @@ fun trimUsername(username: String, takeFirst: Int = 6): String {
         username
     }
 }
+
+fun takeFirstNameOfUser(username: String): String {
+    return if (username.isNotEmpty()) {
+        username.split(" ").firstOrNull() ?: username
+    } else {
+        "Unknown"
+    }
+}

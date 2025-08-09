@@ -22,21 +22,28 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +51,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -134,23 +142,33 @@ fun SettingScreenContent(
 
 @Composable
 fun SettingSectionHeader(settingType: SettingType) {
-    val title = when (settingType) {
-        SettingType.WIDGET -> "😄 Widgets"
-        SettingType.CUSTOMIZE -> "😄 Customize"
-        SettingType.GENERAL -> "😄 General"
-        SettingType.PRIVACY_SAFETY -> "😄 Privacy & Safety"
-        SettingType.SUPPORT -> "😄 Support"
-        SettingType.ABOUT -> "😄 About"
-        SettingType.DANGER_ZONE -> "😄 Danger Zone"
+    val (icon, label) = when (settingType) {
+        SettingType.WIDGET -> Pair(Icons.Default.EmojiEmotions, "Widgets")
+        SettingType.CUSTOMIZE -> Pair(Icons.Default.Build, "Customize")
+        SettingType.GENERAL -> Pair(Icons.Default.Settings, "General")
+        SettingType.PRIVACY_SAFETY -> Pair(Icons.Default.Security, "Privacy & Safety")
+        SettingType.SUPPORT -> Pair(Icons.AutoMirrored.Filled.Help, "Support")
+        SettingType.ABOUT -> Pair(Icons.Default.Info, "About")
+        SettingType.DANGER_ZONE -> Pair(Icons.Default.Warning, "Danger Zone")
     }
 
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 8.dp)
-    )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -165,7 +183,7 @@ fun SettingItem(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isDangerZone)
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
@@ -245,7 +263,7 @@ fun SettingItem(
                     checked = setting.isToggled,
                     onCheckedChange = {
                         onToggleChanged(setting.id, it)
-                    }
+                    },
                 )
             } else {
                 Icon(

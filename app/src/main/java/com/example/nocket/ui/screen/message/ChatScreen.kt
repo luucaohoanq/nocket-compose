@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.MoreVert
@@ -26,9 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.nocket.components.pill.MessageInputPill
 import com.example.nocket.models.Message
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.models.auth.AuthUser
+import com.example.nocket.utils.takeFirstNameOfUser
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
@@ -93,14 +97,19 @@ fun ChatScreen(
             )
         },
         bottomBar = {
-            ChatInputBar(
-                messageText = messageText,
-                onMessageChange = { messageText = it },
-                onSendMessage = {
-                    // Placeholder for future API integration
-                    // Will be implemented later
-                    messageText = ""
-                }
+//            ChatInputBar(
+//                messageText = messageText,
+//                onMessageChange = { messageText = it },
+//                onSendMessage = {
+//                    // Placeholder for future API integration
+//                    // Will be implemented later
+//                    messageText = ""
+//                }
+//            )
+
+            // Message Pill
+            MessageInputPill(
+                modifier = Modifier.padding(bottom = 15.dp)
             )
         }
     ) { paddingValues ->
@@ -165,39 +174,44 @@ fun ChatTopBar(
 ) {
     TopAppBar(
         title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Recipient avatar
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    AsyncImage(
-                        model = recipient.avatar.ifEmpty { 
-                            "https://i.pravatar.cc/150?img=${recipient.id.hashCode() % 70}"
-                        },
-                        contentDescription = "User avatar",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                    // Recipient avatar
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                    ) {
+                        AsyncImage(
+                            model = recipient.avatar.ifEmpty {
+                                "https://i.pravatar.cc/150?img=${recipient.id.hashCode() % 70}"
+                            },
+                            contentDescription = "User avatar",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // Recipient name
+                    Text(
+                        text = takeFirstNameOfUser(recipient.name),
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
-                
-                Spacer(modifier = Modifier.width(12.dp))
-                
-                // Recipient name
-                Text(
-                    text = recipient.name ?: "Unknown User",
-                    style = MaterialTheme.typography.titleMedium
-                )
             }
         },
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
                 )
             }
@@ -224,7 +238,7 @@ fun ChatInputBar(
     onSendMessage: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
         shadowElevation = 4.dp,
         color = MaterialTheme.colorScheme.surface
     ) {
@@ -264,7 +278,7 @@ fun ChatInputBar(
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Send,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send message",
                     tint = if (messageText.isNotBlank()) 
                         MaterialTheme.colorScheme.primary 
