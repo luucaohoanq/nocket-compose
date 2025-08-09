@@ -295,7 +295,7 @@ private fun ProfileHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "@${user.username}",
+                    text = "@${user.email}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -439,6 +439,7 @@ private fun StatItem(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MonthSection(
     monthPosts: MonthPosts,

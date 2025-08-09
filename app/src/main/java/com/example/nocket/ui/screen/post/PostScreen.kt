@@ -57,6 +57,7 @@ fun PostScreen(
             User(
                 id = "everyone",
                 username = "Everyone",
+                email = "",
                 avatar = ""
             )
         )
@@ -145,15 +146,8 @@ fun PostScreen(
                                 .weight(1f),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (isLoading) {
+                            if (isLoading || posts.isEmpty()) {
                                 CircularProgressIndicator()
-                            } else if (posts.isEmpty()) {
-                                // Show empty state
-                                Text(
-                                    text = "No posts yet.\nPosts from you and your friends will appear here.",
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(16.dp)
-                                )
                             } else {
                                 // Filter posts based on selected user
                                 val filteredPosts = when (selectedUser?.id) {

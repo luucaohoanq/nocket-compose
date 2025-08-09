@@ -21,9 +21,10 @@ fun mapToUser(source: AuthUser?): User {
         User(
             id = source.id,
             username = source.name.ifEmpty { "Unknown" },
+            email = source.email.ifEmpty { "Unknown" },
             avatar = source.avatar.ifEmpty { "" }
         )
     } else {
-        User(id = "unknown", username = "Unknown", avatar = "")
+        User(id = "unknown", username = "Unknown", email = "Unknown", avatar = "")
     }
 }

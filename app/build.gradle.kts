@@ -59,6 +59,13 @@ android {
             "\"${properties.getProperty("appwrite.friendships.collection.id") ?: throw RuntimeException(error)}\"")
         buildConfigField("String", "POSTS_COLLECTION_ID",
             "\"${properties.getProperty("appwrite.posts.collection.id") ?: throw RuntimeException(error)}\"")
+
+        buildConfigField("String", "APPWRITE_API_KEY",
+            "\"${properties.getProperty("appwrite.api.key") ?: throw RuntimeException(error)}\"")
+
+        //GET_USERS_FUNCTION_ID
+        buildConfigField("String", "GET_USERS_FUNCTION_ID",
+            "\"${properties.getProperty("appwrite.get.users.function.id") ?: throw RuntimeException(error)}\"")
     }
 
     buildTypes {

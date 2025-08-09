@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.ui.graphics.Color
 import com.example.nocket.constants.DBConfig
+import com.example.nocket.constants.FunctionsConfig
 import com.example.nocket.models.Message
 import com.example.nocket.models.Notification
 import com.example.nocket.models.NotificationType
@@ -50,16 +51,29 @@ class AppwriteRepository @Inject constructor(
     private val databases: Databases,
     private val functions: Functions
 ) {
+    
+    // Cache for user data to prevent duplicate API calls
+    private val userCache = mutableMapOf<String, AuthUser>()
+    private var currentUserCache: AuthUser? = null
 
     suspend fun getCurrentUser(): AuthUser? {
+        // Return cached current user if available
+        currentUserCache?.let { return it }
+        
         return try {
             val user = account.get()
-            AuthUser(
+            val authUser = AuthUser(
                 id = user.id,
                 email = user.email,
                 name = user.name,
                 avatar = (user.prefs.data["avatarUrl"] ?: "") as String
             )
+            
+            // Cache the current user
+            currentUserCache = authUser
+            userCache[authUser.id] = authUser
+            
+            authUser
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}")
              null
@@ -67,21 +81,24 @@ class AppwriteRepository @Inject constructor(
     }
 
     suspend fun getUserByIdCustom(userId: String): AuthUser? {
+        // Check cache first
+        userCache[userId]?.let { 
+            android.util.Log.d("AppwriteRepository", "Returning cached user for ID: $userId")
+            return it 
+        }
+        
         // First check if it's the current user
         val currentUser = getCurrentUser()
         if (currentUser?.id == userId) {
             return currentUser
         }
 
-        // Else, fetch from database / API / placeholder
+        // Else, fetch from the getUserById function which uses Appwrite functions
         return try {
-            // TODO: Replace this with real fetch logic
-            AuthUser(
-                id = userId,
-                name = "User $userId",
-                email = "",
-                avatar = "" // No avatar info for now
-            )
+            val user = getUserById(userId)
+            // Cache the result if successful
+            user?.let { userCache[userId] = it }
+            user
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user by ID: ${e.message}")
             null
@@ -90,24 +107,38 @@ class AppwriteRepository @Inject constructor(
 
     // using Appwrite Functions to get user info by ID
     suspend fun getUserById(userId: String): AuthUser? {
+        // Check cache first (but not current user cache since that's handled in getUserByIdCustom)
+        userCache[userId]?.let { 
+            android.util.Log.d("AppwriteRepository", "Returning cached user from getUserById for ID: $userId")
+            return it 
+        }
+        
+        val functionId = FunctionsConfig.GET_USERS_FUNCTION_ID
+
         return try {
             // Pass userId as a query parameter in the path
             val execution = functions.createExecution(
-                functionId = "getUserInfo",
+                functionId = functionId,
                 path = "?userId=$userId",
                 method = ExecutionMethod.GET
             )
 
             // Parse the response string
             val responseData = execution.responseBody
+            android.util.Log.d("AppwriteRepository", "Fresh API call - Response: $responseData")
             val json = JSONObject(responseData)
 
-            AuthUser(
+            val authUser = AuthUser(
                 id = json.getString("id"),
                 email = json.optString("email"),
                 name = json.optString("name"),
                 avatar = json.optString("avatarUrl")
             )
+            
+            // Cache the result
+            userCache[userId] = authUser
+            
+            authUser
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}", e)
             null
@@ -198,19 +229,23 @@ class AppwriteRepository @Inject constructor(
             
             android.util.Log.d("AppwriteRepository", "Fetched ${posts.documents.size} posts for user ${user.id} and ${friendIds.size} friends")
             
+            // Extract all unique user IDs from posts
+            val postUserIds = posts.documents.map { doc ->
+                doc.data["userId"] as String
+            }.distinct()
+            
+            // Batch fetch all users
+            val usersMap = getUsersByIds(postUserIds)
+            
             // Convert documents to Post objects
             return posts.documents.mapNotNull { doc ->
                 try {
                     val userId = doc.data["userId"] as String
-                    val postUser = getUserByIdCustom(userId) ?: return@mapNotNull null
+                    val postUser = usersMap[userId] ?: return@mapNotNull null
 
                     Post(
                         id = doc.id,
-                        user = User(
-                            id = postUser.id,
-                            username = postUser.name ?: "Unknown",
-                            avatar = postUser.avatar
-                        ),
+                        user = User.mapToUser(postUser),
                         postType = PostType.valueOf((doc.data["postType"] as? String) ?: "IMAGE"),
                         caption = doc.data["caption"] as? String,
                         thumbnailUrl = (doc.data["thumbnailUrl"] as? String) ?: "",
@@ -242,18 +277,22 @@ class AppwriteRepository @Inject constructor(
                 )
             )
 
+            // Extract all unique user IDs from posts
+            val postUserIds = posts.documents.map { doc ->
+                doc.data["userId"] as String
+            }.distinct()
+            
+            // Batch fetch all users
+            val usersMap = getUsersByIds(postUserIds)
+
             return posts.documents.mapNotNull { doc ->
                 try {
                     val postUserId = doc.data["userId"] as String
-                    val postUser = getUserByIdCustom(postUserId) ?: return@mapNotNull null
+                    val postUser = usersMap[postUserId] ?: return@mapNotNull null
 
                     Post(
                         id = doc.id,
-                        user = User(
-                            id = postUser.id,
-                            username = postUser.name ?: "Unknown",
-                            avatar = postUser.avatar
-                        ),
+                        user = User.mapToUser(postUser),
                         postType = PostType.valueOf((doc.data["postType"] as? String) ?: "IMAGE"),
                         caption = doc.data["caption"] as? String,
                         thumbnailUrl = (doc.data["thumbnailUrl"] as? String) ?: "",
@@ -413,21 +452,65 @@ class AppwriteRepository @Inject constructor(
                 val user2Id = doc.data["user2Id"] as String
                 if (user1Id == user.id) user2Id else user1Id
             }
-            friendIds.mapNotNull { friendId ->
-                android.util.Log.d("AppwriteRepository", "Fetched ${friendIds.size} friends for user ${user.id} with data $friendId")
-
-                val friend = getUserByIdCustom(friendId)
-                friend?.let {
-                    User(
-                        id = it.id,
-                        username = it.name ?: "Unknown",
-                        avatar = it.avatar
-                    )
-                }
+            
+            android.util.Log.d("AppwriteRepository", "Fetched ${friendIds.size} friend IDs for user ${user.id}")
+            
+            // Batch fetch all friends
+            val friendsMap = getUsersByIds(friendIds)
+            
+            return friendsMap.values.map { authUser ->
+                User.mapToUser(authUser)
             }
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching friends: ${e.message}")
             emptyList()
         }
+    }
+
+    /**
+     * Clear all cached user data. Useful when logging out or when data needs to be refreshed.
+     */
+    fun clearUserCache() {
+        userCache.clear()
+        currentUserCache = null
+        android.util.Log.d("AppwriteRepository", "User cache cleared")
+    }
+    
+    /**
+     * Clear cache for a specific user. Useful when user data has been updated.
+     */
+    fun clearUserFromCache(userId: String) {
+        userCache.remove(userId)
+        if (currentUserCache?.id == userId) {
+            currentUserCache = null
+        }
+        android.util.Log.d("AppwriteRepository", "Cleared cache for user: $userId")
+    }
+
+    /**
+     * Batch fetch multiple users efficiently. Only fetches users that are not in cache.
+     */
+    suspend fun getUsersByIds(userIds: List<String>): Map<String, AuthUser> {
+        val result = mutableMapOf<String, AuthUser>()
+        val uncachedUserIds = mutableListOf<String>()
+        
+        // First, collect all cached users
+        userIds.forEach { userId ->
+            userCache[userId]?.let { cachedUser ->
+                result[userId] = cachedUser
+            } ?: run {
+                uncachedUserIds.add(userId)
+            }
+        }
+        
+        // Fetch uncached users
+        uncachedUserIds.forEach { userId ->
+            getUserById(userId)?.let { user ->
+                result[userId] = user
+            }
+        }
+        
+        android.util.Log.d("AppwriteRepository", "Batch fetched ${userIds.size} users: ${result.size} found, ${uncachedUserIds.size} were not cached")
+        return result
     }
 }

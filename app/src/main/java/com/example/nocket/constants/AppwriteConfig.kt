@@ -28,6 +28,11 @@ object AppwriteConfig {
      * Appwrite server endpoint url.
      */
     const val APPWRITE_PUBLIC_ENDPOINT = BuildConfig.APPWRITE_PUBLIC_ENDPOINT
+
+    /**
+     * Appwrite API key for server-side operations.
+     */
+    const val APPWRITE_API_KEY = BuildConfig.APPWRITE_API_KEY
 }
 
 object DBConfig {
@@ -63,4 +68,11 @@ object DBConfig {
     const val POSTS_COLLECTION_ID = BuildConfig.POSTS_COLLECTION_ID
 
 
+}
+
+object FunctionsConfig {
+    /**
+     * Appwrite function id for sending notifications.
+     */
+    const val GET_USERS_FUNCTION_ID = BuildConfig.GET_USERS_FUNCTION_ID
 }
