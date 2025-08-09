@@ -1,6 +1,7 @@
 package com.example.nocket.ui.screen.post
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.example.nocket.models.Post
 import com.example.nocket.models.User
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
+import com.example.nocket.utils.mapToUser
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 
@@ -61,23 +63,21 @@ fun PostScreen(
     }
 
     // Get current user from auth state
-    val currentUser = if (authState is AuthState.Authenticated) {
-        val authUser = (authState as AuthState.Authenticated).user
-        User(
-            id = authUser.id,
-            username = authUser.name ?: "You",
-            avatar = authUser.avatar
-        )
-    } else null
-    
+    val currentUser by appwriteViewModel.currentUser.collectAsState()
+    val data = mapToUser(currentUser)
+
     // Fetch posts and friends when authenticated
     LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            isLoading = true
-            val user = (authState as AuthState.Authenticated).user
-            appwriteViewModel.getAllPostsOfUserAndFriends(user)
-            appwriteViewModel.fetchFriendsOfUser(user)
-            isLoading = false
+        when (authState){
+            is AuthState.Authenticated -> {
+                Log.d("UserDebug", "Auth State: Authenticated")
+                isLoading = true
+                val user = (authState as AuthState.Authenticated).user
+                appwriteViewModel.getAllPostsOfUserAndFriends(user)
+                appwriteViewModel.fetchFriendsOfUser(user)
+                appwriteViewModel.fetchCurrentUser()
+                isLoading = false
+            } else -> Log.d("PostScreen", "User is not authenticated, skipping post fetch")
         }
     }
 
@@ -98,10 +98,14 @@ fun PostScreen(
                     topBar = {
                         MainTopBar(
                             navController = navController,
-                            user = currentUser ?: User(id = "", username = "Guest", avatar = ""),
+                            user = data,
                             friends = friends,
                             onMessageClick = { navController.navigate(Screen.Message.route) },
-                            onProfileClick = { navController.navigate(Screen.Profile.route) },
+                            onProfileClick = { 
+                                data?.id?.let { userId ->
+                                    navController.navigate("profile?userId=$userId")
+                                } ?: navController.navigate("profile")
+                            },
                             onNotificationClick = { showNotifications = true },
                             onUserSelected = { user -> 
                                 selectedUser = user
@@ -110,9 +114,9 @@ fun PostScreen(
                                     // Fetch posts for selected user if it's not "everyone"
                                     if (nonNullUser.id != "everyone" && nonNullUser.id != "you" && authState is AuthState.Authenticated) {
                                         appwriteViewModel.getPostsForUser(nonNullUser.id)
-                                    } else if (nonNullUser.id == "you" && currentUser != null) {
+                                    } else if (nonNullUser.id == "you") {
                                         // Fetch current user's posts
-                                        appwriteViewModel.getPostsForUser(currentUser.id)
+                                        appwriteViewModel.getPostsForUser(data.id)
                                     } else if (authState is AuthState.Authenticated) {
                                         // Fetch all posts
                                         val authUser = (authState as AuthState.Authenticated).user

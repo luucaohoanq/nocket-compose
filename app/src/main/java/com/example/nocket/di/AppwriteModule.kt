@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import io.appwrite.Client
 import io.appwrite.services.Account
 import io.appwrite.services.Databases
+import io.appwrite.services.Functions
 import javax.inject.Singleton
 
 @Module
@@ -39,6 +40,14 @@ object AppwriteModule {
     @Singleton
     fun provideDatabases(client: Client): Databases {
         return Databases(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppwriteFunctions(
+        client: Client
+    ): Functions {
+        return Functions(client)
     }
 
     @Provides

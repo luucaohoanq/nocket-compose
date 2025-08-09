@@ -122,8 +122,12 @@ fun Navigation(
                 PostScreen(navController)
             }
 
-            composable(Screen.Profile.route) {
-                UserProfile(navController = navController)
+            composable(
+                route = "profile?userId={userId}",
+                arguments = listOf(navArgument("userId") { nullable = true })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")
+                UserProfile(navController = navController, userId = userId)
             }
 
             composable(Screen.Relationship.route) {

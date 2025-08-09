@@ -15,16 +15,20 @@ import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
 import com.example.nocket.models.User
 import com.example.nocket.models.appwrite.Log
+
 import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.utils.mapToResponse
 import io.appwrite.Client
 import io.appwrite.Query
+import io.appwrite.enums.ExecutionMethod
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.DocumentList
 import io.appwrite.services.Account
 import io.appwrite.services.Databases
+import io.appwrite.services.Functions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -43,35 +47,70 @@ import javax.inject.Singleton
 class AppwriteRepository @Inject constructor(
     private val client: Client,
     private val account: Account,
-    private val databases: Databases
+    private val databases: Databases,
+    private val functions: Functions
 ) {
 
-    suspend fun getUserById(userId: String): AuthUser? {
-        try {
-            // Get user from Appwrite Account service
+    suspend fun getCurrentUser(): AuthUser? {
+        return try {
             val user = account.get()
-
-            // If the current user is the sender, return their information
-            if (user.id == userId) {
-                return AuthUser(
-                    id = user.id,
-                    email = user.email,
-                    name = user.name,
-                    avatar = "" // Appwrite doesn't store avatars in the default user account
-                )
-            } else {
-                // For other users, we need to use the Teams or similar API
-                // or implement a solution to fetch other users' info
-                return AuthUser(
-                    id = userId,
-                    name = "User $userId",
-                    email = "",
-                    avatar = ""
-                )
-            }
+            AuthUser(
+                id = user.id,
+                email = user.email,
+                name = user.name,
+                avatar = (user.prefs.data["avatarUrl"] ?: "") as String
+            )
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}")
-            return null
+             null
+        }
+    }
+
+    suspend fun getUserByIdCustom(userId: String): AuthUser? {
+        // First check if it's the current user
+        val currentUser = getCurrentUser()
+        if (currentUser?.id == userId) {
+            return currentUser
+        }
+
+        // Else, fetch from database / API / placeholder
+        return try {
+            // TODO: Replace this with real fetch logic
+            AuthUser(
+                id = userId,
+                name = "User $userId",
+                email = "",
+                avatar = "" // No avatar info for now
+            )
+        } catch (e: Exception) {
+            android.util.Log.e("AppwriteRepository", "Error fetching user by ID: ${e.message}")
+            null
+        }
+    }
+
+    // using Appwrite Functions to get user info by ID
+    suspend fun getUserById(userId: String): AuthUser? {
+        return try {
+            // Pass userId as a query parameter in the path
+            val execution = functions.createExecution(
+                functionId = "getUserInfo",
+                path = "?userId=$userId",
+                method = ExecutionMethod.GET
+            )
+
+            // Parse the response string
+            val responseData = execution.responseBody
+            val json = JSONObject(responseData)
+
+            AuthUser(
+                id = json.getString("id"),
+                email = json.optString("email"),
+                name = json.optString("name"),
+                avatar = json.optString("avatarUrl")
+            )
+        } catch (e: Exception) {
+            android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}", e)
+            null
         }
     }
 
@@ -163,7 +202,7 @@ class AppwriteRepository @Inject constructor(
             return posts.documents.mapNotNull { doc ->
                 try {
                     val userId = doc.data["userId"] as String
-                    val postUser = getUserById(userId) ?: return@mapNotNull null
+                    val postUser = getUserByIdCustom(userId) ?: return@mapNotNull null
 
                     Post(
                         id = doc.id,
@@ -185,6 +224,47 @@ class AppwriteRepository @Inject constructor(
             }
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching posts: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getPostsForUser(userId: String): List<Post> {
+        try {
+            val posts = databases.listDocuments(
+                databaseId = DBConfig.DATABASE_ID,
+                collectionId = DBConfig.POSTS_COLLECTION_ID,
+                queries = listOf(
+                    Query.equal("userId", userId),
+                    Query.equal("isArchived", false),
+                    Query.orderDesc("\$createdAt"),
+                    Query.limit(50)
+                )
+            )
+
+            return posts.documents.mapNotNull { doc ->
+                try {
+                    val postUserId = doc.data["userId"] as String
+                    val postUser = getUserByIdCustom(postUserId) ?: return@mapNotNull null
+
+                    Post(
+                        id = doc.id,
+                        user = User(
+                            id = postUser.id,
+                            username = postUser.name ?: "Unknown",
+                            avatar = postUser.avatar
+                        ),
+                        postType = PostType.valueOf((doc.data["postType"] as? String) ?: "IMAGE"),
+                        caption = doc.data["caption"] as? String,
+                        thumbnailUrl = (doc.data["thumbnailUrl"] as? String) ?: "",
+                        isArchived = (doc.data["isArchived"] as? Boolean) ?: false,
+                        createdAt = doc.data["\$createdAt"] as String
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
             return emptyList()
         }
     }
@@ -334,7 +414,9 @@ class AppwriteRepository @Inject constructor(
                 if (user1Id == user.id) user2Id else user1Id
             }
             friendIds.mapNotNull { friendId ->
-                val friend = getUserById(friendId)
+                android.util.Log.d("AppwriteRepository", "Fetched ${friendIds.size} friends for user ${user.id} with data $friendId")
+
+                val friend = getUserByIdCustom(friendId)
                 friend?.let {
                     User(
                         id = it.id,

@@ -29,12 +29,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +56,10 @@ import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.auth.AuthState
+import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
+import com.example.nocket.utils.mapToUser
+import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
 
@@ -96,28 +101,40 @@ fun calculateDaysOfMonthInYear(
 @Composable
 fun UserProfile(
     navController: NavController,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    userId: String? = null,
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
-    // Get current authenticated user
-    val authState by authViewModel.authState.collectAsState()
+    // State for storing profile data
+    var profileUser by remember { mutableStateOf<AuthUser?>(null) }
+    val currentUser by appwriteViewModel.currentUser.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
 
-    // Use authState.user if authenticated, fallback to sample data if not
-    val currentUser = when (authState) {
-        is AuthState.Authenticated -> (authState as AuthState.Authenticated).user
-        else -> null
+    // Fetch the correct user based on userId parameter
+    LaunchedEffect(userId, currentUser) {
+        isLoading = true
+        profileUser = if (userId == null || userId == currentUser?.id) {
+            // Show current user profile
+            currentUser
+        } else {
+            // Fetch the other user's profile using suspend function
+            appwriteViewModel.getUserByIdSuspend(userId)
+        }
+        isLoading = false
     }
 
-    // If user is authenticated, display their profile
-    // Otherwise, use sample data (for development/preview)
-    val user = currentUser?.let {
-        // Map AuthUser to User model that the UI expects
-        com.example.nocket.models.User(
-            id = it.id,
-            username = it.name ?: "User",
-        )
-    } ?: SampleData.users[0]  // Fallback to sample data if no authenticated user
+    // Convert to User model for display
+    val data = profileUser?.let { mapToUser(it) }
 
-    val posts = SampleData.samplePosts.filter { it.user.id == user.id }
+    // Fetch posts for the profile user
+    LaunchedEffect(data?.id) {
+        data?.id?.let { userIdToFetch ->
+            appwriteViewModel.getPostsOfUser(userIdToFetch)
+        }
+    }
+
+    // Collect posts from the ViewModel
+    val posts by appwriteViewModel.userPosts.collectAsState()
     var selectedPost by remember { mutableStateOf<Post?>(null) }
 
     // Group posts by month and year
@@ -132,10 +149,31 @@ fun UserProfile(
             )
         }
 
+        isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        data == null -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("User not found")
+            }
+        }
+
         else -> {
             Scaffold(
                 topBar = {
-                    UserProfileTopBar(navController)
+                    UserProfileTopBar(
+                        navController = navController,
+                        user = data
+                    )
                 }
             ) { paddingValues ->
                 LazyColumn(
@@ -147,10 +185,9 @@ fun UserProfile(
                 ) {
                     // Profile Header
                     item {
-                        ProfileHeader(user = user)
+                        ProfileHeader(user = data)
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-
 
                     // Posts grouped by month/year
                     items(groupedPosts) { monthPosts ->

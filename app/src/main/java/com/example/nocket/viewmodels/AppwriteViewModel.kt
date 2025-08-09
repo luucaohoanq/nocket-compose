@@ -56,17 +56,44 @@ class AppwriteViewModel @Inject constructor(
     private val _friends = MutableStateFlow<List<User>>(emptyList())
     val friends: StateFlow<List<User>> = _friends.asStateFlow()
 
+    // Current user StateFlow
+    private val _currentUser = MutableStateFlow<AuthUser?>(null)
+    val currentUser: StateFlow<AuthUser?> = _currentUser.asStateFlow()
+
+    fun fetchCurrentUser() {
+        viewModelScope.launch {
+            try {
+                val user = repository.getCurrentUser()
+                _currentUser.value = user
+            } catch (e: Exception) {
+                AndroidLog.d("AppwriteViewModel", "Error fetching user: ${e.message}")
+            }
+        }
+    }
+
     fun getUserById(userId: String) {
         viewModelScope.launch {
             try {
                 // Skip if already in cache
                 if (_users.value.containsKey(userId)) return@launch
 
-                val user = repository.getUserById(userId)
+                val user = repository.getUserByIdCustom(userId)
                 _users.value = _users.value + (userId to user)
             } catch (e: Exception) {
                 AndroidLog.d("AppwriteViewModel", "Error fetching user: ${e.message}")
             }
+        }
+    }
+
+    /**
+     * Get a user by ID and return it directly (suspend function)
+     */
+    suspend fun getUserByIdSuspend(userId: String): AuthUser? {
+        return try {
+            repository.getUserByIdCustom(userId)
+        } catch (e: Exception) {
+            AndroidLog.e("AppwriteViewModel", "Error fetching user by ID: ${e.message}")
+            null
         }
     }
 
@@ -217,6 +244,22 @@ class AppwriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching posts for user $userId: ${e.message}", e)
                 // Just log the error, UI will handle empty state
+            }
+        }
+    }
+
+    private val _userPosts = MutableStateFlow<List<Post>>(emptyList())
+    val userPosts: StateFlow<List<Post>> = _userPosts.asStateFlow()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getPostsOfUser(userId: String) {
+        viewModelScope.launch {
+            try {
+                val posts = repository.getPostsForUser(userId)
+                _userPosts.value = posts
+            } catch (e: Exception) {
+                _userPosts.value = emptyList()
+                AndroidLog.e("AppwriteViewModel", "Error fetching user posts: ${e.message}")
             }
         }
     }

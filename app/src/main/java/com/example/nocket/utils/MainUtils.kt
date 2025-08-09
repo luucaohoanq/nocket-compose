@@ -1,5 +1,7 @@
 package com.example.nocket.utils
 
+import com.example.nocket.models.User
+import com.example.nocket.models.auth.AuthUser
 import io.appwrite.models.DocumentList
 
 inline fun <reified T> mapToResponse(
@@ -8,5 +10,17 @@ inline fun <reified T> mapToResponse(
 ): List<T> {
     return source.documents.map { document ->
         mapper(document.data)
+    }
+}
+
+fun mapToUser(source: AuthUser?): User {
+    return if (source != null) {
+        User(
+            id = source.id,
+            username = source.name.ifEmpty { "Unknown" },
+            avatar = source.avatar.ifEmpty { "" }
+        )
+    } else {
+        User(id = "unknown", username = "Unknown", avatar = "")
     }
 }

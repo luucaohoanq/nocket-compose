@@ -128,6 +128,8 @@ class AuthRepository @Inject constructor(
                 account.createEmailPasswordSession(email, password)
                 
                 AuthUser.fromAppwriteUser(user)
+
+                // Manually add user to user_details collection to hold additional info
             }
         } catch (e: AppwriteException) {
             Log.e("AuthRepository", "Registration failed: ${e.message}", e)

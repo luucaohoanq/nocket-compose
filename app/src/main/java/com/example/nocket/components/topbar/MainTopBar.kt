@@ -128,7 +128,11 @@ fun MainTopBar(
     unreadMessages: Int = 0,
     unreadNotifications: Int = 0,
     onMessageClick: () -> Unit = { navController?.navigate(Screen.Message.route) },
-    onProfileClick: () -> Unit = { navController?.navigate(Screen.Profile.route) },
+    onProfileClick: () -> Unit = {
+        user?.id?.let { userId ->
+            navController?.navigate("profile?userId=$userId")
+        }
+    },
     onNotificationClick: () -> Unit = {},
     onUserSelected: (User?) -> Unit = {}
 ) {

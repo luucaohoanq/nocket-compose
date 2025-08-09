@@ -34,6 +34,7 @@ import com.example.nocket.Screen
 @Composable
 fun UserProfileTopBar(
     navController: NavController,
+    user: com.example.nocket.models.User? = null
 ) {
     CenterAlignedTopAppBar(
         modifier = Modifier.padding(horizontal = 20.dp),
