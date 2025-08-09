@@ -28,3 +28,11 @@ fun mapToUser(source: AuthUser?): User {
         User(id = "unknown", username = "Unknown", email = "Unknown", avatar = "")
     }
 }
+
+fun trimUsername(username: String, takeFirst: Int = 6): String {
+    return if (username.length > 10) {
+        username.take(takeFirst) + "..."
+    } else {
+        username
+    }
+}

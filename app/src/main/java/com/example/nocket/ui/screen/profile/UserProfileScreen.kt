@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.empty.EmptyDayItem
 import com.example.nocket.components.grid.PostGridItemWithBadge
 import com.example.nocket.components.topbar.UserProfileTopBar
@@ -60,6 +60,7 @@ import com.example.nocket.models.Post
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
+import com.example.nocket.ui.theme.BrownSurface
 import com.example.nocket.utils.calculateDaysOfMonthInYear
 import com.example.nocket.utils.groupPostsByDay
 import com.example.nocket.utils.groupPostsByMonthYear
@@ -67,6 +68,7 @@ import com.example.nocket.utils.mapToUser
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
+import kotlin.times
 
 data class MonthPosts(
     val month: Month,
@@ -176,7 +178,7 @@ fun UserProfile(
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = MaterialTheme.colorScheme.background,
-                            shadowElevation = 2.dp
+                            shadowElevation = 8.dp
                         ) {
                             ProfileHeader(
                                 user = data,
@@ -280,16 +282,6 @@ private fun ProfileHeader(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            // Email (only if authenticated)
-            authUser?.email?.let { email ->
-                Text(
-                    text = email,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
             // Handle with link icon
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -310,27 +302,17 @@ private fun ProfileHeader(
         }
 
         // Profile Picture
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                )
-                .padding(4.dp)
-        ) {
-            AsyncImage(
-                model = user.avatar,
-                contentDescription = "Profile picture",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+        Circle(
+            outerSize = 100.dp,
+            gap = 5.dp,
+            backgroundColor = Color(0xFF404137),
+            borderColor = Color(0xFFFFD700),
+            onClick = {},
+            imageSetting = ImageSetting(
+                imageUrl = user.avatar,
+                contentDescription = "Profile picture"
             )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
+        )
     }
 }
 
@@ -394,8 +376,8 @@ private fun ProfileStats(
                     )
 
                     VerticalDivider(
-                        color = Color(0xFFFFD700),
-                        modifier = Modifier.height(40.dp)
+                        color = BrownSurface,
+                        modifier = Modifier.height(20.dp)
                     )
 
                     StatItem(
@@ -457,30 +439,101 @@ private fun MonthSection(
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        // Group posts by day
-        val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
-        val postsByDay = groupPostsByDay(monthPosts.posts, daysInMonth)
+        // Calendar Grid for this month
+        MonthCalendarGrid(
+            monthPosts = monthPosts,
+            onPostClick = onPostClick
+        )
+    }
+}
 
-        // Posts grid for this month with enhanced spacing
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.height(
-                ((daysInMonth + 6) / 7 * 65).dp // Increased height for badges
-            )
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun MonthCalendarGrid(
+    monthPosts: MonthPosts,
+    onPostClick: (Post) -> Unit
+) {
+    val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
+    val postsByDay = groupPostsByDay(monthPosts.posts, daysInMonth)
+    
+    // Get the first day of the month and calculate offset
+    val firstDayOfMonth = LocalDate.of(monthPosts.year, monthPosts.month.ordinal + 1, 1)
+    val startDayOffset = (firstDayOfMonth.dayOfWeek.value - 1) % 7 // Monday = 0, Sunday = 6
+    
+    // Calculate total cells needed (offset + days in month)
+    val totalCells = startDayOffset + daysInMonth
+    val rows = (totalCells + 6) / 7 // Round up to get number of rows
+    
+    Log.d("Calendar", "Month: ${monthPosts.month.displayName} ${monthPosts.year}")
+    Log.d("Calendar", "First day: ${firstDayOfMonth.dayOfWeek}, Offset: $startDayOffset")
+    Log.d("Calendar", "Days in month: $daysInMonth, Total cells: $totalCells, Rows: $rows")
+    
+    Column(
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        // Day headers (Mon, Tue, Wed, etc.)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            items(daysInMonth) { dayIndex ->
-                val dayNumber = dayIndex + 1
-                val dayPostGroup = postsByDay[dayNumber]
-
-                if (dayPostGroup != null && dayPostGroup.posts.isNotEmpty()) {
-                    PostGridItemWithBadge(
-                        dayPostGroup = dayPostGroup,
-                        onClick = { onPostClick(dayPostGroup.primaryPost!!) }
+            val dayHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+            dayHeaders.forEach { dayHeader ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(30.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = dayHeader,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
                     )
-                } else {
-                    EmptyDayItem()
+                }
+            }
+        }
+        
+        // Calendar grid rows
+        repeat(rows) { rowIndex ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(7) { columnIndex ->
+                    val cellIndex = rowIndex * 7 + columnIndex
+                    
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(65.dp)
+                    ) {
+                        when {
+                            // Empty cell before month starts
+                            cellIndex < startDayOffset -> {
+                                // Invisible placeholder to maintain grid structure
+                                Box(modifier = Modifier.fillMaxSize())
+                            }
+                            // Days within the month
+                            cellIndex < startDayOffset + daysInMonth -> {
+                                val dayNumber = cellIndex - startDayOffset + 1
+                                val dayPostGroup = postsByDay[dayNumber]
+                                
+                                if (dayPostGroup != null && dayPostGroup.posts.isNotEmpty()) {
+                                    PostGridItemWithBadge(
+                                        dayPostGroup = dayPostGroup,
+                                        onClick = { onPostClick(dayPostGroup.primaryPost!!) }
+                                    )
+                                } else {
+                                    EmptyDayItem(dayNumber = dayNumber)
+                                }
+                            }
+                            // Empty cells after month ends (shouldn't happen with our calculation)
+                            else -> {
+                                Box(modifier = Modifier.fillMaxSize())
+                            }
+                        }
+                    }
                 }
             }
         }

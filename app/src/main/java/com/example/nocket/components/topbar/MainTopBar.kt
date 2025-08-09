@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Group
@@ -63,11 +64,13 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.nocket.Screen
 import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.IconSetting
 import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.circle.ImageSource
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
+import com.example.nocket.utils.trimUsername
 import kotlin.text.compareTo
 
 val avatarWidth = 40.dp
@@ -161,7 +164,7 @@ fun MainTopBar(
         mutableStateOf<User?>(
             User(
                 id = "everyone",
-                username = "Everyone", 
+                username = "Everyone",
                 avatar = ""
             )
         )
@@ -259,21 +262,17 @@ fun MainTopBar(
                                             )
                                         }
                                     } else if (friend.id == "everyone") {
-                                        Button(
-                                            onClick = { },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(0xFF4B6EAF)
-                                            ),
-                                            modifier = Modifier.size(avatarWidth),
-                                            contentPadding = PaddingValues(0.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Group,
-                                                contentDescription = "Everyone",
-                                                tint = Color.White,
-                                                modifier = Modifier.size(20.dp)
+                                        Circle(
+                                            outerSize = avatarWidth,
+                                            gap = 10.dp,
+                                            backgroundColor = Color(0xFFB8B8B8),
+                                            borderColor = Color(0xFFB8B8B8),
+                                            onClick = {},
+                                            iconSetting = IconSetting(
+                                                icon = Icons.Filled.Group,
+                                                contentDescription = "Everyone"
                                             )
-                                        }
+                                        )
                                     } else if (friend.id == "you") {
                                         // "You" item - show user avatar or fallback icon
                                         if (user?.avatar?.isNotEmpty() == true) {
@@ -331,7 +330,7 @@ fun MainTopBar(
                                         text = when (friend.id) {
                                             "everyone" -> "Everyone"
                                             "you" -> "You"
-                                            else -> friend.username ?: "Unknown"
+                                            else -> trimUsername(friend.username, 20) ?: "Unknown"
                                         },
                                         color = Color.White,
                                         fontWeight = FontWeight.Medium,
@@ -441,15 +440,19 @@ fun MainTopBar(
 @Composable
 fun MainTopBarPreview() {
     // Create sample data for preview
-    val previewUser = User(id = "preview_user", username = "Preview User", avatar = "https://i.pravatar.cc/150?img=3")
+    val previewUser = User(
+        id = "preview_user",
+        username = "Preview User",
+        avatar = "https://i.pravatar.cc/150?img=3"
+    )
     val previewFriends = List(3) { index ->
         User(
-            id = "friend_$index", 
-            username = "Friend ${index + 1}", 
+            id = "friend_$index",
+            username = "Friend ${index + 1}",
             avatar = if (index % 2 == 0) "https://i.pravatar.cc/150?img=${index + 5}" else ""
         )
     }
-    
+
     MainTopBar(
         navController = rememberNavController(),
         user = previewUser,

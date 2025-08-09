@@ -20,6 +20,7 @@ import com.example.nocket.components.circle.Circle
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
+import com.example.nocket.utils.trimUsername
 
 @Composable
 fun FriendList(
@@ -81,22 +82,14 @@ fun FriendItem(
         onClick = onClick,
         innerContent = {
             AsyncImage(
-                model = user.avatar.ifEmpty { 
-                    "https://i.pravatar.cc/150?img=${user.id.hashCode() % 70}" 
+                model = user.avatar.ifEmpty {
+                    "https://i.pravatar.cc/150?img=${user.id.hashCode() % 70}"
                 },
                 contentDescription = "Avatar",
                 contentScale = ContentScale.Crop,
             )
         }
     )
-}
-
-private fun trimUsername(username: String): String {
-    return if (username.length > 10) {
-        username.take(6) + "..."
-    } else {
-        username
-    }
 }
 
 

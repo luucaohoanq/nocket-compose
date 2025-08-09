@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -43,6 +45,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nocket.Screen
 
+
+val buttons = listOf(
+    Triple(Icons.Filled.Group, Screen.Message.route, "Friends"),
+    Triple(Icons.Filled.Settings, Screen.Setting.route, "Settings"),
+    Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home")
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileTopBar(
@@ -60,79 +69,84 @@ fun UserProfileTopBar(
 
     CenterAlignedTopAppBar(
         modifier = Modifier.padding(horizontal = 20.dp),
-        title = {
-        },
+        title = {},
         navigationIcon = {
-            Box(
-                modifier = Modifier.fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ){
-                Card(
-                    modifier = Modifier
-                        .padding(bottom = 10.dp)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(5.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            Card(
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(5.dp)
                     ),
-                    shape = RoundedCornerShape(5.dp)
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                ),
+                shape = RoundedCornerShape(5.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clickable { /* TODO: Handle gold purchase */ }
+//                        .background(
+//                            brush = Brush.linearGradient(
+//                                colors = listOf(
+//                                    Color(0xFFFFD700),
+//                                    Color(0xFFFFA500),
+//                                    Color(0xFFFFD700)
+//                                )
+//                            ),
+//                            shape = RoundedCornerShape(5.dp)
+//                        )
+                        .border(
+                            width = 2.dp, // border thickness
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFFFFD700),
+                                    Color(0xFFFFA500),
+                                    Color(0xFFFFD700)
+                                )
+                            ),
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
+                    // Shimmer overlay
+                    Canvas(
                         modifier = Modifier
-                            .clickable { /* TODO: Handle gold purchase */ }
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFFFFD700),
-                                        Color(0xFFFFA500),
-                                        Color(0xFFFFD700)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(5.dp)
-                            )
-                            .padding(horizontal = 20.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                            .matchParentSize()
+                            .clip(RoundedCornerShape(25.dp))
                     ) {
-                        // Shimmer overlay
-                        Canvas(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clip(RoundedCornerShape(25.dp))
-                        ) {
-                            val shimmerWidth = 100.dp.toPx()
-                            val shimmerOffset = shimmerTranslateAnim.value - shimmerWidth
+                        val shimmerWidth = 100.dp.toPx()
+                        val shimmerOffset = shimmerTranslateAnim.value - shimmerWidth
 
-                            drawRect(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color.White.copy(alpha = 0.3f),
-                                        Color.Transparent
-                                    ),
-                                    start = Offset(shimmerOffset, 0f),
-                                    end = Offset(shimmerOffset + shimmerWidth, size.height)
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = 0.3f),
+                                    Color.Transparent
                                 ),
-                                size = size
-                            )
-                        }
+                                start = Offset(shimmerOffset, 0f),
+                                end = Offset(shimmerOffset + shimmerWidth, size.height)
+                            ),
+                            size = size
+                        )
+                    }
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Get Locket Gold",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                        }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Get Locket Gold",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
             }
+
         },
         actions = {
             Row(
@@ -140,44 +154,23 @@ fun UserProfileTopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 8.dp)
             ) {
-                Button(
-                    onClick = { navController.navigate(Screen.Message.route) },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.Transparent),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Group,
-                        contentDescription = "Friends",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Button(
-                    onClick = { navController.navigate(Screen.Setting.route) },
-                    modifier = Modifier.size(40.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Settings",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Button(
-                    onClick = { navController.navigate(Screen.Post.route) },
-                    modifier = Modifier.size(40.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Home",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                buttons.forEach { (icon, route, description) ->
+                    Button(
+                        onClick = { navController.navigate(route) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = description,
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 }
             }
         },

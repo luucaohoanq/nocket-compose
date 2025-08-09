@@ -8,6 +8,7 @@ import com.example.nocket.models.Post
 import com.example.nocket.ui.screen.profile.DayPostGroup
 import com.example.nocket.ui.screen.profile.MonthPosts
 import java.time.LocalDate
+import kotlin.rem
 
 fun calculateDaysOfMonthInYear(
     month: Month,
@@ -91,5 +92,20 @@ fun groupPostsByDay(posts: List<Post>, daysInMonth: Int): Map<Int, DayPostGroup>
             dayNumber = dayNumber,
             posts = postsOnDay
         )
+    }
+}
+
+enum class StartDateStyle {
+    MONDAY, SUNDAY
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getStartDayOffset(style: StartDateStyle = StartDateStyle.MONDAY, month: Month, year: Int): Int {
+    val firstDay = LocalDate.of(year, month.ordinal + 1, 1)
+    if (style == StartDateStyle.SUNDAY) {
+        // If style is Sunday, we need to adjust the first day of the week
+        return firstDay.dayOfWeek.value % 7
+    } else {
+        return (firstDay.dayOfWeek.value - 1) % 7
     }
 }

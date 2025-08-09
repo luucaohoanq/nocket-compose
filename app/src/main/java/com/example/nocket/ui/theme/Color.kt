@@ -2,15 +2,6 @@ package com.example.nocket.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Old colors
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
 // Brown Dark Theme Colors
 val BrownPrimary = Color(0xFFD4A574)      // Light brown for primary elements
 val BrownPrimaryDark = Color(0xFF8B5A2B)   // Darker brown for primary variant

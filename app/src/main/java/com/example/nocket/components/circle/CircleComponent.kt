@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -159,7 +160,7 @@ fun CirclePreview() {
                 backgroundColor = Color(0xFF404137),
                 onClick = {},
                 iconSetting = IconSetting(
-                    icon = Icons.Filled.Send
+                    icon = Icons.AutoMirrored.Filled.Send
                 )
             )
 
