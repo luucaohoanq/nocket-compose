@@ -199,7 +199,7 @@ class AppwriteViewModel @Inject constructor(
      * Posts are sorted by creation date (newest first)
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getAllPostsOfUserAndFriends(user: AuthUser) {
+    suspend fun getAllPostsOfUserAndFriends(user: AuthUser) {
         viewModelScope.launch {
             try {
                 AndroidLog.d("AppwriteViewModel", "Fetching posts for user: ${user.id}")

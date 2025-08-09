@@ -1,8 +1,11 @@
 package com.example.nocket.utils
 
+import com.example.nocket.models.Post
 import com.example.nocket.models.User
 import com.example.nocket.models.auth.AuthUser
+import com.example.nocket.ui.screen.profile.DayPostGroup
 import io.appwrite.models.DocumentList
+import kotlin.math.absoluteValue
 
 inline fun <reified T> mapToResponse(
     source: DocumentList<Map<String, Any>>,
