@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material.icons.filled.CameraAlt
@@ -51,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.IconSetting
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
@@ -111,58 +115,35 @@ fun MainBottomBar(
         orderedItems.forEach { item ->
             if (item == centerItem) {
                 // center special button (vd: camera)
-                Box(
-                    modifier = Modifier
-                        .size(centerItem.customSizeCenter)
-                        .align(Alignment.CenterVertically)
-                        .background(
-                            color = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                                Color.Gray
-                            else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                                Color.Gray
-                            else Color.Yellow,
-                            shape = CircleShape
-                        )
-                        .clickable { 
-                            if (centerIconNavigation.isNotEmpty()) {
-                                navController.navigate(centerIconNavigation)
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-
-
-                    if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
-                        // Determine which icon to use, defaulting to whichever is not null
-                        val iconToUse = when {
-                            centerItem.selectedIcon != null -> centerItem.selectedIcon
-                            else -> centerItem.unselectedIcon // Fallback (won't be null due to our condition)
+                Circle(
+                    outerSize = centerItem.customSizeCenter,
+                    gap = 7.dp,
+                    backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        Color.Gray
+                    else Color.Transparent,
+                    borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        Color.Gray
+                    else Color.Yellow,
+                    borderWidth = 3.dp,
+                    onClick = {
+                        if (centerIconNavigation.isNotEmpty()) {
+                            navController.navigate(centerIconNavigation)
                         }
-
-                        // Only show icon if we have a non-null icon to display
-                        iconToUse?.let {
-                            Icon(
-                                imageVector = it,
-                                contentDescription = item.title,
-                                tint = Color.White,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                    } else {
-                        // Vòng tròn trắng bên trong
-                        Box(
-                            modifier = Modifier
-                                .size(45.dp)
-                                .background(color = Color.White, shape = CircleShape)
+                    },
+                    iconSetting = when {
+                        centerItem.selectedIcon != null -> IconSetting(
+                            icon = centerItem.selectedIcon!!,
+                            tint = Color.White,
+                            contentDescription = item.title
                         )
+                        centerItem.unselectedIcon != null -> IconSetting(
+                            icon = centerItem.unselectedIcon!!,
+                            tint = Color.White,
+                            contentDescription = item.title
+                        )
+                        else -> null
                     }
-
-                }
+                )
             } else if (item.title != null) {
                 NavigationBarItem(
                     icon = {
@@ -211,8 +192,8 @@ private val sampleItems = listOf(
     ),
     BottomNavItem(
         title = "Messages",
-        selectedIcon = Icons.Filled.Message,
-        unselectedIcon = Icons.Outlined.Message,
+        selectedIcon = Icons.AutoMirrored.Filled.Message,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Message,
         route = Screen.Message.route
     ),
     BottomNavItem(

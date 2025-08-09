@@ -1,6 +1,7 @@
 package com.example.nocket.ui.screen.submitphoto
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -103,8 +104,10 @@ fun SubmitPhotoScreen(
             CommonTopBar(
                 navController = navController,
                 title = "Send to...",
-                backButtonPosition = BackButtonPosition.End,
-                backButtonIcon = Icons.Outlined.Download
+                endIcon = Icons.Outlined.Download,
+                onEndIconClick = {
+                    Log.d("SubmitPhotoScreen", "Download icon clicked")
+                }
             )
         }
     ) { paddingValues ->

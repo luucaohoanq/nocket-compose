@@ -1,5 +1,6 @@
 package com.example.nocket.components.topbar
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
@@ -15,8 +16,10 @@ fun SettingScreenTopBar(navController: NavController) {
     CommonTopBar(
         navController = navController,
         title = "Settings",
-        backButtonPosition = BackButtonPosition.End,
-        backButtonIcon = Icons.AutoMirrored.Filled.ArrowForward
+        endIcon = Icons.AutoMirrored.Filled.ArrowForward,
+        onEndIconClick = {
+            Log.d("SettingScreenTopBar", "End icon clicked")
+        }
     )
 }
 

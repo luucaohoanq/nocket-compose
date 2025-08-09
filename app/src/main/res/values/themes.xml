@@ -3,7 +3,7 @@
 
 <style name="Theme.MVVM" parent="android:Theme.Material.Light.NoActionBar">
     <item name="android:windowTranslucentStatus">true</item>
-    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:statusBarColor">@android:color/primary_text_light</item>
     <item name="android:navigationBarColor">@android:color/transparent</item>
     <item name="windowSplashScreenIconBackgroundColor">@android:color/black</item>
 </style>

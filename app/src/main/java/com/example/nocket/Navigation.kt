@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.ui.screen.auth.LoginScreen
 import com.example.nocket.viewmodels.AuthViewModel
@@ -20,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.nocket.preview.CameraPreviewWithZoom
 import com.example.nocket.preview.PlaceholderScreen
 import com.example.nocket.ui.screen.camera.CameraScreen
 import com.example.nocket.ui.screen.message.ChatScreen
@@ -42,6 +45,8 @@ sealed class Screen(val route: String) {  //enum
     object Setting : Screen("setting")
     object Detail : Screen("detail")
     object Camera : Screen("camera")
+
+    object TestCamera : Screen("test_camera")  // For testing camera functionality
 }
 
 //https://developer.android.com/topic/architecture
@@ -64,7 +69,8 @@ fun Navigation(
         Screen.Profile.route,
         Screen.Setting.route,
         Screen.Login.route,
-        Screen.Chat.route
+        Screen.Chat.route,
+        Screen.TestCamera.route
     )
 
     // Track current route as state that updates with navigation changes
@@ -148,6 +154,10 @@ fun Navigation(
 
             composable(Screen.Detail.route) {
                 PlaceholderScreen(title = "Detail", navController = navController)
+            }
+
+            composable(Screen.TestCamera.route) {
+                com.example.nocket.ui.screen.camera.TestCameraScreen(navController)
             }
         }
     }

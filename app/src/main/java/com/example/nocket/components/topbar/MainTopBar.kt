@@ -70,6 +70,7 @@ import com.example.nocket.components.circle.ImageSource
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
+import com.example.nocket.ui.theme.BackgroundPreview
 import com.example.nocket.utils.trimUsername
 import kotlin.text.compareTo
 
@@ -137,7 +138,8 @@ fun MainTopBar(
         }
     },
     onNotificationClick: () -> Unit = {},
-    onUserSelected: (User?) -> Unit = {}
+    onUserSelected: (User?) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var titleWidth by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current.density
@@ -176,14 +178,14 @@ fun MainTopBar(
     }
 
     CenterAlignedTopAppBar(
-        modifier = Modifier.padding(horizontal = 20.dp),
+        modifier = modifier.padding(horizontal = 20.dp),
         title = {
             Box(
                 modifier = Modifier
                     .height(avatarWidth)
                     .wrapContentWidth()
                     .background(
-                        color = Color(0xFF404137),
+                        color = BackgroundPreview,
                         shape = RoundedCornerShape(50)
                     )
                     .clip(RoundedCornerShape(50))
@@ -228,9 +230,9 @@ fun MainTopBar(
                     ),
                     modifier = Modifier
                         .width(dropdownWidth)
-                        .heightIn(max = 380.dp)
+                        .heightIn(max = 450.dp)
                         .background(
-                            color = Color(0xFF404137),
+                            color = BackgroundPreview,
                             shape = RoundedCornerShape(24.dp)
                         ),
                 ) {
@@ -239,7 +241,7 @@ fun MainTopBar(
                             modifier = Modifier
                                 .padding(vertical = 5.dp)
                                 .background(
-                                    color = Color(0xFF404137),
+                                    color = BackgroundPreview,
                                 ),
                             text = {
                                 Row(
@@ -310,7 +312,7 @@ fun MainTopBar(
                                         Button(
                                             onClick = { },
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(0xFF404137)
+                                                containerColor = BackgroundPreview
                                             ),
                                             modifier = Modifier.size(avatarWidth),
                                             contentPadding = PaddingValues(0.dp)
@@ -376,7 +378,7 @@ fun MainTopBar(
                 ),
                 gap = 0.dp,
                 outerSize = avatarWidth,
-                backgroundColor = Color(0xFF404137),
+                backgroundColor = BackgroundPreview,
                 borderColor = Color(0xFFB8B8B8),
                 onClick = onProfileClick
             )
@@ -462,6 +464,7 @@ fun MainTopBarPreview() {
         onMessageClick = {},
         onProfileClick = {},
         onNotificationClick = {},
-        onUserSelected = {}
+        onUserSelected = {},
+        modifier = Modifier.fillMaxWidth()
     )
 }

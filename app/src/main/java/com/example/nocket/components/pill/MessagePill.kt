@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,34 +27,46 @@ fun MessageInputPill(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(15.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(24.dp)
             )
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Send message...",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
 
-        Text("😄", modifier = Modifier.padding(horizontal = 4.dp))
-        Text("❤️", modifier = Modifier.padding(horizontal = 4.dp))
-        Text("🔥", modifier = Modifier.padding(horizontal = 4.dp))
+        Text(
+            "😄",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+        Text(
+            "❤️",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+        Text(
+            "🔥",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
 
         Icon(
             imageVector = Icons.Default.AddCircle,
             contentDescription = "More",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
-                .padding(start = 4.dp)
-                .size(20.dp)
+                .size(40.dp)
         )
     }
 }
@@ -68,7 +81,7 @@ fun MessageInputPillPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun BottomPreview(){
+fun BottomPreview() {
     MaterialTheme {
         Column() {
             MessageInputPill()

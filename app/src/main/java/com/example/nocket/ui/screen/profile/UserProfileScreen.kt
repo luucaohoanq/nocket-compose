@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -60,7 +62,7 @@ import com.example.nocket.models.Post
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
-import com.example.nocket.ui.theme.BrownSurface
+import com.example.nocket.ui.theme.GraySurface
 import com.example.nocket.utils.calculateDaysOfMonthInYear
 import com.example.nocket.utils.groupPostsByDay
 import com.example.nocket.utils.groupPostsByMonthYear
@@ -271,13 +273,13 @@ private fun ProfileHeader(
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier.weight(1f) // Take available space
         ) {
             // Username
             Text(
                 text = user.username,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -376,7 +378,7 @@ private fun ProfileStats(
                     )
 
                     VerticalDivider(
-                        color = BrownSurface,
+                        color = GraySurface,
                         modifier = Modifier.height(20.dp)
                     )
 
@@ -427,16 +429,59 @@ private fun MonthSection(
     monthPosts: MonthPosts,
     onPostClick: (Post) -> Unit
 ) {
+    val topRounded = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    val bottomRounded = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+
     Column(
         modifier = Modifier.fillMaxWidth()
+            .clip(bottomRounded)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(12.dp)
+            ),
     ) {
         // Month header
-        Text(
-            text = "${monthPosts.month.displayName} ${monthPosts.year}",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 12.dp)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            // Layer 1: Gradient background with blur
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(topRounded)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xCC424242), // semi-transparent dark gray
+                                Color(0xCC616161)  // semi-transparent medium gray
+                            )
+                        )
+                    )
+                    .blur(16.dp) // only blurs the background layer
+            )
+
+            // Layer 2: Text on top
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier
+                    .clip(topRounded)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "${monthPosts.month.displayName} ${monthPosts.year}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
+
+
+        HorizontalDivider(
+            color = GraySurface,
+            modifier = Modifier.height(10.dp)
         )
 
         // Calendar Grid for this month
@@ -469,7 +514,14 @@ private fun MonthCalendarGrid(
     Log.d("Calendar", "Days in month: $daysInMonth, Total cells: $totalCells, Rows: $rows")
     
     Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(20.dp)
+            )
+            .padding(16.dp)
     ) {
         // Day headers (Mon, Tue, Wed, etc.)
         Row(
@@ -481,7 +533,8 @@ private fun MonthCalendarGrid(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(30.dp),
+                        .height(30.dp)
+                    ,
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

@@ -1,6 +1,7 @@
 package com.example.nocket.ui.screen.message
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Search
@@ -105,15 +107,12 @@ fun MessageScreen(
                 navController = navController,
                 title = "Messages",
                 titleColor = Color.White,
-                actions = {
-                    IconButton(onClick = { /* Handle search */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search messages",
-                            tint = Color.White
-                        )
-                    }
-                }
+                startIcon = Icons.AutoMirrored.Filled.ArrowBack,
+                onStartIconClick = { navController.popBackStack() },
+                endIcon = Icons.Default.Search,
+                onEndIconClick = {
+                    Log.d("MessageScreen", "Search icon clicked")
+                },
             )
         }
     ) { paddingValues ->

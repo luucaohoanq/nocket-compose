@@ -49,7 +49,7 @@ fun PostGrid(
     onPostClick: (Post) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val postsWithImages = posts.filter { it.thumbnailUrl != null }
+    val postsWithImages = posts.filter { true }
     
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
