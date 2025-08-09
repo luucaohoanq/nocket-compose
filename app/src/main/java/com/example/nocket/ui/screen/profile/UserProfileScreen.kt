@@ -4,11 +4,10 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,6 +42,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -54,24 +54,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.nocket.components.topbar.UserProfileTopBar
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.models.auth.AuthUser
@@ -202,37 +195,89 @@ fun UserProfile(
             Scaffold(
                 topBar = {
                     UserProfileTopBar(
-                        navController = navController,
-                        user = data
+                        navController = navController
                     )
                 }
             ) { paddingValues ->
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(MaterialTheme.colorScheme.background),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Profile Header
-                    item {
-                        ProfileHeader(user = data)
-                    }
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // Fixed ProfileHeader - never scrolls
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.background,
+                            shadowElevation = 2.dp
+                        ) {
+                            ProfileHeader(
+                                user = data,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
 
+                        // Scrollable content area
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .weight(1f)
+                        ) {
+                            // Scrollable posts content
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.background),
+                                contentPadding = PaddingValues(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 16.dp,
+                                    bottom = 120.dp // Space for fixed stats
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                items(groupedPosts.reversed()) { monthPosts ->
+                                    MonthSection(
+                                        monthPosts = monthPosts,
+                                        onPostClick = { post -> selectedPost = post }
+                                    )
+                                }
+                            }
 
+                            // Fixed ProfileStats at bottom - completely independent
+                            Surface(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.background,
+                                shadowElevation = 8.dp
+                            ) {
+                                Column {
+                                    // Gradient fade
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                            .background(
+                                                brush = Brush.verticalGradient(
+                                                    colors = listOf(
+                                                        Color.Transparent,
+                                                        MaterialTheme.colorScheme.background
+                                                    )
+                                                )
+                                            )
+                                    )
 
-                    // Posts grouped by month/year
-                    items(groupedPosts) { monthPosts ->
-                        MonthSection(
-                            monthPosts = monthPosts,
-                            onPostClick = { post -> selectedPost = post }
-                        )
-                    }
-
-                    // Stats with gold effect
-                    item {
-                        ProfileStats(posts = posts)
+                                    // Stats component
+                                    ProfileStats(
+                                        posts = posts,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -243,7 +288,8 @@ fun UserProfile(
 @Composable
 private fun ProfileHeader(
     user: com.example.nocket.models.User,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     // Get current authenticated user to access email (not in User model)
     val authState by authViewModel.authState.collectAsState()
@@ -254,8 +300,7 @@ private fun ProfileHeader(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
@@ -326,7 +371,10 @@ private fun ProfileHeader(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun ProfileStats(posts: List<Post>) {
+private fun ProfileStats(
+    posts: List<Post>,
+    modifier: Modifier = Modifier
+) {
     val currentDate = LocalDate.now()
     val totalLockets = posts.size
     val daysInCurrentMonth = currentDate.lengthOfMonth()
@@ -340,53 +388,57 @@ private fun ProfileStats(posts: List<Post>) {
         Color(0xFFFFD700), // Gold
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Main Stats Row
         Box(
-            modifier = Modifier
-                .wrapContentWidth()
-                .border(
-                    width = 2.dp,
-                    brush = Brush.linearGradient(goldColors),
-                    shape = RoundedCornerShape(50)
-                )
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0x40FFD700),
-                            Color(0x20FFA500)
-                        )
-                    ),
-                    shape = RoundedCornerShape(50)
-                )
-                .clip(RoundedCornerShape(50))
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(32.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .border(
+                        width = 2.dp,
+                        brush = Brush.linearGradient(goldColors),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0x40FFD700),
+                                Color(0x20FFA500)
+                            )
+                        ),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .clip(RoundedCornerShape(50))
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center
             ) {
-                StatItem(
-                    icon = "🧡",
-                    count = "$totalLockets",
-                    label = "Lockets"
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StatItem(
+                        icon = "🧡",
+                        count = "$totalLockets",
+                        label = "Lockets"
+                    )
 
-                VerticalDivider(
-                    color = Color(0xFFFFD700),
-                    modifier = Modifier.height(40.dp)
-                )
+                    VerticalDivider(
+                        color = Color(0xFFFFD700),
+                        modifier = Modifier.height(40.dp)
+                    )
 
-                StatItem(
-                    icon = "🔥",
-                    count = "${streakDays}d",
-                    label = "streak"
-                )
+                    StatItem(
+                        icon = "🔥",
+                        count = "${streakDays}d",
+                        label = "streak"
+                    )
+                }
             }
         }
     }
@@ -472,17 +524,17 @@ private fun MonthSection(
 private fun groupPostsByDay(posts: List<Post>, daysInMonth: Int): Map<Int, DayPostGroup> {
     // Group posts by day (mock implementation - in real app, parse createdAt timestamp)
     val postsByDay = mutableMapOf<Int, MutableList<Post>>()
-    
+
     posts.forEachIndexed { index, post ->
         // Mock day assignment - distribute posts across days
         val day = when {
             posts.size <= daysInMonth -> index + 1
             else -> (post.hashCode().absoluteValue % daysInMonth) + 1
         }
-        
+
         postsByDay.getOrPut(day) { mutableListOf() }.add(post)
     }
-    
+
     return postsByDay.mapValues { (day, posts) ->
         DayPostGroup(dayNumber = day, posts = posts)
     }
@@ -525,7 +577,7 @@ private fun PostGridItemWithBadge(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                
+
                 // Blur overlay for multiple posts
                 if (dayPostGroup.hasMultiplePosts) {
                     Box(
@@ -540,7 +592,7 @@ private fun PostGridItemWithBadge(
                                 )
                             )
                     )
-                    
+
                     // Stack indicator
                     Box(
                         modifier = Modifier
@@ -618,7 +670,7 @@ private fun EmptyDayItem() {
 @RequiresApi(Build.VERSION_CODES.O)
 private fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
     val currentDate = LocalDate.now()
-    
+
     // Create a more realistic distribution that demonstrates badge functionality
     // Some posts will be on the same day to show the badge feature
     return listOf(

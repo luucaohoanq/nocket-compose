@@ -1,10 +1,19 @@
 package com.example.nocket.components.topbar
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,18 +33,31 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nocket.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileTopBar(
-    navController: NavController,
-    user: com.example.nocket.models.User? = null
+    navController: NavController
 ) {
+
+    val shimmerTranslateAnim = animateFloatAsState(
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer"
+    )
+
     CenterAlignedTopAppBar(
         modifier = Modifier.padding(horizontal = 20.dp),
         title = {
@@ -58,13 +80,57 @@ fun UserProfileTopBar(
                     ),
                     shape = RoundedCornerShape(5.dp)
                 ) {
-                    Text(
-                        text = "Get Locket Gold",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clickable { /* TODO: Handle gold purchase */ }
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFFFFD700),
+                                        Color(0xFFFFA500),
+                                        Color(0xFFFFD700)
+                                    )
+                                ),
+                                shape = RoundedCornerShape(5.dp)
+                            )
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Shimmer overlay
+                        Canvas(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clip(RoundedCornerShape(25.dp))
+                        ) {
+                            val shimmerWidth = 100.dp.toPx()
+                            val shimmerOffset = shimmerTranslateAnim.value - shimmerWidth
+
+                            drawRect(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.White.copy(alpha = 0.3f),
+                                        Color.Transparent
+                                    ),
+                                    start = Offset(shimmerOffset, 0f),
+                                    end = Offset(shimmerOffset + shimmerWidth, size.height)
+                                ),
+                                size = size
+                            )
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Get Locket Gold",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        }
+                    }
                 }
             }
         },
