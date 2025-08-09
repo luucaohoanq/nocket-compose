@@ -1,7 +1,14 @@
 package com.example.nocket.ui.screen.profile
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +22,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +35,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,9 +54,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,6 +80,7 @@ import com.example.nocket.utils.mapToUser
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
+import kotlin.math.absoluteValue
 
 enum class Month(
     val displayName: String
@@ -85,6 +104,15 @@ data class MonthPosts(
     val year: Int,
     val posts: List<Post>
 )
+
+data class DayPostGroup(
+    val dayNumber: Int,
+    val posts: List<Post>
+) {
+    val count: Int get() = posts.size
+    val hasMultiplePosts: Boolean get() = posts.size > 1
+    val primaryPost: Post? get() = posts.firstOrNull()
+}
 
 fun calculateDaysOfMonthInYear(
     month: Month,
@@ -168,6 +196,9 @@ fun UserProfile(
         }
 
         else -> {
+            Log.d("UserProfile", "Displaying profile for user: ${data.username}")
+            Log.d("UserProfile", "Post of user: ${posts.size} posts")
+
             Scaffold(
                 topBar = {
                     UserProfileTopBar(
@@ -181,13 +212,15 @@ fun UserProfile(
                         .fillMaxSize()
                         .padding(paddingValues)
                         .background(MaterialTheme.colorScheme.background),
-                    contentPadding = PaddingValues(16.dp)
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Profile Header
                     item {
                         ProfileHeader(user = data)
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
+
+
 
                     // Posts grouped by month/year
                     items(groupedPosts) { monthPosts ->
@@ -195,13 +228,11 @@ fun UserProfile(
                             monthPosts = monthPosts,
                             onPostClick = { post -> selectedPost = post }
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
 
-                    // Stats and Actions
+                    // Stats with gold effect
                     item {
                         ProfileStats(posts = posts)
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }
@@ -302,35 +333,61 @@ private fun ProfileStats(posts: List<Post>) {
     val currentDay = currentDate.dayOfMonth
     val streakDays = 5 // Mock streak
 
+    val goldColors = listOf(
+        Color(0xFFFFD700), // Gold
+        Color(0xFFFFA500), // Orange Gold
+        Color(0xFFFFE55C), // Light Gold
+        Color(0xFFFFD700), // Gold
+    )
+
     Box(
         modifier = Modifier
-            .wrapContentWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50)
-            )
-            .clip(RoundedCornerShape(50))
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Box(
+            modifier = Modifier
+                .wrapContentWidth()
+                .border(
+                    width = 2.dp,
+                    brush = Brush.linearGradient(goldColors),
+                    shape = RoundedCornerShape(50)
+                )
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0x40FFD700),
+                            Color(0x20FFA500)
+                        )
+                    ),
+                    shape = RoundedCornerShape(50)
+                )
+                .clip(RoundedCornerShape(50))
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center
         ) {
-            StatItem(
-                icon = "🧡",
-                count = "$totalLockets",
-                label = "Lockets"
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                StatItem(
+                    icon = "🧡",
+                    count = "$totalLockets",
+                    label = "Lockets"
+                )
 
-            VerticalDivider(color = MaterialTheme.colorScheme.secondary)
+                VerticalDivider(
+                    color = Color(0xFFFFD700),
+                    modifier = Modifier.height(40.dp)
+                )
 
-            StatItem(
-                icon = "🔥",
-                count = "${streakDays}d",
-                label = "streak"
-            )
+                StatItem(
+                    icon = "🔥",
+                    count = "${streakDays}d",
+                    label = "streak"
+                )
+            }
         }
     }
 }
@@ -382,33 +439,126 @@ private fun MonthSection(
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        // Posts grid for this month
+        // Group posts by day
+        val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
+        val postsByDay = groupPostsByDay(monthPosts.posts, daysInMonth)
+
+        // Posts grid for this month with enhanced spacing
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.height(
-                ((calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year) + 6) / 7 * 45).dp
+                ((daysInMonth + 6) / 7 * 65).dp // Increased height for badges
             )
         ) {
-            // Calculate days in month and create calendar-like grid
-            val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
-            val totalCells = ((daysInMonth + 6) / 7) * 7 // Round up to complete weeks
-
             items(daysInMonth) { dayIndex ->
                 val dayNumber = dayIndex + 1
-                val postForDay = monthPosts.posts.find {
-                    // Mock: assume each post represents a day (in real app, parse timestamp)
-                    (it.hashCode() % daysInMonth) + 1 == dayNumber
-                }
+                val dayPostGroup = postsByDay[dayNumber]
 
-                if (postForDay != null) {
-                    PostGridItem(
-                        post = postForDay,
-                        onClick = { onPostClick(postForDay) }
+                if (dayPostGroup != null && dayPostGroup.posts.isNotEmpty()) {
+                    PostGridItemWithBadge(
+                        dayPostGroup = dayPostGroup,
+                        onClick = { onPostClick(dayPostGroup.primaryPost!!) }
                     )
                 } else {
                     EmptyDayItem()
+                }
+            }
+        }
+    }
+}
+
+private fun groupPostsByDay(posts: List<Post>, daysInMonth: Int): Map<Int, DayPostGroup> {
+    // Group posts by day (mock implementation - in real app, parse createdAt timestamp)
+    val postsByDay = mutableMapOf<Int, MutableList<Post>>()
+    
+    posts.forEachIndexed { index, post ->
+        // Mock day assignment - distribute posts across days
+        val day = when {
+            posts.size <= daysInMonth -> index + 1
+            else -> (post.hashCode().absoluteValue % daysInMonth) + 1
+        }
+        
+        postsByDay.getOrPut(day) { mutableListOf() }.add(post)
+    }
+    
+    return postsByDay.mapValues { (day, posts) ->
+        DayPostGroup(dayNumber = day, posts = posts)
+    }
+}
+
+@Composable
+private fun PostGridItemWithBadge(
+    dayPostGroup: DayPostGroup,
+    onClick: () -> Unit
+) {
+    BadgedBox(
+        badge = {
+            if (dayPostGroup.hasMultiplePosts) {
+                Badge(
+                    containerColor = Color(0xFFFFD700),
+                    contentColor = Color.Black,
+                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp)
+                ) {
+                    Text(
+                        text = "${dayPostGroup.count}",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .aspectRatio(1f)
+                .clickable { onClick() },
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Box {
+                // Main post image
+                AsyncImage(
+                    model = dayPostGroup.primaryPost?.thumbnailUrl,
+                    contentDescription = "Post image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                
+                // Blur overlay for multiple posts
+                if (dayPostGroup.hasMultiplePosts) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.3f)
+                                    )
+                                )
+                            )
+                    )
+                    
+                    // Stack indicator
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(4.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.7f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "+${dayPostGroup.count - 1}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
@@ -424,8 +574,8 @@ private fun PostGridItem(
         modifier = Modifier
             .aspectRatio(1f)
             .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         AsyncImage(
             model = post.thumbnailUrl,
@@ -442,12 +592,25 @@ private fun EmptyDayItem() {
         modifier = Modifier
             .aspectRatio(1f)
             .background(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                shape = RoundedCornerShape(8.dp)
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                shape = RoundedCornerShape(12.dp)
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Empty space or placeholder
+        // Subtle dot indicator
+        Box(
+            modifier = Modifier
+                .size(4.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
+        )
     }
 }
 
@@ -455,18 +618,19 @@ private fun EmptyDayItem() {
 @RequiresApi(Build.VERSION_CODES.O)
 private fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
     val currentDate = LocalDate.now()
-
-    // For demo purposes, create some mock month groups
+    
+    // Create a more realistic distribution that demonstrates badge functionality
+    // Some posts will be on the same day to show the badge feature
     return listOf(
         MonthPosts(
             month = Month.AUGUST,
             year = 2025,
-            posts = posts.take(8) // Take first 8 posts for August
+            posts = posts // All posts in August to show grouping
         ),
         MonthPosts(
             month = Month.JULY,
             year = 2025,
-            posts = posts.drop(8).take(4) // Next 4 posts for July
+            posts = posts.take(2) // Some posts in July
         )
     ).filter { it.posts.isNotEmpty() }
 }
