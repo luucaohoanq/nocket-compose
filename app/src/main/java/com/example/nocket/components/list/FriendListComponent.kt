@@ -9,23 +9,38 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -35,14 +50,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.nocket.R
+import com.example.nocket.components.button.ShowMoreShowLessButton
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.container.BlurredContainer
 import com.example.nocket.components.container.NotBlurredContainer
+import com.example.nocket.constants.MeasurementConfig
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
 import com.example.nocket.utils.trimUsername
@@ -265,7 +283,7 @@ fun ExternalAppComponent() {
                 imageVector = Icons.Default.ZoomIn,
                 contentDescription = "More",
                 tint = Color.White,
-                modifier = Modifier.size(25.dp)
+                modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
             )
 
             Text(
@@ -290,11 +308,21 @@ fun ExternalAppComponent() {
 @Composable
 fun YourFriendAppComponent(
     friends: List<User> = emptyList(),
-    onRemoveFriend: (User) -> Unit = {}
+    onRemoveFriend: (User) -> Unit = {},
+    initialShowCount: Int = 3 // Show only 3 friends initially
 ) {
+    var showAll by remember { mutableStateOf(false) }
+    
+    // Determine how many friends to show
+    val friendsToShow = if (showAll || friends.size <= initialShowCount) {
+        friends
+    } else {
+        friends.take(initialShowCount)
+    }
+    
     Column(
         modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -323,43 +351,75 @@ fun YourFriendAppComponent(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         } else {
-            friends.forEach { friend ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(15.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Circle(
-                        outerSize = 56.dp,
-                        gap = 5.dp,
-                        backgroundColor = Color(0xFF404137),
-                        onClick = {},
-                        imageSetting = ImageSetting(
-                            imageUrl = friend.avatar,
-                        )
-                    )
-
-                    // Username text with special handling for "Everyone" and "You"
-                    Text(
-                        text = trimUsername(friend.username, 20),
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    // Flexible spacer to push the arrow to the end
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Arrow icon (always visible)
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Remove Friend",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable { onRemoveFriend(friend) }
+            // Friends list - use Column since parent is already scrollable
+            Column(
+            ) {
+                friendsToShow.forEach { friend ->
+                    FriendListItem(
+                        friend = friend,
+                        onRemoveFriend = onRemoveFriend
                     )
                 }
             }
+            
+            // Show More/Show Less button
+            if (friends.size > initialShowCount) {
+                ShowMoreShowLessButton(
+                    showAll = showAll,
+                    totalCount = friends.size,
+                    visibleCount = friendsToShow.size,
+                    onToggle = { showAll = !showAll }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FriendListItem(
+    friend: User,
+    onRemoveFriend: (User) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .padding(12.dp)
+            .clickable { /* Navigate to friend's profile */ },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
+        // Friend's avatar
+        Circle(
+            outerSize = 56.dp,
+            gap = 5.dp,
+            backgroundColor = Color(0xFF404137),
+            onClick = {},
+            imageSetting = ImageSetting(
+                imageUrl = friend.avatar,
+            )
+        )
+
+        // Friend's name
+        Text(
+            text = friend.username ?: "Unknown",
+            color = Color.White,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        // Remove friend button
+        IconButton(
+            onClick = { onRemoveFriend(friend) },
+            modifier = Modifier.size(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove Friend",
+                tint = Color.White
+            )
         }
     }
 }
@@ -436,7 +496,7 @@ fun ShareYourLinkComponent() {
                 imageVector = Icons.Default.Upload,
                 contentDescription = "Friends",
                 tint = Color.White,
-                modifier = Modifier.size(25.dp)
+                modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
             )
 
             Text(
@@ -447,7 +507,7 @@ fun ShareYourLinkComponent() {
             )
         }
 
-        repeat(3, {
+        listThirdPartyApp.forEach { item ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -459,14 +519,14 @@ fun ShareYourLinkComponent() {
                     borderColor = Color.Gray,
                     onClick = {},
                     imageSetting = ImageSetting(
-                        imageUrl = "https://images.unsplash.com/photo-1710988238169-12c5c2474652?q=80&w=1329&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        imageUrl = item.imageUrl,
                         contentDescription = "Example Image"
                     )
                 )
 
                 // Username text with special handling for "Everyone" and "You"
                 Text(
-                    text = "Messenger",
+                    text = item.name,
                     color = Color.White,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.titleMedium
@@ -477,13 +537,13 @@ fun ShareYourLinkComponent() {
 
                 // Arrow icon (always visible)
                 Icon(
-                    imageVector = Icons.Filled.Close,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                     contentDescription = "Select",
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
                 )
             }
-        })
+        }
     }
 }
 

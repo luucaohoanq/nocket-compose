@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -28,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nocket.components.list.ExternalAppComponent
-import com.example.nocket.components.list.HorizontalShowMoreComponent
 import com.example.nocket.components.list.ShareYourLinkComponent
 import com.example.nocket.components.list.TotalFriendComponent
 import com.example.nocket.components.list.YourFriendAppComponent
@@ -47,15 +50,14 @@ fun UserDetailBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = { Box(Modifier.padding(vertical = 8.dp)) }
+        dragHandle = { Box(Modifier.padding(vertical = 80.dp)) }
     ) {
         Column(
             modifier = Modifier
-                .padding(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                )
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                .background(Color(0xFF121212)),
+                .background(Color(0xFF121212))
+                .verticalScroll(rememberScrollState()), // Make the entire content scrollable
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -76,8 +78,6 @@ fun UserDetailBottomSheet(
                 friends = friends,
                 onRemoveFriend = onRemoveFriend
             )
-
-            HorizontalShowMoreComponent()
 
             ShareYourLinkComponent()
         }
