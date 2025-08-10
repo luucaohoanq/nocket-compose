@@ -222,7 +222,7 @@ fun CaptionBottomSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                color = Color.White,
                 thickness = 3.dp,
                 modifier = Modifier
                     .width(40.dp)
