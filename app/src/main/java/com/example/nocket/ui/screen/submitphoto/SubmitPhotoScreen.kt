@@ -140,14 +140,14 @@ fun SubmitPhotoScreen(
             Log.d("SubmitPhotoScreen", "Post: ${post?.id}, Type: ${post?.postType}, Caption: ${post?.caption}")
 
             // Post image (full width)
-            post?.thumbnailUrl?.let { imageUrl ->
+            if(post?.thumbnailUrl != null) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
                 ) {
                     AsyncImage(
-                        model = imageUrl,
+                        model = post.thumbnailUrl,
                         contentDescription = "Post image",
                         modifier = Modifier
                             .fillMaxSize()
@@ -207,6 +207,21 @@ fun SubmitPhotoScreen(
                             )
                         }
                     }
+                }
+            } else {
+                // Placeholder for camera view or empty state
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .background(Color.LightGray.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No image selected",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.DarkGray
+                    )
                 }
             }
 

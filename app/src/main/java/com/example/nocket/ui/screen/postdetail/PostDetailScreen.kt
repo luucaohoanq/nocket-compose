@@ -203,7 +203,7 @@ fun PostDetailScreen(
                         )
 
                         Text(
-                            text = "Just now",
+                            text = post.createdAt,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

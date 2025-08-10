@@ -289,7 +289,7 @@ val sampleItems3 = listOf(
         title = "Camera",
         selectedIcon = null,
         unselectedIcon = null,
-        route = "",
+        route = Screen.Camera.route,
         isCenter = true
     ),
     BottomNavItem(
