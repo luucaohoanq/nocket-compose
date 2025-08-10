@@ -3,8 +3,8 @@ package com.example.nocket.data
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
@@ -26,6 +26,8 @@ import java.time.LocalDateTime
  * Contains mock data for users, messages, posts, settings, notifications, and friendships
  */
 object SampleData {
+
+    const val imageNotAvailable = "https://images.unsplash.com/photo-1610513320995-1ad4bbf25e55?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
     // Enhanced user sample data with diverse usernames
     val users = listOf(
@@ -50,64 +52,64 @@ object SampleData {
     @RequiresApi(Build.VERSION_CODES.O)
     val messages = listOf(
         Message(
-            sender = users[0],
-            recipient = users[14],
+            senderId = users[0].id,
+            recipientId = users[14].id,
             previewContent = "Hey! How are you doing today? 😊",
             timeSent = LocalDateTime.now().minusMinutes(5).toString(),
             isRead = true
         ),
         Message(
-            sender = users[1],
-            recipient = users[14],
+            senderId = users[1].id,
+            recipientId = users[14].id,
             previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
             timeSent = LocalDateTime.now().minusMinutes(30).toString(),
             isRead = true
         ),
         Message(
-            sender = users[2],
-            recipient = users[14],
+            senderId = users[2].id,
+            recipientId = users[14].id,
             previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
             timeSent = LocalDateTime.now().minusHours(2).toString(),
             isRead = false
         ),
         Message(
-            sender = users[3],
-            recipient = users[14],
+            senderId = users[3].id,
+            recipientId = users[14].id,
             previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
             timeSent = LocalDateTime.now().minusHours(5).toString(),
             isRead = true
         ),
         Message(
-            sender = users[4],
-            recipient = users[14],
+            senderId = users[4].id,
+            recipientId = users[14].id,
             previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
             timeSent = LocalDateTime.now().minusDays(1).toString(),
             isRead = false
         ),
         Message(
-            sender = users[5],
-            recipient = users[14],
+            senderId = users[5].id,
+            recipientId = users[14].id,
             previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
             timeSent = LocalDateTime.now().minusDays(2).toString(),
             isRead = true
         ),
         Message(
-            sender = users[6],
-            recipient = users[14],
+            senderId = users[6].id,
+            recipientId = users[14].id,
             previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
             timeSent = LocalDateTime.now().minusDays(3).toString(),
             isRead = false
         ),
         Message(
-            sender = users[7],
-            recipient = users[14],
+            senderId = users[7].id,
+            recipientId = users[14].id,
             previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
             timeSent = LocalDateTime.now().minusDays(4).toString(),
             isRead = true
         ),
         Message(
-            sender = users[8],
-            recipient = users[14],
+            senderId = users[8].id,
+            recipientId = users[14].id,
             previewContent = "Check out this cool article I found about space exploration 🚀",
             timeSent = LocalDateTime.now().minusDays(5).toString(),
             isRead = false
@@ -221,47 +223,132 @@ object SampleData {
     )
 
     // Comprehensive settings list
-    val settings = listOf(
-        Setting(type = SettingType.WIDGET, title = "Widget Settings", description = "Customize your home screen widget"),
+    val settingList = listOf<Setting>(
+        Setting(
+            type = SettingType.WIDGET,
+            title = "Widget Settings",
+            description = "Customize your home screen widget"
+        ),
 
-        Setting(type = SettingType.CUSTOMIZE, title = "App Icon", icon = "ICON_APP", description = "Choose from 12 beautiful app icons"),
-        Setting(type = SettingType.CUSTOMIZE, title = "Theme", icon = "ICON_THEME", description = "Switch between light, dark, or auto mode"),
-        Setting(type = SettingType.CUSTOMIZE, title = "Color Scheme", icon = "ICON_COLOR", description = "Personalize with your favorite colors"),
+        Setting(
+            type = SettingType.CUSTOMIZE,
+            title = "App Icon",
+            icon = "ICON_APP",
+            description = "Choose from 12 beautiful app icons"
+        ),
+        Setting(
+            type = SettingType.CUSTOMIZE,
+            title = "Theme",
+            icon = "ICON_THEME",
+            description = "Switch between light, dark, or auto mode"
+        ),
+        Setting(
+            type = SettingType.CUSTOMIZE,
+            title = "Streak on widget",
+            icon = "ICON_COLOR",
+            isToggleable = true,
+            isToggled = true
+        ),
 
-        Setting(type = SettingType.GENERAL, title = "Edit Profile Picture", description = "Update your profile photo"),
-        Setting(type = SettingType.GENERAL, title = "Edit Name", description = "Change your display name"),
-        Setting(type = SettingType.GENERAL, title = "Edit Birthday", description = "Set or update your birth date"),
-        Setting(type = SettingType.GENERAL, title = "Change Phone Number", description = "Update your contact number"),
-        Setting(type = SettingType.GENERAL, title = "Change Email Address", description = "Update your email address"),
-        Setting(type = SettingType.GENERAL, title = "Notification Settings", description = "Manage push notifications"),
-        Setting(type = SettingType.GENERAL, title = "Language & Region", description = "Change app language"),
-        Setting(type = SettingType.GENERAL, title = "Storage & Data", description = "Manage app storage usage"),
-        Setting(type = SettingType.GENERAL, title = "How to Add Widget", description = "Step-by-step widget setup guide"),
-        Setting(type = SettingType.GENERAL, title = "Restore Purchases", description = "Restore previous premium features"),
+        Setting(
+            type = SettingType.GENERAL,
+            title = "Edit Name",
+            description = "Change your display name"
+        ),
+        Setting(
+            type = SettingType.GENERAL,
+            title = "Edit Birthday",
+            description = "Set or update your birth date"
+        ),
+        Setting(
+            type = SettingType.GENERAL,
+            title = "Change Phone Number",
+            description = "Update your contact number"
+        ),
+        Setting(
+            type = SettingType.GENERAL,
+            title = "How to Add Widget",
+            description = "Step-by-step widget setup guide"
+        ),
+        Setting(
+            type = SettingType.GENERAL,
+            title = "Restore Purchases",
+            description = "Restore previous premium features"
+        ),
 
-        Setting(type = SettingType.PRIVACY_SAFETY, title = "Blocked Accounts", description = "View and manage blocked users"),
-        Setting(type = SettingType.PRIVACY_SAFETY, title = "Account Visibility", description = "Control who can find your profile"),
-        Setting(type = SettingType.PRIVACY_SAFETY, title = "Two-Factor Authentication", description = "Add extra security to your account"),
-        Setting(type = SettingType.PRIVACY_SAFETY, title = "Privacy Choices", description = "Manage data sharing preferences"),
-        Setting(type = SettingType.PRIVACY_SAFETY, title = "Download Your Data", description = "Export your personal data"),
+        Setting(
+            type = SettingType.PRIVACY_SAFETY,
+            title = "Blocked Accounts",
+            description = "View and manage blocked users"
+        ),
+        Setting(
+            type = SettingType.PRIVACY_SAFETY,
+            title = "Account Visibility",
+            description = "Control who can find your profile"
+        ),
+        Setting(
+            type = SettingType.PRIVACY_SAFETY,
+            title = "Privacy Choices",
+            description = "Manage data sharing preferences"
+        ),
 
-        Setting(type = SettingType.SUPPORT, title = "Report a Problem", description = "Get help with technical issues"),
-        Setting(type = SettingType.SUPPORT, title = "Make a Suggestion", description = "Share ideas for new features"),
-        Setting(type = SettingType.SUPPORT, title = "Contact Support", description = "Reach out to our support team"),
-        Setting(type = SettingType.SUPPORT, title = "FAQ & Help Center", description = "Find answers to common questions"),
+        Setting(
+            type = SettingType.SUPPORT,
+            title = "Report a Problem",
+            description = "Get help with technical issues"
+        ),
+        Setting(
+            type = SettingType.SUPPORT,
+            title = "Make a Suggestion",
+            description = "Share ideas for new features"
+        ),
 
-        Setting(type = SettingType.ABOUT, title = "Follow us on TikTok", description = "@nocketapp - Latest updates & tips"),
-        Setting(type = SettingType.ABOUT, title = "Follow us on Instagram", description = "@nocketapp - Behind the scenes"),
-        Setting(type = SettingType.ABOUT, title = "Follow us on Twitter", description = "@nocketapp - News & announcements"),
-        Setting(type = SettingType.ABOUT, title = "Share Nocket", description = "Invite friends to join Nocket"),
-        Setting(type = SettingType.ABOUT, title = "Rate Nocket", description = "Leave a review on your app store"),
-        Setting(type = SettingType.ABOUT, title = "What's New", description = "Check out latest features"),
-        Setting(type = SettingType.ABOUT, title = "Terms of Service", description = "Read our terms and conditions"),
-        Setting(type = SettingType.ABOUT, title = "Privacy Policy", description = "Understand how we protect your data"),
-        Setting(type = SettingType.ABOUT, title = "Open Source Licenses", description = "View third-party licenses"),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "TikTok",
+            description = "@nocketapp - Latest updates & tips"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Instagram",
+            description = "@nocketapp - Behind the scenes"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Twitter",
+            description = "@nocketapp - News & announcements"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Share Nocket",
+            description = "Invite friends to join Nocket"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Rate Nocket",
+            description = "Leave a review on your app store"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Terms of Service",
+            description = "Read our terms and conditions"
+        ),
+        Setting(
+            type = SettingType.ABOUT,
+            title = "Privacy Policy",
+            description = "Understand how we protect your data"
+        ),
 
-        Setting(type = SettingType.DANGER_ZONE, title = "Delete Account", description = "Permanently delete your account and all data"),
-        Setting(type = SettingType.DANGER_ZONE, title = "Sign Out", description = "Sign out from all devices"),
+        Setting(
+            type = SettingType.DANGER_ZONE,
+            title = "Delete Account",
+            description = "Permanently delete your account and all data"
+        ),
+        Setting(
+            type = SettingType.DANGER_ZONE,
+            title = "Sign Out",
+            description = "Sign out from all devices"
+        ),
     )
 
     // Sample notifications data
@@ -283,7 +370,7 @@ object SampleData {
             description = "${users[2].username} commented on your post: 'This is amazing!'",
             time = LocalDateTime.now().minusHours(1).toString(),
             isRead = false,
-            icon = Icons.Default.Message,
+            icon = Icons.AutoMirrored.Filled.Message,
             iconColor = Color(0xFF2196F3),
             userId = users[2].id
         ),
@@ -313,7 +400,7 @@ object SampleData {
             description = "${users[5].username} sent you a message",
             time = LocalDateTime.now().minusHours(8).toString(),
             isRead = true,
-            icon = Icons.Default.Message,
+            icon = Icons.AutoMirrored.Filled.Message,
             iconColor = Color(0xFF009688),
             userId = users[5].id
         ),
@@ -342,61 +429,61 @@ object SampleData {
     @RequiresApi(Build.VERSION_CODES.O)
     val messageList = listOf(
         Message(
-            sender = users[0],
-            recipient = users[9],
+            senderId = users[0].id,
+            recipientId = users[9].id,
             previewContent = "Hey! How are you doing today? 😊",
             timeSent = LocalDateTime.now().minusMinutes(5).toString()
         ),
         Message(
-            sender = users[1],
-            recipient = users[9],
+            senderId = users[1].id,
+            recipientId = users[9].id,
             previewContent = "Are you coming to the party this weekend? It's going to be amazing! 🎉",
             timeSent = LocalDateTime.now().minusMinutes(30).toString()
         ),
         Message(
-            sender = users[2],
-            recipient = users[9],
+            senderId = users[2].id,
+            recipientId = users[9].id,
             previewContent = "Let's catch up soon! I have so much to tell you about my new job 💼",
             timeSent = LocalDateTime.now().minusHours(2).toString()
         ),
         Message(
-            sender = users[3],
-            recipient = users[9],
+            senderId = users[3].id,
+            recipientId = users[9].id,
             previewContent = "Thanks for the help with the project! You're a lifesaver 🙏",
             timeSent = LocalDateTime.now().minusHours(5).toString()
         ),
         Message(
-            sender = users[4],
-            recipient = users[9],
+            senderId = users[4].id,
+            recipientId = users[9].id,
             previewContent = "Did you see the new movie that came out? We should watch it together! 🍿",
             timeSent = LocalDateTime.now().minusDays(1).toString()
         ),
         Message(
-            sender = users[5],
-            recipient = users[9],
+            senderId = users[5].id,
+            recipientId = users[9].id,
             previewContent = "The weather is amazing today! Perfect for a walk in the park ☀️",
             timeSent = LocalDateTime.now().minusDays(2).toString()
         ),
         Message(
-            sender = users[6],
-            recipient = users[9],
+            senderId = users[6].id,
+            recipientId = users[9].id,
             previewContent = "Happy birthday! Hope you have a wonderful day 🎂🎈",
             timeSent = LocalDateTime.now().minusDays(3).toString()
         ),
         Message(
-            sender = users[7],
-            recipient = users[9],
+            senderId = users[7].id,
+            recipientId = users[9].id,
             previewContent = "Just finished my workout. Feeling great! 💪 Want to join me next time?",
             timeSent = LocalDateTime.now().minusDays(4).toString()
         ),
         Message(
-            sender = users[8],
-            recipient = users[9],
+            senderId = users[8].id,
+            recipientId = users[9].id,
             previewContent = "Check out this cool article I found about space exploration 🚀",
             timeSent = LocalDateTime.now().minusDays(5).toString()
         )
     )
-    
+
     // Sample friendships data
     val friendships = listOf(
         Friendship(
@@ -465,14 +552,14 @@ object SampleData {
             status = FriendshipStatus.ACCEPTED
         )
     )
-    
+
     // Fun statistics for the app
     @RequiresApi(Build.VERSION_CODES.O)
     val stats = mapOf(
         "totalUsers" to users.size,
         "totalMessages" to messages.size,
         "totalPosts" to samplePosts.size,
-        "totalSettings" to settings.size,
+        "totalSettings" to settingList.size,
         "totalFriendships" to friendships.size,
         "totalNotifications" to notifications.size,
         "appName" to "Nocket",

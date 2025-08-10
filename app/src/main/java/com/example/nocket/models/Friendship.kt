@@ -8,7 +8,11 @@ data class Friendship(
     val user2Id: String = UUID.randomUUID().toString(),
     val status: FriendshipStatus,
     val requesterId: String = "", // For backward compatibility
-    val addresseeId: String = "" // For backward compatibility
+    val addresseeId: String = "", // For backward compatibility
+    // New fields for enhanced functionality
+    val combinedUserIds: List<String> = listOf(user1Id, user2Id), // For easier querying
+    val createdAt: String? = null, // When friendship was created
+    val updatedAt: String? = null // When status was last changed
 )
 
 enum class FriendshipStatus {

@@ -10,7 +10,7 @@ cameraViewVersion = "1.4.2"
 coilCompose = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
 converterGson = "2.9.0"
-coreSplashscreen = "1.0.1"
+coreSplashscreen = "1.2.0-alpha02"
 gson = "2.11.0"
 hilt = "2.51.1"
 hiltNavigationCompose = "1.2.0"
@@ -38,8 +38,11 @@ jackson = "2.15.3"
 stripeAndroid = "20.42.0"
 workRuntimeKtx = "2.10.2"
 material3 = "1.3.2"
+appwrite = "8.1.0"
 
 [libraries]
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistPager" }
+appwrite = { group = "io.appwrite", name = "sdk-for-android", version.ref = "appwrite" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }

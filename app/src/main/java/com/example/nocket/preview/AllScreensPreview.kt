@@ -18,9 +18,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.example.nocket.ui.screen.post.PostScreen
+import com.example.nocket.data.SampleData
 import com.example.nocket.ui.screen.message.MessageScreen
-import com.example.nocket.ui.screen.settings.SettingScreen
+import com.example.nocket.ui.screen.post.PostScreen
+import com.example.nocket.ui.screen.settings.SettingScreenContent
 import com.example.nocket.ui.theme.AppTheme
 
 class ScreenTypeProvider : PreviewParameterProvider<String> {
@@ -45,7 +46,7 @@ fun AllScreensPreview(
             "Home" -> PostScreen(navController)
             "Messages" -> MessageScreen(navController)
             "Posts" -> PostScreen(navController)
-            "Settings" -> SettingScreen(navController)
+            "Settings" -> SettingScreenContent(settings = SampleData.settingList, navController = navController)
         }
     }
 }

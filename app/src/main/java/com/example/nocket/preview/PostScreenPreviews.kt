@@ -40,7 +40,7 @@ fun PostGridItemPreview() {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
                 PostGridItem(
-                    post = SampleData.samplePosts.first { it.thumbnailUrl != null },
+                    post = SampleData.samplePosts.first { true },
                     onClick = {}
                 )
             }
@@ -66,7 +66,7 @@ fun CameraButtonPreview() {
 fun PostDetailScreenPreview() {
     AppTheme {
         PostDetailScreen(
-            post = SampleData.samplePosts.first { it.thumbnailUrl != null },
+            post = SampleData.samplePosts.first { true },
             onBack = {},
             navController = rememberNavController()
         )
@@ -102,7 +102,7 @@ fun PostGridWithoutCameraPreview() {
 @Preview(name = "Post Grid Dark Theme", showBackground = true)
 @Composable
 fun PostGridDarkPreview() {
-    AppTheme(darkTheme = true) {
+    AppTheme(darkTheme = false) {
         Surface(color = MaterialTheme.colorScheme.background) {
             PostGrid(
                 posts = SampleData.samplePosts,

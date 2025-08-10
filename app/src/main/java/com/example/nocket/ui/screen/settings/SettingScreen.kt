@@ -22,15 +22,19 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,151 +43,58 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.components.topbar.SettingScreenTopBar
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
-
-val settingList = listOf<Setting>(
-    Setting(
-        type = SettingType.WIDGET,
-        title = "Widget Settings",
-        description = "Customize your home screen widget"
-    ),
-
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "App Icon",
-        icon = "ICON_APP",
-        description = "Choose from 12 beautiful app icons"
-    ),
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "Theme",
-        icon = "ICON_THEME",
-        description = "Switch between light, dark, or auto mode"
-    ),
-    Setting(
-        type = SettingType.CUSTOMIZE,
-        title = "Streak on widget",
-        icon = "ICON_COLOR",
-        isToggleable = true,
-        isToggled = true
-    ),
-
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Edit Name",
-        description = "Change your display name"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Edit Birthday",
-        description = "Set or update your birth date"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Change Phone Number",
-        description = "Update your contact number"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "How to Add Widget",
-        description = "Step-by-step widget setup guide"
-    ),
-    Setting(
-        type = SettingType.GENERAL,
-        title = "Restore Purchases",
-        description = "Restore previous premium features"
-    ),
-
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Blocked Accounts",
-        description = "View and manage blocked users"
-    ),
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Account Visibility",
-        description = "Control who can find your profile"
-    ),
-    Setting(
-        type = SettingType.PRIVACY_SAFETY,
-        title = "Privacy Choices",
-        description = "Manage data sharing preferences"
-    ),
-
-    Setting(
-        type = SettingType.SUPPORT,
-        title = "Report a Problem",
-        description = "Get help with technical issues"
-    ),
-    Setting(
-        type = SettingType.SUPPORT,
-        title = "Make a Suggestion",
-        description = "Share ideas for new features"
-    ),
-
-    Setting(
-        type = SettingType.ABOUT,
-        title = "TikTok",
-        description = "@nocketapp - Latest updates & tips"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Instagram",
-        description = "@nocketapp - Behind the scenes"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Twitter",
-        description = "@nocketapp - News & announcements"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Share Nocket",
-        description = "Invite friends to join Nocket"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Rate Nocket",
-        description = "Leave a review on your app store"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Terms of Service",
-        description = "Read our terms and conditions"
-    ),
-    Setting(
-        type = SettingType.ABOUT,
-        title = "Privacy Policy",
-        description = "Understand how we protect your data"
-    ),
-
-    Setting(
-        type = SettingType.DANGER_ZONE,
-        title = "Delete Account",
-        description = "Permanently delete your account and all data"
-    ),
-    Setting(
-        type = SettingType.DANGER_ZONE,
-        title = "Sign Out",
-        description = "Sign out from all devices"
-    ),
-)
+import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
+    // Collect data from viewModel
+    val settings by appwriteViewModel.settings.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        appwriteViewModel.getAllSetting()
+    }
+
+    // Render UI with collected data
+    SettingScreenContent(
+        settings = settings,
+        navController = navController,
+        onToggleChanged = { settingId, isToggled ->
+            appwriteViewModel.updateSettingToggle(settingId, isToggled)
+        },
+        onLogout = {
+            authViewModel.logout()
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingScreenContent(
+    settings: List<Setting>,
+    navController: NavHostController = rememberNavController(),
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
+    onLogout: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -202,15 +113,19 @@ fun SettingScreen(
             }
 
             // Group settings by type
-            val groupedSettings = settingList.groupBy { it.type }
+            val groupedSettings = settings.groupBy { it.type }
 
-            groupedSettings.forEach { (settingType, settings) ->
+            groupedSettings.forEach { (settingType, settingItems) ->
                 item {
                     SettingSectionHeader(settingType = settingType)
                 }
 
-                items(settings) { setting ->
-                    SettingItem(setting = setting)
+                items(settingItems) { setting ->
+                    SettingItem(
+                        setting = setting,
+                        onToggleChanged = onToggleChanged,
+                        onLogout = if (setting.title.contains("Sign out", ignoreCase = true)) onLogout else null
+                    )
                 }
 
                 item {
@@ -223,37 +138,48 @@ fun SettingScreen(
 
 @Composable
 fun SettingSectionHeader(settingType: SettingType) {
-    val title = when (settingType) {
-        SettingType.WIDGET -> "😄 Widgets"
-        SettingType.CUSTOMIZE -> "😄 Customize"
-        SettingType.GENERAL -> "😄 General"
-        SettingType.PRIVACY_SAFETY -> "😄 Privacy & Safety"
-        SettingType.SUPPORT -> "😄 Support"
-        SettingType.ABOUT -> "😄 About"
-        SettingType.DANGER_ZONE -> "😄 Danger Zone"
+    val (icon, label) = when (settingType) {
+        SettingType.WIDGET -> Pair(Icons.Default.EmojiEmotions, "Widgets")
+        SettingType.CUSTOMIZE -> Pair(Icons.Default.Build, "Customize")
+        SettingType.GENERAL -> Pair(Icons.Default.Settings, "General")
+        SettingType.PRIVACY_SAFETY -> Pair(Icons.Default.Security, "Privacy & Safety")
+        SettingType.SUPPORT -> Pair(Icons.AutoMirrored.Filled.Help, "Support")
+        SettingType.ABOUT -> Pair(Icons.Default.Info, "About")
+        SettingType.DANGER_ZONE -> Pair(Icons.Default.Warning, "Danger Zone")
     }
 
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 8.dp)
-    )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingItem(
     setting: Setting,
-    onToggleChanged: (Boolean) -> Unit = {}
+    onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
+    onLogout: (() -> Unit)? = null
 ) {
     val isDangerZone = setting.type == SettingType.DANGER_ZONE
     var isToggled = setting.isToggled
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isDangerZone)
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
@@ -263,8 +189,11 @@ fun SettingItem(
         shape = RoundedCornerShape(8.dp),
         onClick = {
             if (setting.isToggleable) {
-                isToggled = !isToggled
-                onToggleChanged(isToggled)
+                // Pass both the setting ID and the new toggle state (opposite of current)
+                onToggleChanged(setting.id, !setting.isToggled)
+            } else if (setting.title.contains("Sign out", ignoreCase = true) && onLogout != null) {
+                // Handle logout
+                onLogout()
             }
             // Handle other settings click
         }
@@ -327,11 +256,10 @@ fun SettingItem(
             // Arrow icon with subtle animation hint
             if (setting.isToggleable) {
                 androidx.compose.material3.Switch(
-                    checked = isToggled,
+                    checked = setting.isToggled,
                     onCheckedChange = {
-                        isToggled = it
-                        onToggleChanged(it)
-                    }
+                        onToggleChanged(setting.id, it)
+                    },
                 )
             } else {
                 Icon(
@@ -364,10 +292,4 @@ fun getSettingIcon(setting: Setting): ImageVector {
         setting.title.contains("Sign out") -> Icons.AutoMirrored.Filled.Logout
         else -> Icons.Default.Settings
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingScreenPreview() {
-    SettingScreen()
 }

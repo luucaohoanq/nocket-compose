@@ -1,17 +1,16 @@
 package com.example.nocket.ui.screen.profile
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,56 +19,57 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.ImageSetting
+import com.example.nocket.components.empty.EmptyDayItem
+import com.example.nocket.components.grid.PostGridItemWithBadge
+import com.example.nocket.components.sheet.UserDetailBottomSheet
 import com.example.nocket.components.topbar.UserProfileTopBar
-import com.example.nocket.data.SampleData
+import com.example.nocket.constants.Month
 import com.example.nocket.models.Post
+import com.example.nocket.models.auth.AuthState
+import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.ui.screen.postdetail.PostDetailScreen
+import com.example.nocket.ui.theme.GraySurface
+import com.example.nocket.utils.calculateDaysOfMonthInYear
+import com.example.nocket.utils.groupPostsByDay
+import com.example.nocket.utils.groupPostsByMonthYear
+import com.example.nocket.utils.mapToUser
+import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
-
-enum class Month(
-    val displayName: String
-) {
-    JANUARY("January"),
-    FEBRUARY("February"),
-    MARCH("March"),
-    APRIL("April"),
-    MAY("May"),
-    JUNE("June"),
-    JULY("July"),
-    AUGUST("August"),
-    SEPTEMBER("September"),
-    OCTOBER("October"),
-    NOVEMBER("November"),
-    DECEMBER("December")
-}
 
 data class MonthPosts(
     val month: Month,
@@ -77,28 +77,102 @@ data class MonthPosts(
     val posts: List<Post>
 )
 
-fun calculateDaysOfMonthInYear(
-    month: Month,
-    year: Int
-): Int {
-    return when (month) {
-        Month.JANUARY, Month.MARCH, Month.MAY, Month.JULY, Month.AUGUST, Month.OCTOBER, Month.DECEMBER -> 31
-        Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER -> 30
-        Month.FEBRUARY -> if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) 29 else 28
-    }
+data class DayPostGroup(
+    val dayNumber: Int,
+    val posts: List<Post>
+) {
+    val count: Int get() = posts.size
+    val hasMultiplePosts: Boolean get() = posts.size > 1
+    val primaryPost: Post? get() = posts.firstOrNull()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserProfile(
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    userId: String? = null,
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
-    val user = SampleData.users[0] // Current user
-    val posts = SampleData.samplePosts.filter { it.user.id == user.id }
+    // State for storing profile data
+    var profileUser by remember { mutableStateOf<AuthUser?>(null) }
+    val currentUser by appwriteViewModel.currentUser.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
+
+    // Ensure current user is fetched first
+    LaunchedEffect(Unit) {
+        appwriteViewModel.fetchCurrentUser()
+    }
+
+    // Fetch the correct user based on userId parameter
+    LaunchedEffect(userId, currentUser) {
+        isLoading = true
+        profileUser = if (userId == null || userId == currentUser?.id) {
+            // Show current user profile
+            currentUser
+        } else {
+            // Fetch the other user's profile using suspend function
+            appwriteViewModel.getUserByIdSuspend(userId)
+        }
+        isLoading = false
+    }
+
+    // Convert to User model for display
+    val data = profileUser?.let { mapToUser(it) }
+
+    // Fetch posts for the profile user
+    LaunchedEffect(data?.id, currentUser?.id) {
+        data?.id?.let { userIdToFetch ->
+            val viewerId = if (userId == null || userId == currentUser?.id) {
+                // Viewing own profile - show all posts
+                userIdToFetch
+            } else {
+                // Viewing another user's profile - apply visibility filtering
+                currentUser?.id
+            }
+            appwriteViewModel.getPostsForUser(userIdToFetch, viewerId)
+        }
+    }
+
+    // Collect posts from the ViewModel
+    val posts by appwriteViewModel.userPosts.collectAsState()
     var selectedPost by remember { mutableStateOf<Post?>(null) }
 
     // Group posts by month and year
     val groupedPosts = groupPostsByMonthYear(posts)
+
+    // Add bottom sheet state and visibility state
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showUserDetailBottomSheet by remember { mutableStateOf(false) }
+
+    // Get friends data
+    val friends by appwriteViewModel.friends.collectAsState()
+
+    // Fetch friends for the current user - use the actual currentUser object
+    LaunchedEffect(currentUser) {
+        currentUser?.let { user ->
+            appwriteViewModel.fetchFriendsOfUser(user)
+            // Debug: Check the state after fetching
+            kotlinx.coroutines.delay(1000) // Wait for fetch to complete
+            appwriteViewModel.debugFriendsState()
+        }
+    }
+
+    // Show the UserDetailBottomSheet when needed
+    if (showUserDetailBottomSheet) {
+        UserDetailBottomSheet(
+            sheetState = sheetState,
+            onDismiss = {
+                showUserDetailBottomSheet = false
+            },
+            friends = friends,
+            onRemoveFriend = { friend ->
+                // Implement friend removal logic
+                // appwriteViewModel.removeFriend(friend.id)
+            }
+        )
+    }
 
     when {
         selectedPost != null -> {
@@ -109,39 +183,117 @@ fun UserProfile(
             )
         }
 
+        isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        data == null -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("User not found")
+            }
+        }
+
         else -> {
+            Log.d("UserProfile", "Displaying profile for user: ${data.username}")
+            Log.d("UserProfile", "Post of user: $posts")
+
             Scaffold(
                 topBar = {
-                    UserProfileTopBar(navController)
+                    UserProfileTopBar(
+                        navController = navController,
+                        onFriendsClick = {
+                            showUserDetailBottomSheet = true
+                        }
+                    )
                 }
             ) { paddingValues ->
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .background(MaterialTheme.colorScheme.background),
-                    contentPadding = PaddingValues(16.dp)
                 ) {
-                    // Profile Header
-                    item {
-                        ProfileHeader(user = user)
-                        Spacer(modifier = Modifier.height(24.dp))
-                    }
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // Fixed ProfileHeader - never scrolls
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.background,
+                            shadowElevation = 8.dp
+                        ) {
+                            ProfileHeader(
+                                user = data,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
 
+                        // Scrollable content area
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .weight(1f)
+                        ) {
+                            // Scrollable posts content
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.background),
+                                contentPadding = PaddingValues(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 16.dp,
+                                    bottom = 120.dp // Space for fixed stats
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                items(groupedPosts.reversed()) { monthPosts ->
+                                    MonthSection(
+                                        monthPosts = monthPosts,
+                                        onPostClick = { post -> selectedPost = post }
+                                    )
+                                }
+                            }
 
-                    // Posts grouped by month/year
-                    items(groupedPosts) { monthPosts ->
-                        MonthSection(
-                            monthPosts = monthPosts,
-                            onPostClick = { post -> selectedPost = post }
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                    }
+                            // Fixed ProfileStats at bottom - completely independent
+                            Surface(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.background,
+                                shadowElevation = 8.dp
+                            ) {
+                                Column {
+                                    // Gradient fade
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                            .background(
+                                                brush = Brush.verticalGradient(
+                                                    colors = listOf(
+                                                        Color.Transparent,
+                                                        MaterialTheme.colorScheme.background
+                                                    )
+                                                )
+                                            )
+                                    )
 
-                    // Stats and Actions
-                    item {
-                        ProfileStats(posts = posts)
-                        Spacer(modifier = Modifier.height(24.dp))
+                                    // Stats component
+                                    ProfileStats(
+                                        posts = posts,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -150,34 +302,41 @@ fun UserProfile(
 }
 
 @Composable
-private fun ProfileHeader(user: com.example.nocket.models.User) {
+private fun ProfileHeader(
+    user: com.example.nocket.models.User,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
+) {
+    // Get current authenticated user to access email (not in User model)
+    val authState by authViewModel.authState.collectAsState()
+    val authUser = if (authState is AuthState.Authenticated) {
+        (authState as AuthState.Authenticated).user
+    } else null
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier.weight(1f) // Take available space
         ) {
             // Username
             Text(
                 text = user.username,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             // Handle with link icon
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "@lcaohoanq",
+                    text = "@${user.email}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -192,68 +351,91 @@ private fun ProfileHeader(user: com.example.nocket.models.User) {
         }
 
         // Profile Picture
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                )
-                .padding(4.dp)
-        ) {
-            AsyncImage(
-                model = user.avatar,
-                contentDescription = "Profile picture",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+        Circle(
+            outerSize = 100.dp,
+            gap = 5.dp,
+            backgroundColor = Color(0xFF404137),
+            borderColor = Color(0xFFFFD700),
+            onClick = {},
+            imageSetting = ImageSetting(
+                imageUrl = user.avatar,
+                contentDescription = "Profile picture"
             )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
+        )
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun ProfileStats(posts: List<Post>) {
+private fun ProfileStats(
+    posts: List<Post>,
+    modifier: Modifier = Modifier
+) {
     val currentDate = LocalDate.now()
     val totalLockets = posts.size
     val daysInCurrentMonth = currentDate.lengthOfMonth()
     val currentDay = currentDate.dayOfMonth
     val streakDays = 5 // Mock streak
 
-    Box(
-        modifier = Modifier
-            .wrapContentWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50)
-            )
-            .clip(RoundedCornerShape(50))
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        contentAlignment = Alignment.Center
+    val goldColors = listOf(
+        Color(0xFFFFD700), // Gold
+        Color(0xFFFFA500), // Orange Gold
+        Color(0xFFFFE55C), // Light Gold
+        Color(0xFFFFD700), // Gold
+    )
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
+        // Main Stats Row
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            contentAlignment = Alignment.Center
         ) {
-            StatItem(
-                icon = "🧡",
-                count = "$totalLockets",
-                label = "Lockets"
-            )
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .border(
+                        width = 2.dp,
+                        brush = Brush.linearGradient(goldColors),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0x40FFD700),
+                                Color(0x20FFA500)
+                            )
+                        ),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .clip(RoundedCornerShape(50))
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StatItem(
+                        icon = "🧡",
+                        count = "$totalLockets",
+                        label = "Lockets"
+                    )
 
-            VerticalDivider(color = MaterialTheme.colorScheme.secondary)
+                    VerticalDivider(
+                        color = GraySurface,
+                        modifier = Modifier.height(20.dp)
+                    )
 
-            StatItem(
-                icon = "🔥",
-                count = "${streakDays}d",
-                label = "streak"
-            )
+                    StatItem(
+                        icon = "🔥",
+                        count = "${streakDays}d",
+                        label = "streak"
+                    )
+                }
+            }
         }
     }
 }
@@ -288,108 +470,173 @@ private fun StatItem(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MonthSection(
     monthPosts: MonthPosts,
     onPostClick: (Post) -> Unit
 ) {
+    val topRounded = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    val bottomRounded = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+
     Column(
         modifier = Modifier.fillMaxWidth()
+            .clip(bottomRounded)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(12.dp)
+            ),
     ) {
         // Month header
-        Text(
-            text = "${monthPosts.month.displayName} ${monthPosts.year}",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 12.dp)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            // Layer 1: Gradient background with blur
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(topRounded)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xCC424242), // semi-transparent dark gray
+                                Color(0xCC616161)  // semi-transparent medium gray
+                            )
+                        )
+                    )
+                    .blur(16.dp) // only blurs the background layer
+            )
+
+            // Layer 2: Text on top
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier
+                    .clip(topRounded)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "${monthPosts.month.displayName} ${monthPosts.year}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
+
+
+        HorizontalDivider(
+            color = GraySurface,
+            modifier = Modifier.height(10.dp)
         )
 
-        // Posts grid for this month
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.height(
-                ((calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year) + 6) / 7 * 45).dp
+        // Calendar Grid for this month
+        MonthCalendarGrid(
+            monthPosts = monthPosts,
+            onPostClick = onPostClick
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun MonthCalendarGrid(
+    monthPosts: MonthPosts,
+    onPostClick: (Post) -> Unit
+) {
+    val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
+    val postsByDay = groupPostsByDay(monthPosts.posts, daysInMonth)
+    
+    // Get the first day of the month and calculate offset
+    val firstDayOfMonth = LocalDate.of(monthPosts.year, monthPosts.month.ordinal + 1, 1)
+    val startDayOffset = (firstDayOfMonth.dayOfWeek.value - 1) % 7 // Monday = 0, Sunday = 6
+    
+    // Calculate total cells needed (offset + days in month)
+    val totalCells = startDayOffset + daysInMonth
+    val rows = (totalCells + 6) / 7 // Round up to get number of rows
+    
+    Log.d("Calendar", "Month: ${monthPosts.month.displayName} ${monthPosts.year}")
+    Log.d("Calendar", "First day: ${firstDayOfMonth.dayOfWeek}, Offset: $startDayOffset")
+    Log.d("Calendar", "Days in month: $daysInMonth, Total cells: $totalCells, Rows: $rows")
+    
+    Column(
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(20.dp)
             )
+            .padding(16.dp)
+    ) {
+        // Day headers (Mon, Tue, Wed, etc.)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Calculate days in month and create calendar-like grid
-            val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
-            val totalCells = ((daysInMonth + 6) / 7) * 7 // Round up to complete weeks
-
-            items(daysInMonth) { dayIndex ->
-                val dayNumber = dayIndex + 1
-                val postForDay = monthPosts.posts.find {
-                    // Mock: assume each post represents a day (in real app, parse timestamp)
-                    (it.hashCode() % daysInMonth) + 1 == dayNumber
-                }
-
-                if (postForDay != null) {
-                    PostGridItem(
-                        post = postForDay,
-                        onClick = { onPostClick(postForDay) }
+            val dayHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+            dayHeaders.forEach { dayHeader ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(30.dp)
+                    ,
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = dayHeader,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
                     )
-                } else {
-                    EmptyDayItem()
+                }
+            }
+        }
+        
+        // Calendar grid rows
+        repeat(rows) { rowIndex ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(7) { columnIndex ->
+                    val cellIndex = rowIndex * 7 + columnIndex
+                    
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(65.dp)
+                    ) {
+                        when {
+                            // Empty cell before month starts
+                            cellIndex < startDayOffset -> {
+                                // Invisible placeholder to maintain grid structure
+                                Box(modifier = Modifier.fillMaxSize())
+                            }
+                            // Days within the month
+                            cellIndex < startDayOffset + daysInMonth -> {
+                                val dayNumber = cellIndex - startDayOffset + 1
+                                val dayPostGroup = postsByDay[dayNumber]
+                                
+                                if (dayPostGroup != null && dayPostGroup.posts.isNotEmpty()) {
+                                    PostGridItemWithBadge(
+                                        dayPostGroup = dayPostGroup,
+                                        onClick = { onPostClick(dayPostGroup.primaryPost!!) }
+                                    )
+                                } else {
+                                    EmptyDayItem(dayNumber = dayNumber)
+                                }
+                            }
+                            // Empty cells after month ends (shouldn't happen with our calculation)
+                            else -> {
+                                Box(modifier = Modifier.fillMaxSize())
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-private fun PostGridItem(
-    post: Post,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        AsyncImage(
-            model = post.thumbnailUrl,
-            contentDescription = "Post image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-    }
-}
-
-@Composable
-private fun EmptyDayItem() {
-    Box(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                shape = RoundedCornerShape(8.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        // Empty space or placeholder
-    }
-}
-
-// Helper function to group posts by month and year
-@RequiresApi(Build.VERSION_CODES.O)
-private fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
-    val currentDate = LocalDate.now()
-
-    // For demo purposes, create some mock month groups
-    return listOf(
-        MonthPosts(
-            month = Month.AUGUST,
-            year = 2025,
-            posts = posts.take(8) // Take first 8 posts for August
-        ),
-        MonthPosts(
-            month = Month.JULY,
-            year = 2025,
-            posts = posts.drop(8).take(4) // Next 4 posts for July
-        )
-    ).filter { it.posts.isNotEmpty() }
-}

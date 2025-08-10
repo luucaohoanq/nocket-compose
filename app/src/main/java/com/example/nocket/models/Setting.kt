@@ -10,7 +10,21 @@ data class Setting(
     val type: SettingType,
     val isToggleable: Boolean = false,
     val isToggled: Boolean = false
-)
+){
+    companion object {
+        fun fromMap(data: Map<String, Any>): Setting {
+            return Setting(
+                id = data["\$id"] as String,
+                title = data["title"] as? String ?: "",
+                description = data["description"] as? String ?: "",
+                icon = data["icon"] as? String ?: "ICON_DEFAULT",
+                type = SettingType.valueOf(data["type"] as String),
+                isToggleable = data["isToggleable"] as? Boolean ?: false,
+                isToggled = data["isToggled"] as? Boolean ?: false
+            )
+        }
+    }
+}
 
 enum class SettingType {
     WIDGET,

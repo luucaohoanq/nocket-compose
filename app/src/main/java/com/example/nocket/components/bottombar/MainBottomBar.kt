@@ -1,24 +1,20 @@
 package com.example.nocket.components.bottombar
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.IosShare
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.MotionPhotosAuto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material.icons.filled.ViewCozy
@@ -26,20 +22,22 @@ import androidx.compose.material.icons.outlined.Cached
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.IosShare
-import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.material.icons.outlined.ViewCozy
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
+import com.example.nocket.components.circle.Circle
+import com.example.nocket.components.circle.IconSetting
 
 data class BottomNavItem(
     val title: String? = null,
@@ -55,7 +55,8 @@ data class BottomNavItem(
     val unselectedIcon: ImageVector? = null,
     val route: String,
     val isCenter: Boolean = false, // flag để xác định button special (ví dụ camera)
-    val customSizeCenter: Dp = 56.dp // Kích thước tùy chỉnh cho button center
+    val customSizeCenter: Dp = 60.dp, // Kích thước tùy chỉnh cho button center
+    val onClick: (() -> Unit)? = null // Callback khi nhấn vào item
 )
 
 private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavItem>, BottomNavItem?> {
@@ -83,15 +84,22 @@ private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainBottomBar(
     navController: NavController,
     items: List<BottomNavItem>,
     modifier: Modifier = Modifier,
+    onItemClick: (BottomNavItem) -> Unit = { }
 ) {
     // Use provided items or determine items based on current route
     val (orderedItems, centerItem) = normalizeItems(items)
     val centerIconNavigation = items.find { it.isCenter }?.route ?: Screen.Post.route
+
+    //bottom sheet
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
     NavigationBar(
         containerColor = Color.Transparent,
         modifier = modifier
@@ -99,53 +107,71 @@ fun MainBottomBar(
         orderedItems.forEach { item ->
             if (item == centerItem) {
                 // center special button (vd: camera)
-                Box(
-                    modifier = Modifier
-                        .size(centerItem.customSizeCenter)
-                        .align(Alignment.CenterVertically)
-                        .background(
-                            color = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                                Color.Gray
-                            else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                                Color.Gray
-                            else Color.Yellow,
-                            shape = CircleShape
-                        )
-                        .clickable { navController.navigate(centerIconNavigation) },
-                    contentAlignment = Alignment.Center
-                ) {
-
-
-                    if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
-                        // Determine which icon to use, defaulting to whichever is not null
-                        val iconToUse = when {
-                            centerItem.selectedIcon != null -> centerItem.selectedIcon
-                            else -> centerItem.unselectedIcon // Fallback (won't be null due to our condition)
-                        }
-
-                        // Only show icon if we have a non-null icon to display
-                        iconToUse?.let {
-                            Icon(
-                                imageVector = it,
-                                contentDescription = item.title,
+                if (item.title == "Camera" || item.title == "Take a picture") {
+                    Circle(
+                        outerSize = centerItem.customSizeCenter,
+                        gap = 7.dp,
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Transparent,
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Yellow,
+                        borderWidth = 3.dp,
+                        onClick = {
+                            if (centerIconNavigation.isNotEmpty()) {
+                                navController.navigate(centerIconNavigation)
+                            }
+                        },
+                        iconSetting = when {
+                            centerItem.selectedIcon != null -> IconSetting(
+                                icon = centerItem.selectedIcon!!,
                                 tint = Color.White,
-                                modifier = Modifier.size(40.dp)
+                                contentDescription = item.title
                             )
-                        }
-                    } else {
-                        // Vòng tròn trắng bên trong
-                        Box(
-                            modifier = Modifier
-                                .size(45.dp)
-                                .background(color = Color.White, shape = CircleShape)
-                        )
-                    }
 
+                            centerItem.unselectedIcon != null -> IconSetting(
+                                icon = centerItem.unselectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            else -> null
+                        }
+                    )
+                } else if (item.title == "Send") {
+                    Circle(
+                        outerSize = centerItem.customSizeCenter,
+                        gap = 20.dp,
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Transparent,
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Yellow,
+                        modifier = Modifier.rotate(-45F),
+                        borderWidth = 3.dp,
+                        onClick = {
+                            if (centerIconNavigation.isNotEmpty()) {
+                                navController.navigate(centerIconNavigation)
+                            }
+                        },
+                        iconSetting = when {
+                            centerItem.selectedIcon != null -> IconSetting(
+                                icon = centerItem.selectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            centerItem.unselectedIcon != null -> IconSetting(
+                                icon = centerItem.unselectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            else -> null
+                        }
+                    )
                 }
             } else if (item.title != null) {
                 NavigationBarItem(
@@ -170,6 +196,7 @@ fun MainBottomBar(
                     },
                     selected = false,
                     onClick = {
+                        onItemClick(item) // Call the callback first
                         if (item.route.isNotEmpty()) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId)
@@ -195,8 +222,8 @@ private val sampleItems = listOf(
     ),
     BottomNavItem(
         title = "Messages",
-        selectedIcon = Icons.Filled.Message,
-        unselectedIcon = Icons.Outlined.Message,
+        selectedIcon = Icons.AutoMirrored.Filled.Message,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Message,
         route = Screen.Message.route
     ),
     BottomNavItem(
@@ -253,7 +280,7 @@ val sampleItems3 = listOf(
         title = "Camera",
         selectedIcon = null,
         unselectedIcon = null,
-        route = "",
+        route = Screen.Camera.route,
         isCenter = true
     ),
     BottomNavItem(
@@ -275,7 +302,7 @@ val takePhotoBar = listOf(
         title = "Take a picture",
         selectedIcon = null,
         unselectedIcon = null,
-        route = Screen.SubmitPhoto.route,
+        route = "submit_photo",  // Using string directly to ensure consistency
         customSizeCenter = 80.dp,
         isCenter = true
     ),
@@ -303,10 +330,10 @@ val submitPhotoBar = listOf(
         isCenter = true
     ),
     BottomNavItem(
-        title = "Share",
+        title = "Captions List",
         selectedIcon = Icons.Filled.MotionPhotosAuto,
         unselectedIcon = Icons.Outlined.MotionPhotosAuto,
-        route = ""
+        route = "",
     )
 )
 

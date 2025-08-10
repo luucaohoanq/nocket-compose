@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -24,6 +26,46 @@ android {
         }
 
         manifestPlaceholders["appAuthRedirectScheme"] = "com.example.nocket"
+
+        // Read from local.properties
+        val properties = Properties()
+        if (rootProject.file("local.properties").exists()) {
+            properties.load(project.rootProject.file("local.properties").inputStream())
+        } else {
+            throw RuntimeException("local.properties file not found")
+        }
+
+        val error = "variable not found in local.properties"
+
+        // Define BuildConfig fields without revealing fallback values
+        buildConfigField("String", "APPWRITE_VERSION",
+        "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "APPWRITE_PROJECT_ID",
+        "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "APPWRITE_PROJECT_NAME",
+        "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "APPWRITE_PUBLIC_ENDPOINT",
+        "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException(error)}\"")
+
+        buildConfigField("String", "DATABASE_ID",
+            "\"${properties.getProperty("appwrite.database.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "SETTINGS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.settings.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "NOTIFICATIONS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.notifications.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "MESSAGES_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.messages.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "FRIENDSHIPS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.friendships.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField("String", "POSTS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.posts.collection.id") ?: throw RuntimeException(error)}\"")
+
+        buildConfigField("String", "APPWRITE_API_KEY",
+            "\"${properties.getProperty("appwrite.api.key") ?: throw RuntimeException(error)}\"")
+
+        //GET_USERS_FUNCTION_ID
+        buildConfigField("String", "GET_USERS_FUNCTION_ID",
+            "\"${properties.getProperty("appwrite.get.users.function.id") ?: throw RuntimeException(error)}\"")
     }
 
     buildTypes {
@@ -44,6 +86,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -58,7 +101,11 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation (libs.play.services.auth) // hoặc bản mới nhất
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // compose platform
     implementation(platform(libs.androidx.compose.bom))
+
+    // ui, preview & material
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -89,7 +136,11 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation(libs.okhttp.urlconnection)
+
+    // accompanist
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.pager)
+
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.coil.compose)
 
@@ -102,7 +153,11 @@ dependencies {
     implementation (libs.androidx.camera.view.v131)
     implementation (libs.barcode.scanning)
 
-    implementation(libs.osmdroid.android)
+    // appwrite
+    implementation(libs.appwrite)
+
+    // splashscreen
+    implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.appauth)
     implementation(libs.androidx.browser)
@@ -114,6 +169,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // debug libraries
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
