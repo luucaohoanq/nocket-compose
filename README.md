@@ -152,6 +152,11 @@ font-weight: 500;
     </tr>
 
 <tr>
+      <td align="center"><img src="Sources/assets/user_detail_bottom_sheet.png" alt="Contact List" width="240"/><br/>Contact List</td>
+      <td align="center"><img src="Sources/assets/submit_photo_add_caption.png" alt="Add Caption" width="240"/><br/>Add Caption</td>
+    </tr>
+
+<tr>
       <td align="center"><img src="Sources/assets/logo.png" alt="Logo" width="240"/><br/>Logo</td>
       <td align="center"><img src="Sources/assets/splash_screen.png" alt="Splash Screen" width="240"/><br/>Splash Screen</td>
       <td align="center"><img src="Sources/assets/login_screen.png" alt="Splash Screen" width="240"/><br/>Login Screen</td>

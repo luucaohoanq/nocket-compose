@@ -1,32 +1,46 @@
 package com.example.nocket.components.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -36,12 +50,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.nocket.R
+import com.example.nocket.components.button.ShowMoreShowLessButton
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
+import com.example.nocket.components.container.BlurredContainer
+import com.example.nocket.components.container.NotBlurredContainer
+import com.example.nocket.constants.MeasurementConfig
 import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
 import com.example.nocket.utils.trimUsername
@@ -154,12 +173,10 @@ fun FriendList(
 @Composable
 fun ThirdPartyAppList(
     apps: List<ThirdPartyApp> = emptyList(),
-    selectedAppId: String = "",
     onAppSelected: (ThirdPartyApp) -> Unit = {}
 ) {
     GenericCircleList(
         items = apps,
-        selectedItemId = selectedAppId,
         onItemSelected = onAppSelected,
         itemToListItem = { it.asListItem() },
         itemContent = { app, isSelected ->
@@ -202,27 +219,22 @@ fun ThirdPartyAppItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-
     Circle(
         outerSize = 56.dp,
         gap = 1.dp,
         backgroundColor = Color(0xFF404137),
         borderColor = if (isSelected) Color.Yellow else Color(0xFFB8B8B8),
         onClick = onClick,
-        innerContent = {
-            Icon(
-                painter = painterResource(id = app.icon),
-                contentDescription = app.name,
-                tint = Color.White,
-                modifier = Modifier.size(50.dp)
-            )
-        }
+        imageSetting = ImageSetting(
+            imageUrl = app.imageUrl, // Use drawable resource instead
+        )
     )
 }
 
 // Keep your original data classes
 data class ThirdPartyApp(
     val name: String,
+    val imageUrl: String = "",
     val icon: Int,
     val onClick: () -> Unit
 )
@@ -230,65 +242,31 @@ data class ThirdPartyApp(
 val listThirdPartyApp = listOf(
     ThirdPartyApp(
         name = "Facebook",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/500px-Facebook_Logo_%282019%29.png",
         icon = R.drawable.fb,
         onClick = {}
     ),
     ThirdPartyApp(
         name = "Instagram",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png",
         icon = R.drawable.insta,
         onClick = {}
     ),
     ThirdPartyApp(
         name = "Messages",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IMessage_logo.svg/234px-IMessage_logo.svg.png",
         icon = R.drawable.message,
         onClick = {}
     ),
     ThirdPartyApp(
         name = "Other",
-        icon = R.drawable.ic_launcher_foreground,
+        imageUrl = "https://img.icons8.com/windows/50/link.png",
+        icon = R.drawable.ic_connection,
         onClick = {}
     ),
 )
 
-@Composable
-fun BlurredContainer(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .height(100.dp)
-            .clip(
-                RoundedCornerShape(20.dp)
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        // Blurred background layer
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xCC424242),
-                            Color(0xCC616161)
-                        )
-                    )
-                )
-                .blur(16.dp)
-        )
 
-        // Content layer (not blurred)
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.large)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            content()
-        }
-    }
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
@@ -302,10 +280,10 @@ fun ExternalAppComponent() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.AddCircle,
+                imageVector = Icons.Default.ZoomIn,
                 contentDescription = "More",
                 tint = Color.White,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
             )
 
             Text(
@@ -319,7 +297,6 @@ fun ExternalAppComponent() {
         BlurredContainer {
             ThirdPartyAppList(
                 apps = listThirdPartyApp,
-                selectedAppId = "Facebook",
                 onAppSelected = { app ->
                     println("Selected app: ${app.name}")
                 }
@@ -328,12 +305,24 @@ fun ExternalAppComponent() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
-fun YourFriendAppComponent() {
+fun YourFriendAppComponent(
+    friends: List<User> = emptyList(),
+    onRemoveFriend: (User) -> Unit = {},
+    initialShowCount: Int = 3 // Show only 3 friends initially
+) {
+    var showAll by remember { mutableStateOf(false) }
+    
+    // Determine how many friends to show
+    val friendsToShow = if (showAll || friends.size <= initialShowCount) {
+        friends
+    } else {
+        friends.take(initialShowCount)
+    }
+    
     Column(
         modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -354,44 +343,93 @@ fun YourFriendAppComponent() {
             )
         }
 
-        repeat(3, {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        if (friends.isEmpty()) {
+            Text(
+                text = "You don't have any friends yet",
+                color = Color.White.copy(alpha = 0.6f),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        } else {
+            // Friends list - use Column since parent is already scrollable
+            Column(
             ) {
-                Circle(
-                    outerSize = 56.dp,
-                    gap = 5.dp,
-                    backgroundColor = Color(0xFF404137),
-                    onClick = {},
-                    imageSetting = ImageSetting(
-                        imageUrl = "https://images.unsplash.com/photo-1710988238169-12c5c2474652?q=80&w=1329&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                        contentDescription = "Example Image"
+                friendsToShow.forEach { friend ->
+                    FriendListItem(
+                        friend = friend,
+                        onRemoveFriend = onRemoveFriend
                     )
-                )
-
-                // Username text with special handling for "Everyone" and "You"
-                Text(
-                    text = SampleData.users.firstOrNull { it.id == "everyone" }?.username
-                        ?: "Everyone",
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                // Flexible spacer to push the arrow to the end
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Arrow icon (always visible)
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Select",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                }
+            }
+            
+            // Show More/Show Less button
+            if (friends.size > initialShowCount) {
+                ShowMoreShowLessButton(
+                    showAll = showAll,
+                    totalCount = friends.size,
+                    visibleCount = friendsToShow.size,
+                    onToggle = { showAll = !showAll }
                 )
             }
-        })
+        }
     }
+}
+
+@Composable
+fun FriendListItem(
+    friend: User,
+    onRemoveFriend: (User) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .padding(12.dp)
+            .clickable { /* Navigate to friend's profile */ },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
+        // Friend's avatar
+        Circle(
+            outerSize = 56.dp,
+            gap = 5.dp,
+            backgroundColor = Color(0xFF404137),
+            onClick = {},
+            imageSetting = ImageSetting(
+                imageUrl = friend.avatar,
+            )
+        )
+
+        // Friend's name
+        Text(
+            text = friend.username ?: "Unknown",
+            color = Color.White,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        // Remove friend button
+        IconButton(
+            onClick = { onRemoveFriend(friend) },
+            modifier = Modifier.size(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove Friend",
+                tint = Color.White
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
+@Composable
+fun YourFriendAppComponentPreview() {
+    YourFriendAppComponent(
+        friends = SampleData.users.take(3)
+    )
 }
 
 
@@ -419,7 +457,7 @@ fun HorizontalShowMoreComponent() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .background(
-                    color = Color.Gray,
+                    color = Color.DarkGray,
                     shape = RoundedCornerShape(50)
                 )
                 .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -447,7 +485,7 @@ fun HorizontalShowMoreComponent() {
 @Composable
 fun ShareYourLinkComponent() {
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
@@ -458,7 +496,7 @@ fun ShareYourLinkComponent() {
                 imageVector = Icons.Default.Upload,
                 contentDescription = "Friends",
                 tint = Color.White,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
             )
 
             Text(
@@ -469,7 +507,7 @@ fun ShareYourLinkComponent() {
             )
         }
 
-        repeat(3, {
+        listThirdPartyApp.forEach { item ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -481,14 +519,14 @@ fun ShareYourLinkComponent() {
                     borderColor = Color.Gray,
                     onClick = {},
                     imageSetting = ImageSetting(
-                        imageUrl = "https://images.unsplash.com/photo-1710988238169-12c5c2474652?q=80&w=1329&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        imageUrl = item.imageUrl,
                         contentDescription = "Example Image"
                     )
                 )
 
                 // Username text with special handling for "Everyone" and "You"
                 Text(
-                    text = "Messenger",
+                    text = item.name,
                     color = Color.White,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.titleMedium
@@ -499,13 +537,13 @@ fun ShareYourLinkComponent() {
 
                 // Arrow icon (always visible)
                 Icon(
-                    imageVector = Icons.Filled.Close,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                     contentDescription = "Select",
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(MeasurementConfig.USER_DETAIL_BOTTOM_SHEET_TRAILING_ICON_SIZE)
                 )
             }
-        })
+        }
     }
 }
 
@@ -540,79 +578,86 @@ fun GenericListExamples() {
         BlurredContainer {
             ThirdPartyAppList(
                 apps = listThirdPartyApp,
-                selectedAppId = "Instagram"
             )
         }
     }
 }
 
 @Composable
-fun TotalFriendComponent() {
-    HorizontalDivider(
-        color = Color.White,
-        thickness = 3.dp,
-        modifier = Modifier
-            .width(40.dp)
-    )
+fun TotalFriendComponent(
+    totalFriends: Int,
+    maxFriends: Int = 20,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text(
+            text = "$totalFriends out of $maxFriends friends",
+            color = Color.White,
+            fontWeight = FontWeight.Medium,
+            style = MaterialTheme.typography.titleLarge
+        )
 
-    Text(
-        text = "32 out of 20 friends",
-        color = Color.White,
-        fontWeight = FontWeight.Medium,
-        style = MaterialTheme.typography.titleLarge
-    )
-
-    Text(
-        text = "Invite a friend to continue",
-        color = Color.White,
-        fontWeight = FontWeight.SemiBold,
-        style = MaterialTheme.typography.titleSmall
-    )
-    Box(
-        modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp)
-            .fillMaxWidth()           // Mở rộng full ngang
-//                    .height(100.dp)
-            .clip(RoundedCornerShape(20.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.LightGray,
-                            Color.Gray
-                        )
-                    )
-                )
-                .blur(16.dp)
+        Text(
+            text = "Invite a friend to continue",
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleSmall
         )
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .clip(MaterialTheme.shapes.large)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(start = 16.dp, end = 16.dp)
+                .fillMaxWidth()           // Mở rộng full ngang
+//                    .height(100.dp)
+                .clip(RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Box(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .matchParentSize()
+                    .background(Color.DarkGray)
+            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.large)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Friends",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
-                )
-                Text(
-                    text = "Add new friend",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Friends",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                    Text(
+                        text = "Add new friend",
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
+@Composable
+fun TotalFriendComponentPreview() {
+    Column(
+        modifier = Modifier.padding(16.dp),
+    ) {
+        TotalFriendComponent(totalFriends = 5, maxFriends = 20)
+
+        // Example with no friends
+        TotalFriendComponent(totalFriends = 0, maxFriends = 20)
     }
 }

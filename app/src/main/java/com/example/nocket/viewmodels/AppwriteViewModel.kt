@@ -306,13 +306,61 @@ class AppwriteViewModel @Inject constructor(
     fun fetchFriendsOfUser(user: AuthUser) {
         viewModelScope.launch {
             try {
+                AndroidLog.d("AppwriteViewModel", "Starting to fetch friends for user: ${user.id}")
+                AndroidLog.d("AppwriteViewModel", "User details: username=${user.name}, email=${user.email}")
+                
                 val friendsList = repository.getFriendsOfUser(user)
                 _friends.value = friendsList
-                AndroidLog.d("AppwriteViewModel", "fetchFriendsOfUser: Fetched ${friendsList.size} friends for user ${user.id}")
+                
+                AndroidLog.d("AppwriteViewModel", "fetchFriendsOfUser: Successfully fetched ${friendsList.size} friends for user ${user.id}")
+                if (friendsList.isNotEmpty()) {
+                    AndroidLog.d("AppwriteViewModel", "Friends list: ${friendsList.map { it.username }}")
+                } else {
+                    AndroidLog.d("AppwriteViewModel", "No friends found for user ${user.id}")
+                }
             } catch (e: Exception) {
-                AndroidLog.e("AppwriteViewModel", "Error fetching friends: ${e.message}")
+                AndroidLog.e("AppwriteViewModel", "Error fetching friends for user ${user.id}: ${e.message}", e)
                 _friends.value = emptyList()
             }
+        }
+    }
+
+    /**
+     * Convenience function to fetch friends by user ID
+     * This gets the full user object first, then fetches friends
+     */
+    fun fetchFriendsOfUserById(userId: String) {
+        viewModelScope.launch {
+            try {
+                AndroidLog.d("AppwriteViewModel", "Fetching user by ID first: $userId")
+                val user = repository.getUserByIdCustom(userId)
+                if (user != null) {
+                    AndroidLog.d("AppwriteViewModel", "Got user: ${user.name}, now fetching friends")
+                    fetchFriendsOfUser(user)
+                } else {
+                    AndroidLog.e("AppwriteViewModel", "Could not find user with ID: $userId")
+                    _friends.value = emptyList()
+                }
+            } catch (e: Exception) {
+                AndroidLog.e("AppwriteViewModel", "Error fetching user by ID $userId: ${e.message}", e)
+                _friends.value = emptyList()
+            }
+        }
+    }
+
+    /**
+     * Debug function to check current friends state
+     */
+    fun debugFriendsState() {
+        viewModelScope.launch {
+            val currentFriends = _friends.value
+            val currentUserData = _currentUser.value
+            
+            AndroidLog.d("AppwriteViewModel", "=== FRIENDS DEBUG ===")
+            AndroidLog.d("AppwriteViewModel", "Current user: ${currentUserData?.id} (${currentUserData?.name})")
+            AndroidLog.d("AppwriteViewModel", "Friends count: ${currentFriends.size}")
+            AndroidLog.d("AppwriteViewModel", "Friends: ${currentFriends.map { "${it.id}:${it.username}" }}")
+            AndroidLog.d("AppwriteViewModel", "===================")
         }
     }
 }

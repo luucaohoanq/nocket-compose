@@ -460,6 +460,8 @@ class AppwriteRepository @Inject constructor(
      */
     suspend fun getFriendsOfUser(user: AuthUser): List<User> {
         return try {
+            android.util.Log.d("AppwriteRepository", "Fetching friends for user: ${user.id}")
+            
             val friendships = databases.listDocuments(
                 databaseId = DBConfig.DATABASE_ID,
                 collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
@@ -471,22 +473,34 @@ class AppwriteRepository @Inject constructor(
                 )
             )
             
+            android.util.Log.d("AppwriteRepository", "Found ${friendships.documents.size} friendship documents for user ${user.id}")
+            
             // Extract friend IDs using the new combinedUserIds field
             val friendIds = friendships.documents.mapNotNull { doc ->
                 val combinedIds = doc.data["combinedUserIds"] as? List<String>
+                android.util.Log.d("AppwriteRepository", "Friendship document combinedUserIds: $combinedIds")
                 combinedIds?.find { it != user.id } // Get the other user ID
             }
             
-            android.util.Log.d("AppwriteRepository", "Fetched ${friendIds.size} friend IDs for user ${user.id}")
+            android.util.Log.d("AppwriteRepository", "Extracted ${friendIds.size} friend IDs for user ${user.id}: $friendIds")
+            
+            if (friendIds.isEmpty()) {
+                android.util.Log.d("AppwriteRepository", "No friend IDs found, returning empty list")
+                return emptyList()
+            }
             
             // Batch fetch all friends
             val friendsMap = getUsersByIds(friendIds)
+            android.util.Log.d("AppwriteRepository", "Fetched ${friendsMap.size} friend details from getUsersByIds")
             
-            return friendsMap.values.map { authUser ->
+            val friendsList = friendsMap.values.map { authUser ->
                 User.mapToUser(authUser)
             }
+            
+            android.util.Log.d("AppwriteRepository", "Returning ${friendsList.size} friends: ${friendsList.map { it.username }}")
+            return friendsList
         } catch (e: Exception) {
-            android.util.Log.e("AppwriteRepository", "Error fetching friends: ${e.message}")
+            android.util.Log.e("AppwriteRepository", "Error fetching friends: ${e.message}", e)
             emptyList()
         }
     }
