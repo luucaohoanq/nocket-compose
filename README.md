@@ -176,7 +176,7 @@ constants/      → AppwriteConfig.kt bridges BuildConfig to the app
 ## 🛠 Tech Stack
 
 | Layer          | Technology                   |
-|----------------|------------------------------|
+| -------------- | ---------------------------- |
 | **Language**   | Kotlin                       |
 | **UI**         | Jetpack Compose + Material 3 |
 | **Navigation** | Navigation Compose           |

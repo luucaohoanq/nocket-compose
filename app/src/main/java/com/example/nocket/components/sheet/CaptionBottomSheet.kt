@@ -1,6 +1,8 @@
 package com.example.nocket.components.sheet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +19,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -26,39 +30,177 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.font.FontWeight
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class CaptionItem(
     val title: String,
-    val icon: ImageVector,
-    val backgroundColor: Color,
+    val iconVector: ImageVector? = null,
+    val iconString: String? = null,
+    val backgroundBrush: Brush,
     val textColor: Color = Color.White
+) {
+    fun hasVectorIcon() = iconVector != null
+}
+
+val generalCaptionsSample = listOf(
+    CaptionItem(
+        "Text",
+        iconVector = Icons.Default.TextFields,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color.DarkGray, Color.Black)
+        )
+    ),
+    CaptionItem(
+        "Review",
+        iconVector = Icons.Default.Star,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF444444), Color(0xFF222222))
+        )
+    ),
+    CaptionItem(
+        "Now Playing",
+        iconVector = Icons.Default.MusicNote,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF222222), Color(0xFF111111))
+        )
+    ),
+    CaptionItem(
+        "Location",
+        iconVector = Icons.Default.Place,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF444444), Color(0xFF666666))
+        )
+    ),
+    CaptionItem(
+        "Weather",
+        iconVector = Icons.Default.WbSunny,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF4FC3F7), Color(0xFF0288D1))
+        )
+    ),
+    CaptionItem(
+        "8:38 AM",
+        iconVector = Icons.Default.AccessTime,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF888888), Color(0xFF444444))
+        )
+    ),
 )
 
-val generalCaptions = listOf(
-    CaptionItem("Text", Icons.Default.TextFields, Color.DarkGray),
-    CaptionItem("Review", Icons.Default.Star, Color(0xFF444444)),
-    CaptionItem("Now Playing", Icons.Default.MusicNote, Color(0xFF222222)),
-    CaptionItem("Location", Icons.Default.Place, Color(0xFF444444)),
-    CaptionItem("Weather", Icons.Default.WbSunny, Color(0xFF4FC3F7)),
-    CaptionItem("8:38 AM", Icons.Default.AccessTime, Color(0xFF888888))
-)
+@Composable
+fun generalCaptions(): List<CaptionItem> {
+    val timeNow = rememberCurrentTime()
+
+    return listOf(
+
+        CaptionItem(
+            "Text",
+            iconVector = Icons.Default.TextFields,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color.DarkGray, Color.Black)
+            )
+        ),
+        CaptionItem(
+            "Review",
+            iconVector = Icons.Default.Star,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF444444), Color(0xFF222222))
+            )
+        ),
+        CaptionItem(
+            "Now Playing",
+            iconVector = Icons.Default.MusicNote,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF222222), Color(0xFF111111))
+            )
+        ),
+        CaptionItem(
+            "Location",
+            iconVector = Icons.Default.Place,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF444444), Color(0xFF666666))
+            )
+        ),
+        CaptionItem(
+            "Weather",
+            iconVector = Icons.Default.WbSunny,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF4FC3F7), Color(0xFF0288D1))
+            )
+        ), CaptionItem(
+            timeNow,
+            iconVector = Icons.Default.AccessTime,
+            backgroundBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF888888), Color(0xFF444444))
+            )
+        )
+    )
+}
 
 val decorativeCaptions = listOf(
-    CaptionItem("Party Time!", Icons.Default.Celebration, Color(0xFF81C784)),
-    CaptionItem("Good morning", Icons.Default.WbSunny, Color(0xFFFFA726)),
-    CaptionItem("OOTD", Icons.Default.Face, Color.Black),
-    CaptionItem("Miss you", Icons.Default.Favorite, Color.Red)
+    CaptionItem(
+        "Party Time!",
+        iconVector = Icons.Default.Celebration,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFF81C784), Color(0xFF388E3C))
+        )
+    ),
+    CaptionItem(
+        "Good morning",
+        iconVector = Icons.Default.WbSunny,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color(0xFFFFA726), Color(0xFFF57C00))
+        )
+    ),
+    CaptionItem(
+        "OOTD",
+        iconVector = Icons.Default.Face,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color.Black, Color.DarkGray)
+        )
+    ),
+    CaptionItem(
+        "Miss you",
+        iconVector = Icons.Default.Favorite,
+        backgroundBrush = Brush.linearGradient(
+            colors = listOf(Color.Red, Color(0xFFB71C1C))
+        )
+    )
 )
 
+@Composable
+fun rememberCurrentTime(): String {
+    var currentTime by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            val now = Date()
+            val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
+            currentTime = sdf.format(now)
+            delay(60_000) // cập nhật mỗi phút
+        }
+    }
+    return currentTime
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -66,6 +208,9 @@ fun CaptionBottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit
 ) {
+
+    val generalItems = generalCaptions()
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -73,9 +218,17 @@ fun CaptionBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(start = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                thickness = 3.dp,
+                modifier = Modifier
+                    .width(40.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
             Text(
                 text = "Captions",
                 style = MaterialTheme.typography.titleMedium,
@@ -83,20 +236,20 @@ fun CaptionBottomSheet(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Text("General", style = MaterialTheme.typography.labelMedium)
+            Text("General", style = MaterialTheme.typography.titleMedium)
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                generalCaptions.forEach {
+                generalItems.forEach {
                     CaptionPill(item = it)
                 }
             }
 
-            Text("Decorative", style = MaterialTheme.typography.labelMedium)
+            Text("Decorative", style = MaterialTheme.typography.titleMedium)
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 decorativeCaptions.forEach {
                     CaptionPill(item = it)
@@ -109,21 +262,53 @@ fun CaptionBottomSheet(
 }
 
 @Composable
-fun CaptionPill(item: CaptionItem) {
+fun CaptionPill(
+    item: CaptionItem,
+    onClick: (() -> Unit)? = null
+) {
+    val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = Modifier
-            .background(color = item.backgroundColor, shape = RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .background(
+                brush = item.backgroundBrush,
+                shape = RoundedCornerShape(50)
+            )
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .then(
+                if (onClick != null) Modifier
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null, // hoặc bỏ hẳn param này để dùng ripple mặc định
+                        onClick = onClick
+                    )
+                else Modifier
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = item.icon,
-            contentDescription = item.title,
-            tint = item.textColor,
-            modifier = Modifier.size(18.dp)
+        when {
+            item.hasVectorIcon() -> Icon(
+                imageVector = item.iconVector!!,
+                contentDescription = item.title,
+                tint = item.textColor,
+                modifier = Modifier.size(20.dp)
+            )
+
+            item.iconString != null -> Text(
+                text = item.iconString,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                color = item.textColor,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+
+            else -> Spacer(modifier = Modifier.width(0.dp))
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = item.title,
+            color = item.textColor,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge
         )
-        Spacer(Modifier.width(4.dp))
-        Text(text = item.title, color = item.textColor)
     }
 }
 

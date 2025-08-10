@@ -44,3 +44,12 @@ fun takeFirstNameOfUser(username: String): String {
         "Unknown"
     }
 }
+
+//if the caption length is more than 30 characters, truncate it and add "..."
+fun trimCaption(caption: String, takeFirst: Int = 30): String {
+    return if (caption.length > takeFirst) {
+        caption.take(takeFirst) + "..."
+    } else {
+        caption
+    }
+}

@@ -167,6 +167,7 @@ fun MainBottomBar(
                     },
                     selected = false,
                     onClick = {
+                        onItemClick(item) // Call the callback first
                         if (item.route.isNotEmpty()) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId)

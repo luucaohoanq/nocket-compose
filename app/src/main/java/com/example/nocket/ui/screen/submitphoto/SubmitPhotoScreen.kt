@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,28 +38,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.example.nocket.Screen
 import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.submitPhotoBar
-import com.example.nocket.components.common.BackButtonPosition
 import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.indicator.PageIndicator
 import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.sheet.CaptionBottomSheet
-import com.example.nocket.components.topbar.MainTopBar
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
+import com.example.nocket.utils.mapToUser
+import com.example.nocket.utils.trimCaption
+import com.example.nocket.viewmodels.AppwriteViewModel
 import kotlinx.coroutines.launch
+import kotlin.text.compareTo
 
 val submitButtonSize = 80.dp
 
@@ -67,20 +71,8 @@ val submitButtonSize = 80.dp
 @Composable
 fun SubmitPhotoScreen(
     navController: NavController,
+    appwriteViewModel: AppwriteViewModel = hiltViewModel()
 ) {
-    // Define localCameraMode state before using it in the Scaffold
-    // If the post has id "camera", automatically show camera mode
-    var post = SampleData.samplePosts.firstOrNull { it.id == "camera" }
-        ?: Post(
-            id = "camera",
-            user = SampleData.users[14], // Current user
-            caption = "Take a photo",
-            thumbnailUrl = "https://picsum.photos/400/300?random=56",
-            createdAt = "2023-10-01T12:00:00Z",
-            postType = PostType.IMAGE
-        )
-
-    var showNotifications by remember { mutableStateOf(false) }
     var selectedUser by remember {
         mutableStateOf<User?>(
             User(
@@ -97,7 +89,19 @@ fun SubmitPhotoScreen(
     val coroutineScope = rememberCoroutineScope()
     var showCaptionSheet by remember { mutableStateOf(false) }
 
-    val currentUser = SampleData.users[14]
+    // Get current user from auth state
+    val currentUser by appwriteViewModel.currentUser.collectAsState()
+    val data = mapToUser(currentUser)
+
+    val userPosts by appwriteViewModel.userPosts.collectAsState()
+
+    // Trigger the data fetch when screen loads
+    LaunchedEffect(data.id) {
+        appwriteViewModel.getPostsOfUser(data.id)
+    }
+
+    val post: Post? = userPosts.firstOrNull()
+    val maxCaptionLength = 30
 
     Scaffold(
         topBar = {
@@ -133,7 +137,7 @@ fun SubmitPhotoScreen(
 
 
             // Post image (full width)
-            post.thumbnailUrl?.let { imageUrl ->
+            post?.thumbnailUrl?.let { imageUrl ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -171,6 +175,16 @@ fun SubmitPhotoScreen(
 
                     // Caption
                     post.caption?.let { caption ->
+                        // Get haptic feedback instance
+                        val haptic = LocalHapticFeedback.current
+
+                        // Trigger haptic feedback when caption exceeds max length
+                        LaunchedEffect(caption) {
+                            if (caption.length > maxCaptionLength) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
@@ -182,8 +196,7 @@ fun SubmitPhotoScreen(
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Text(
-                                //if the caption length is more than 30 characters, truncate it and add "..."
-                                text = caption.take(30) + if (caption.length > 30) "..." else "",
+                                text = trimCaption(caption, maxCaptionLength),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.White,
                                 lineHeight = 20.sp,
@@ -238,7 +251,7 @@ fun SubmitPhotoScreen(
                 ) {
 
                     FriendList(
-                        user = currentUser,
+                        user = data,
                         selectedFriendId = selectedUser?.id ?: "everyone",
                         onFriendSelected = { selectedUser = it }
                     )

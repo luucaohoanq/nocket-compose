@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -53,28 +55,18 @@ import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
 import com.example.nocket.preview.CameraPreviewWithZoom
+import com.example.nocket.utils.mapToUser
+import com.example.nocket.viewmodels.AppwriteViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CameraScreen(
     navController: NavController,
+    appwriteViewModel: AppwriteViewModel = hiltViewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var capturedPhotoPath by remember { mutableStateOf<String?>(null) }
 
-    // Define localCameraMode state before using it in the Scaffold
-    // If the post has id "camera", automatically show camera mode
-    var post = SampleData.samplePosts.firstOrNull { it.id == "camera" }
-        ?: Post(
-            id = "camera",
-            user = SampleData.users[14], // Current user
-            caption = "Take a photo",
-            thumbnailUrl = "https://picsum.photos/400/300?random=56",
-            createdAt = "2023-10-01T12:00:00Z",
-            postType = PostType.IMAGE
-        )
-
-    var showNotifications by remember { mutableStateOf(false) }
     var selectedUser by remember {
         mutableStateOf<User?>(
             User(
@@ -86,16 +78,21 @@ fun CameraScreen(
     }
     // Use the passed onCameraClick instead of navigating to CameraXScreen
 
-    val currentUser = SampleData.users[14]
+    // Get current user from auth state
+    val currentUser by appwriteViewModel.currentUser.collectAsState()
+    val data = mapToUser(currentUser)
 
     Scaffold(
         topBar = {
             MainTopBar(
                 navController = navController,
-                user = currentUser, // Using user 14 as the current user
+                user = data, // Using user 14 as the current user
                 onMessageClick = { navController.navigate(Screen.Message.route) },
-                onProfileClick = { navController.navigate(Screen.Profile.route) },
-                onNotificationClick = { showNotifications = true },
+                onProfileClick = { {
+                    data?.id?.let { userId ->
+                        navController.navigate("profile?userId=$userId")
+                    } ?: navController.navigate("profile")
+                } },
                 onUserSelected = { user -> selectedUser = user }
             )
         }
