@@ -33,7 +33,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nocket.Screen
+import kotlinx.coroutines.launch
 
 
 val buttons = listOf(
-    Triple(Icons.Filled.Group, Screen.Message.route, "FRIEND"),
+    Triple(Icons.Filled.Group, "", "FRIEND"),
     Triple(Icons.Filled.Settings, Screen.Setting.route, "Settings"),
     Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home")
 )
@@ -56,7 +63,8 @@ val buttons = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileTopBar(
-    navController: NavController
+    navController: NavController,
+    onFriendsClick: () -> Unit = {}
 ) {
 
     val shimmerTranslateAnim = animateFloatAsState(
@@ -158,7 +166,13 @@ fun UserProfileTopBar(
             ) {
                 buttons.forEach { (icon, route, description) ->
                     Button(
-                        onClick = { navController.navigate(route) },
+                        onClick = {
+                            if(description == "FRIEND") {
+                                onFriendsClick()
+                            } else {
+                                navController.navigate(route)
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = Color.White

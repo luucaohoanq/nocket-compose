@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,6 +58,7 @@ import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.empty.EmptyDayItem
 import com.example.nocket.components.grid.PostGridItemWithBadge
+import com.example.nocket.components.sheet.UserDetailBottomSheet
 import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.constants.Month
 import com.example.nocket.models.Post
@@ -87,6 +90,7 @@ data class DayPostGroup(
     val primaryPost: Post? get() = posts.firstOrNull()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserProfile(
@@ -99,6 +103,11 @@ fun UserProfile(
     var profileUser by remember { mutableStateOf<AuthUser?>(null) }
     val currentUser by appwriteViewModel.currentUser.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
+
+    // Ensure current user is fetched first
+    LaunchedEffect(Unit) {
+        appwriteViewModel.fetchCurrentUser()
+    }
 
     // Fetch the correct user based on userId parameter
     LaunchedEffect(userId, currentUser) {
@@ -137,6 +146,38 @@ fun UserProfile(
     // Group posts by month and year
     val groupedPosts = groupPostsByMonthYear(posts)
 
+    // Add bottom sheet state and visibility state
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showUserDetailBottomSheet by remember { mutableStateOf(false) }
+
+    // Get friends data
+    val friends by appwriteViewModel.friends.collectAsState()
+
+    // Fetch friends for the current user - use the actual currentUser object
+    LaunchedEffect(currentUser) {
+        currentUser?.let { user ->
+            appwriteViewModel.fetchFriendsOfUser(user)
+            // Debug: Check the state after fetching
+            kotlinx.coroutines.delay(1000) // Wait for fetch to complete
+            appwriteViewModel.debugFriendsState()
+        }
+    }
+
+    // Show the UserDetailBottomSheet when needed
+    if (showUserDetailBottomSheet) {
+        UserDetailBottomSheet(
+            sheetState = sheetState,
+            onDismiss = {
+                showUserDetailBottomSheet = false
+            },
+            friends = friends,
+            onRemoveFriend = { friend ->
+                // Implement friend removal logic
+                // appwriteViewModel.removeFriend(friend.id)
+            }
+        )
+    }
+
     when {
         selectedPost != null -> {
             PostDetailScreen(
@@ -171,7 +212,10 @@ fun UserProfile(
             Scaffold(
                 topBar = {
                     UserProfileTopBar(
-                        navController = navController
+                        navController = navController,
+                        onFriendsClick = {
+                            showUserDetailBottomSheet = true
+                        }
                     )
                 }
             ) { paddingValues ->
