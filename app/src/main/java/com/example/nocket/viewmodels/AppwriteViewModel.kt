@@ -47,6 +47,12 @@ class AppwriteViewModel @Inject constructor(
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts.asStateFlow()
 
+    // Loading states for posts
+    private val _postsLoading = MutableStateFlow(false)
+    val postsLoading: StateFlow<Boolean> = _postsLoading.asStateFlow()
+
+    private val _userPostsLoading = MutableStateFlow(false)
+    val userPostsLoading: StateFlow<Boolean> = _userPostsLoading.asStateFlow()
 
     // Add these properties to AppwriteViewModel
     private val _users = MutableStateFlow<Map<String, AuthUser?>>(emptyMap())
@@ -201,6 +207,7 @@ class AppwriteViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getAllPostsOfUserAndFriends(user: AuthUser) {
         viewModelScope.launch {
+            _postsLoading.value = true
             try {
                 AndroidLog.d("AppwriteViewModel", "Fetching posts for user: ${user.id}")
                 val result = repository.getAllPostsOfUserAndFriends(user)
@@ -210,7 +217,9 @@ class AppwriteViewModel @Inject constructor(
                 AndroidLog.d("AppwriteViewModel", "Fetched ${result.size} posts for user")
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching posts: ${e.message}", e)
-                // Just log the error, UI will handle empty state
+                _posts.value = emptyList()
+            } finally {
+                _postsLoading.value = false
             }
         }
     }
@@ -225,6 +234,7 @@ class AppwriteViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getPostsForUser(userId: String, viewerId: String? = null) {
         viewModelScope.launch {
+            _userPostsLoading.value = true
             try {
                 val posts = repository.getPostsForUser(userId, viewerId)
                 _userPosts.value = posts
@@ -232,6 +242,8 @@ class AppwriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching posts for user: ${e.message}")
                 _userPosts.value = emptyList()
+            } finally {
+                _userPostsLoading.value = false
             }
         }
     }
@@ -242,6 +254,7 @@ class AppwriteViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getPostsOfUser(userId: String) {
         viewModelScope.launch {
+            _userPostsLoading.value = true
             try {
                 val posts = repository.getPostsForUser(userId, userId) // User viewing their own posts
                 _userPosts.value = posts
@@ -249,6 +262,8 @@ class AppwriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching user's own posts: ${e.message}")
                 _userPosts.value = emptyList()
+            } finally {
+                _userPostsLoading.value = false
             }
         }
     }
@@ -259,6 +274,7 @@ class AppwriteViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getPostsByTags(tags: List<String>, viewerId: String? = null) {
         viewModelScope.launch {
+            _postsLoading.value = true
             try {
                 val posts = repository.getPostsByTags(tags, viewerId)
                 _posts.value = posts // Use the main posts StateFlow for tag results
@@ -266,6 +282,8 @@ class AppwriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 AndroidLog.e("AppwriteViewModel", "Error fetching posts by tags: ${e.message}")
                 _posts.value = emptyList()
+            } finally {
+                _postsLoading.value = false
             }
         }
     }

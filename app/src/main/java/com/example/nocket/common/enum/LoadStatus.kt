@@ -1,4 +1,4 @@
-package org.com.hcmurs.common.enum
+package com.example.nocket.common.enum
 
 sealed class LoadStatus(val description: String = "") {
     class Init(): LoadStatus()

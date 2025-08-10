@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,10 +48,13 @@ fun PostScreen(
     val posts by appwriteViewModel.posts.collectAsState()
     val userPosts by appwriteViewModel.userPosts.collectAsState() // For specific user posts
     val friends by appwriteViewModel.friends.collectAsState()
+    
+    // Use ViewModel loading states instead of local loading state
+    val postsLoading by appwriteViewModel.postsLoading.collectAsState()
+    val userPostsLoading by appwriteViewModel.userPostsLoading.collectAsState()
 
     var selectedPost by remember { mutableStateOf<Post?>(null) }
     var showNotifications by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
 
     // Track the selected user for filtering posts
     var selectedUser by remember {
@@ -73,12 +77,10 @@ fun PostScreen(
         when (authState) {
             is AuthState.Authenticated -> {
                 Log.d("UserDebug", "Auth State: Authenticated")
-                isLoading = true
                 val user = (authState as AuthState.Authenticated).user
                 appwriteViewModel.getAllPostsOfUserAndFriends(user)
                 appwriteViewModel.fetchFriendsOfUser(user)
                 appwriteViewModel.fetchCurrentUser()
-                isLoading = false
             }
 
             else -> Log.d("PostScreen", "User is not authenticated, skipping post fetch")
@@ -98,20 +100,50 @@ fun PostScreen(
         else -> {
             Box(modifier = Modifier.fillMaxSize()) {
                 // Determine which posts to show and handle loading state
-                val (displayPosts, isPostsLoading) = when (selectedUser?.id) {
-                    "everyone" -> posts to (isLoading || posts.isEmpty())
-                    "you" -> userPosts to (isLoading || userPosts.isEmpty())
-                    null -> posts to (isLoading || posts.isEmpty())
-                    else -> userPosts to (isLoading || userPosts.isEmpty()) // Show friend's posts from userPosts StateFlow
+                val (displayPosts, isCurrentlyLoading) = when (selectedUser?.id) {
+                    "everyone" -> posts to postsLoading
+                    "you" -> userPosts to userPostsLoading
+                    null -> posts to postsLoading
+                    else -> userPosts to userPostsLoading // Show friend's posts from userPosts StateFlow
                 }
 
-                if (isPostsLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    PostGrid(
-                        posts = displayPosts,
-                        onPostClick = { post -> selectedPost = post }
-                    )
+                when {
+                    isCurrentlyLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    displayPosts.isEmpty() -> {
+                        // Show empty state
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = when (selectedUser?.id) {
+                                    "everyone" -> "No posts to show"
+                                    "you" -> "You haven't posted anything yet"
+                                    else -> "${selectedUser?.username ?: "This user"} hasn't posted anything yet"
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            if (selectedUser?.id == "you") {
+                                Text(
+                                    text = "Tap the camera button to create your first post",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        PostGrid(
+                            posts = displayPosts,
+                            onPostClick = { post -> selectedPost = post }
+                        )
+                    }
                 }
 
                 MainTopBar(
