@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nocket.extensions.edgeToEdgeWithStyle
 import com.example.nocket.models.auth.AuthState
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         // Apply edge-to-edge style after super.onCreate to ensure it takes effect
         edgeToEdgeWithStyle()
 

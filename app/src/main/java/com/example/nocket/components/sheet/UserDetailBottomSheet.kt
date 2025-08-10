@@ -38,7 +38,7 @@ import com.example.nocket.components.list.YourFriendAppComponent
 import com.example.nocket.models.User
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailBottomSheet(
     sheetState: SheetState,
@@ -50,25 +50,27 @@ fun UserDetailBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = { Box(Modifier.padding(vertical = 80.dp)) }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                .background(Color(0xFF121212))
-                .verticalScroll(rememberScrollState()), // Make the entire content scrollable
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
+        dragHandle = { 
+            // Simple drag handle without excessive padding
             HorizontalDivider(
                 color = Color.White,
                 thickness = 3.dp,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(vertical = 8.dp)
+                    .background(Color(0xFF121212))
                     .width(40.dp)
             )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF121212))
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 16.dp), // Add bottom padding for scroll end
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
             TotalFriendComponent(friends.size, modifier = Modifier.padding(top = 0.dp))
 
