@@ -2,9 +2,7 @@ package com.example.nocket.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 // Brown Dark Color Scheme
 private val BrownDarkColorScheme = darkColorScheme(

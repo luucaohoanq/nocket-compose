@@ -8,7 +8,6 @@ import com.example.nocket.models.Post
 import com.example.nocket.ui.screen.profile.DayPostGroup
 import com.example.nocket.ui.screen.profile.MonthPosts
 import java.time.LocalDate
-import kotlin.rem
 
 fun calculateDaysOfMonthInYear(
     month: Month,

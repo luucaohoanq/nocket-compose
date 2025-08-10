@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
@@ -47,13 +46,11 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.empty.EmptyDayItem
@@ -73,7 +70,6 @@ import com.example.nocket.utils.mapToUser
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 import java.time.LocalDate
-import kotlin.times
 
 data class MonthPosts(
     val month: Month,

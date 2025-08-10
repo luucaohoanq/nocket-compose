@@ -7,27 +7,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,13 +44,11 @@ import com.example.nocket.components.bottombar.MainBottomBar
 import com.example.nocket.components.bottombar.sampleItems3
 import com.example.nocket.components.pill.MessageInputPill
 import com.example.nocket.components.topbar.MainTopBar
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
 import com.example.nocket.utils.mapToUser
 import com.example.nocket.viewmodels.AppwriteViewModel
-import com.example.nocket.viewmodels.AuthViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

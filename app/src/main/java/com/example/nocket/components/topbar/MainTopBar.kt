@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Group
@@ -32,7 +30,6 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,13 +64,10 @@ import com.example.nocket.Screen
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.IconSetting
 import com.example.nocket.components.circle.ImageSetting
-import com.example.nocket.components.circle.ImageSource
 import com.example.nocket.data.SampleData
-import com.example.nocket.models.FriendshipStatus
 import com.example.nocket.models.User
 import com.example.nocket.ui.theme.BackgroundPreview
 import com.example.nocket.utils.trimUsername
-import kotlin.text.compareTo
 
 val avatarWidth = 40.dp
 val dropdownWidth = 250.dp

@@ -11,7 +11,6 @@ import com.example.nocket.models.Setting
 import com.example.nocket.models.User
 import com.example.nocket.models.appwrite.Log
 import com.example.nocket.models.auth.AuthUser
-import  android.util.Log as AndroidLog
 import com.example.nocket.repositories.AppwriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appwrite.starterkit.data.models.ProjectInfo
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.util.Log as AndroidLog
 
 /**
  * A ViewModel class that serves as the central hub for managing and storing the state

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,10 +29,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.nocket.components.topbar.avatarWidth
 import com.example.nocket.ui.theme.BackgroundPreview
-import com.example.nocket.ui.theme.GrayPrimary
-import com.example.nocket.ui.theme.GrayPrimaryDark
-import com.example.nocket.ui.theme.GraySecondary
-import com.example.nocket.ui.theme.GraySurface
 import com.example.nocket.utils.trimUsername
 
 

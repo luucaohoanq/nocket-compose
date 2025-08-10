@@ -10,20 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.nocket.models.auth.AuthState
-import com.example.nocket.ui.screen.auth.LoginScreen
-import com.example.nocket.viewmodels.AuthViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.nocket.preview.CameraPreviewWithZoom
+import com.example.nocket.models.auth.AuthState
 import com.example.nocket.preview.PlaceholderScreen
+import com.example.nocket.ui.screen.auth.LoginScreen
 import com.example.nocket.ui.screen.camera.CameraScreen
 import com.example.nocket.ui.screen.message.ChatScreen
 import com.example.nocket.ui.screen.message.MessageScreen
@@ -32,6 +28,7 @@ import com.example.nocket.ui.screen.profile.UserProfile
 import com.example.nocket.ui.screen.settings.SettingScreen
 import com.example.nocket.ui.screen.submitphoto.SubmitPhotoScreen
 import com.example.nocket.viewmodels.AppwriteViewModel
+import com.example.nocket.viewmodels.AuthViewModel
 
 sealed class Screen(val route: String) {  //enum
     object Login : Screen("login")
