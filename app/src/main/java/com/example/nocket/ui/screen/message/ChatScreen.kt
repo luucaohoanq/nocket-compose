@@ -5,17 +5,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,12 +48,12 @@ fun ChatScreen(
     val authState by authViewModel.authState.collectAsState()
     val messages by appwriteViewModel.messages.collectAsState()
     val users by appwriteViewModel.users.collectAsState()
-    
+
     // Get current user from auth state
     val currentUser = if (authState is AuthState.Authenticated) {
         (authState as AuthState.Authenticated).user
     } else null
-    
+
     // Get recipient user from users map
     val recipient = users[recipientId] ?: AuthUser(
         id = recipientId,
@@ -63,23 +61,23 @@ fun ChatScreen(
         email = "",
         avatar = ""
     )
-    
+
     // Filter messages between current user and recipient
     val chatMessages = messages.filter { message ->
         (message.senderId == recipientId && message.recipientId == currentUser?.id) ||
-        (message.senderId == currentUser?.id && message.recipientId == recipientId)
+                (message.senderId == currentUser?.id && message.recipientId == recipientId)
     }.sortedBy { it.timeSent }
-    
+
     val listState = rememberLazyListState()
     var messageText by remember { mutableStateOf("") }
-    
+
     // Scroll to bottom when new messages arrive
     LaunchedEffect(chatMessages.size) {
         if (chatMessages.isNotEmpty()) {
             listState.animateScrollToItem(chatMessages.size - 1)
         }
     }
-    
+
     // Load messages when screen opens
     LaunchedEffect(authState, recipientId) {
         if (authState is AuthState.Authenticated) {
@@ -97,17 +95,6 @@ fun ChatScreen(
             )
         },
         bottomBar = {
-//            ChatInputBar(
-//                messageText = messageText,
-//                onMessageChange = { messageText = it },
-//                onSendMessage = {
-//                    // Placeholder for future API integration
-//                    // Will be implemented later
-//                    messageText = ""
-//                }
-//            )
-
-            // Message Pill
             MessageInputPill(
                 modifier = Modifier.padding(bottom = 15.dp)
             )
@@ -150,20 +137,70 @@ fun ChatScreen(
                         .padding(horizontal = 16.dp),
                     state = listState,
                     contentPadding = PaddingValues(vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(chatMessages) { message ->
+                    itemsIndexed(chatMessages) { index, message ->
                         val isFromCurrentUser = message.senderId == currentUser?.id
-                        MessageBubble(
-                            message = message,
-                            isFromCurrentUser = isFromCurrentUser,
-                            sender = if (isFromCurrentUser) currentUser else recipient
+                        val previousMessage = if (index > 0) chatMessages[index - 1] else null
+                        val nextMessage = if (index < chatMessages.size - 1) chatMessages[index + 1] else null
+
+                        // Determine avatar visibility logic
+                        val showAvatar = shouldShowAvatar(
+                            currentMessage = message,
+                            nextMessage = nextMessage,
+                            isFromCurrentUser = isFromCurrentUser
                         )
+
+                        // Determine spacing logic
+                        val isNewSenderGroup = isNewSenderGroup(message, previousMessage)
+                        val messageSpacing = if (isNewSenderGroup) 16.dp else 2.dp
+
+                        Column {
+                            if (isNewSenderGroup) {
+                                Spacer(modifier = Modifier.height(messageSpacing))
+                            }
+
+                            MessageBubble(
+                                message = message,
+                                isFromCurrentUser = isFromCurrentUser,
+                                sender = if (isFromCurrentUser) currentUser else recipient,
+                                showAvatar = showAvatar,
+                                isFirstInGroup = isNewSenderGroup
+                            )
+                        }
                     }
                 }
             }
         }
     }
+}
+
+// Helper function to determine if avatar should be shown
+private fun shouldShowAvatar(
+    currentMessage: Message,
+    nextMessage: Message?,
+    isFromCurrentUser: Boolean
+): Boolean {
+    // Never show avatar for current user messages
+    if (isFromCurrentUser) return false
+
+    // Always show avatar if this is the last message
+    if (nextMessage == null) return true
+
+    // Show avatar if the next message is from a different sender
+    return currentMessage.senderId != nextMessage.senderId
+}
+
+// Helper function to determine if this message starts a new sender group
+private fun isNewSenderGroup(
+    currentMessage: Message,
+    previousMessage: Message?
+): Boolean {
+    // First message is always a new group
+    if (previousMessage == null) return true
+
+    // New group if sender changed
+    return currentMessage.senderId != previousMessage.senderId
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -181,7 +218,7 @@ fun ChatTopBar(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // Recipient avatar
+                    // Recipient avatar with better styling
                     Box(
                         modifier = Modifier
                             .size(40.dp)
@@ -200,11 +237,20 @@ fun ChatTopBar(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    // Recipient name
-                    Text(
-                        text = takeFirstNameOfUser(recipient.name),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Column {
+                        // Recipient name
+                        Text(
+                            text = takeFirstNameOfUser(recipient.name),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        // Online status (optional)
+                        Text(
+                            text = "Active now",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 1.dp)
+                        )
+                    }
                 }
             }
         },
@@ -259,7 +305,7 @@ fun ChatInputBar(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             // Text input field
             OutlinedTextField(
                 value = messageText,
@@ -270,7 +316,7 @@ fun ChatInputBar(
                 placeholder = { Text("Type a message") },
                 maxLines = 5,
             )
-            
+
             // Send button
             IconButton(
                 onClick = onSendMessage,
@@ -280,9 +326,9 @@ fun ChatInputBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send message",
-                    tint = if (messageText.isNotBlank()) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    tint = if (messageText.isNotBlank())
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 )
             }
@@ -295,58 +341,113 @@ fun ChatInputBar(
 fun MessageBubble(
     message: Message,
     isFromCurrentUser: Boolean,
-    sender: AuthUser?
+    sender: AuthUser?,
+    showAvatar: Boolean = false,
+    isFirstInGroup: Boolean = false
 ) {
-    val bubbleColor = if (isFromCurrentUser) 
-        MaterialTheme.colorScheme.primary 
-    else 
+    val bubbleColor = if (isFromCurrentUser)
+        MaterialTheme.colorScheme.primary
+    else
         MaterialTheme.colorScheme.secondaryContainer
-    
-    val textColor = if (isFromCurrentUser) 
-        MaterialTheme.colorScheme.onPrimary 
-    else 
+
+    val textColor = if (isFromCurrentUser)
+        MaterialTheme.colorScheme.onPrimary
+    else
         MaterialTheme.colorScheme.onSecondaryContainer
-    
+
+    // Dynamic bubble shape based on position in conversation
     val bubbleShape = RoundedCornerShape(
-        topStart = 16.dp,
-        topEnd = 16.dp,
-        bottomStart = if (isFromCurrentUser) 16.dp else 4.dp,
-        bottomEnd = if (isFromCurrentUser) 4.dp else 16.dp
+        topStart = if (!isFromCurrentUser && isFirstInGroup) 20.dp else 16.dp,
+        topEnd = if (isFromCurrentUser && isFirstInGroup) 20.dp else 16.dp,
+        bottomStart = if (isFromCurrentUser) 16.dp else if (showAvatar) 20.dp else 6.dp,
+        bottomEnd = if (isFromCurrentUser) if (showAvatar) 20.dp else 6.dp else 16.dp
     )
-    
+
     val formattedTime = try {
         val time = LocalDateTime.parse(message.timeSent)
         time.format(DateTimeFormatter.ofPattern("HH:mm"))
     } catch (e: Exception) {
         "Now"
     }
-    
-    Column(
+
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = if (isFromCurrentUser) Alignment.End else Alignment.Start
+        horizontalArrangement = if (isFromCurrentUser) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Bottom
     ) {
-        // Message content
-        Box(
-            modifier = Modifier
-                .widthIn(max = 280.dp)
-                .clip(bubbleShape)
-                .background(bubbleColor)
-                .padding(12.dp)
-        ) {
-            Text(
-                text = message.content,
-                color = textColor
-            )
+        // Avatar space for non-user messages
+        if (!isFromCurrentUser) {
+            if (showAvatar && sender != null) {
+                // Show actual avatar
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                ) {
+                    AsyncImage(
+                        model = sender.avatar.ifEmpty {
+                            "https://i.pravatar.cc/150?img=${sender.id.hashCode() % 70}"
+                        },
+                        contentDescription = "User avatar",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            } else {
+                // Empty space to maintain alignment
+                Spacer(modifier = Modifier.width(32.dp))
+            }
+            Spacer(modifier = Modifier.width(8.dp))
         }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        // Message time
-        Text(
-            text = formattedTime,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
+
+        Column(
+            horizontalAlignment = if (isFromCurrentUser) Alignment.End else Alignment.Start
+        ) {
+            // Sender name for first message in group (only for non-current user)
+            if (!isFromCurrentUser && isFirstInGroup && sender != null) {
+                Text(
+                    text = takeFirstNameOfUser(sender.name),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(
+                        start = if (!isFromCurrentUser) 12.dp else 0.dp,
+                        bottom = 4.dp
+                    )
+                )
+            }
+
+            // Message content with improved styling
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 280.dp)
+                    .clip(bubbleShape)
+                    .background(bubbleColor)
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    text = message.content,
+                    color = textColor,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            // Message time (show only for messages with avatars or every few messages)
+            if (showAvatar || isFirstInGroup) {
+                Text(
+                    text = formattedTime,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(
+                        top = 4.dp
+                    ).padding(horizontal = 16.dp)
+                )
+            }
+        }
+
+        // Space for current user messages alignment
+        if (isFromCurrentUser) {
+            Spacer(modifier = Modifier.width(40.dp))
+        }
     }
 }
