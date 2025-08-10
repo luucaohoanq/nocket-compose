@@ -185,7 +185,7 @@ fun MainTopBar(
                 modifier = Modifier
                     .height(avatarWidth)
                     .wrapContentWidth()
-                    .widthIn(max = 250.dp)
+                    .widthIn(max = 400.dp)
                     .background(
                         color = BackgroundPreview,
                         shape = RoundedCornerShape(50)

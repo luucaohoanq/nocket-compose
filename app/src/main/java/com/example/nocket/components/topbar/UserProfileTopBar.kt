@@ -48,7 +48,7 @@ import com.example.nocket.Screen
 
 
 val buttons = listOf(
-    Triple(Icons.Filled.Group, Screen.Message.route, "Friends"),
+    Triple(Icons.Filled.Group, Screen.Message.route, "FRIEND"),
     Triple(Icons.Filled.Settings, Screen.Setting.route, "Settings"),
     Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home")
 )

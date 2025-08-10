@@ -222,6 +222,7 @@ class AppwriteViewModel @Inject constructor(
     /**
      * Get posts for a specific user with proper visibility filtering
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getPostsForUser(userId: String, viewerId: String? = null) {
         viewModelScope.launch {
             try {
@@ -255,6 +256,7 @@ class AppwriteViewModel @Inject constructor(
     /**
      * Get posts by tags (new feature)
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getPostsByTags(tags: List<String>, viewerId: String? = null) {
         viewModelScope.launch {
             try {

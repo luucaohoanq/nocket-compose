@@ -1,8 +1,11 @@
 package com.example.nocket.models
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.time.LocalDateTime
 import java.util.UUID
 
+@RequiresApi(Build.VERSION_CODES.O)
 data class Post(
     val id: String = UUID.randomUUID().toString(),
     val user: User,
@@ -12,7 +15,7 @@ data class Post(
     val isArchived: Boolean = false,
     val createdAt: String = LocalDateTime.now().toString(),
     // New fields for enhanced functionality
-    val visibility: String = "public", // "public", "friends", "private"
+    val visibility: String = Visibility.FRIEND.toString(), // "PUBLIC", "FRIEND", "PRIVATE"
     val friendsOnly: Boolean = false, // Quick boolean check
     val tags: List<String> = emptyList(), // Tags for categorization
     val updatedAt: String? = null // Track modifications
@@ -22,4 +25,10 @@ enum class PostType {
     IMAGE,
     VIDEO,
     TEXT
+}
+
+enum class Visibility {
+    PUBLIC,
+    FRIEND,
+    PRIVATE
 }

@@ -45,6 +45,7 @@ fun PostScreen(
 ) {
     val authState by authViewModel.authState.collectAsState()
     val posts by appwriteViewModel.posts.collectAsState()
+    val userPosts by appwriteViewModel.userPosts.collectAsState() // For specific user posts
     val friends by appwriteViewModel.friends.collectAsState()
 
     var selectedPost by remember { mutableStateOf<Post?>(null) }
@@ -96,19 +97,19 @@ fun PostScreen(
 
         else -> {
             Box(modifier = Modifier.fillMaxSize()) {
-                if (isLoading || posts.isEmpty()) {
+                // Determine which posts to show and handle loading state
+                val (displayPosts, isPostsLoading) = when (selectedUser?.id) {
+                    "everyone" -> posts to (isLoading || posts.isEmpty())
+                    "you" -> userPosts to (isLoading || userPosts.isEmpty())
+                    null -> posts to (isLoading || posts.isEmpty())
+                    else -> userPosts to (isLoading || userPosts.isEmpty()) // Show friend's posts from userPosts StateFlow
+                }
+
+                if (isPostsLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 } else {
-                    // Filter posts based on selected user
-                    val filteredPosts = when (selectedUser?.id) {
-                        "everyone" -> posts // Show all posts
-                        "you" -> posts.filter { it.user.id == currentUser?.id } // Show only current user's posts
-                        null -> posts // Show all posts if selectedUser is null
-                        else -> posts.filter { it.user.id == selectedUser!!.id } // Show selected user's posts
-                    }
-
                     PostGrid(
-                        posts = filteredPosts,
+                        posts = displayPosts,
                         onPostClick = { post -> selectedPost = post }
                     )
                 }

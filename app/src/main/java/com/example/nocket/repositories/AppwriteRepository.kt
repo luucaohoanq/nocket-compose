@@ -15,6 +15,7 @@ import com.example.nocket.models.PostType
 import com.example.nocket.models.Setting
 import com.example.nocket.models.SettingType
 import com.example.nocket.models.User
+import com.example.nocket.models.Visibility
 import com.example.nocket.models.appwrite.Log
 
 import com.example.nocket.models.auth.AuthUser
@@ -233,8 +234,8 @@ class AppwriteRepository @Inject constructor(
                         }),
                         Query.equal("isArchived", false),
                         Query.or(listOf(
-                            Query.equal("visibility", "public"),
-                            Query.equal("visibility", "friends")
+                            Query.equal("visibility", "PUBLIC"),
+                            Query.equal("visibility", "FRIEND")
                         )),
                         Query.orderDesc("\$createdAt"),
                         Query.limit(25)
@@ -272,7 +273,7 @@ class AppwriteRepository @Inject constructor(
                         isArchived = (doc.data["isArchived"] as? Boolean) ?: false,
                         createdAt = doc.data["\$createdAt"] as String,
                         // New fields support
-                        visibility = doc.data["visibility"] as? String ?: "public",
+                        visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
                         updatedAt = doc.data["updatedAt"] as? String
@@ -308,12 +309,12 @@ class AppwriteRepository @Inject constructor(
                 if (areFriends) {
                     // Friends can see public and friends-only posts
                     queries.add(Query.or(listOf(
-                        Query.equal("visibility", "public"),
-                        Query.equal("visibility", "friends")
+                        Query.equal("visibility", "PUBLIC"),
+                        Query.equal("visibility", "FRIEND")
                     )))
                 } else {
                     // Non-friends can only see public posts
-                    queries.add(Query.equal("visibility", "public"))
+                    queries.add(Query.equal("visibility", "PUBLIC"))
                 }
             }
             // If no viewerId or viewer is the owner, show all posts (no visibility filter)
@@ -348,7 +349,7 @@ class AppwriteRepository @Inject constructor(
                         isArchived = (doc.data["isArchived"] as? Boolean) ?: false,
                         createdAt = doc.data["\$createdAt"] as String,
                         // New fields
-                        visibility = doc.data["visibility"] as? String ?: "public",
+                        visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
                         updatedAt = doc.data["updatedAt"] as? String
@@ -407,7 +408,7 @@ class AppwriteRepository @Inject constructor(
             // Base filters
             queries.addAll(listOf(
                 Query.equal("isArchived", false),
-                Query.equal("visibility", "public"), // Only public posts for tag searches
+                Query.equal("visibility", Visibility.PUBLIC.toString()), // Only public posts for tag searches
                 Query.orderDesc("\$createdAt"),
                 Query.limit(limit)
             ))
@@ -438,7 +439,7 @@ class AppwriteRepository @Inject constructor(
                         thumbnailUrl = (doc.data["thumbnailUrl"] as? String) ?: "",
                         isArchived = (doc.data["isArchived"] as? Boolean) ?: false,
                         createdAt = doc.data["\$createdAt"] as String,
-                        visibility = doc.data["visibility"] as? String ?: "public",
+                        visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
                         updatedAt = doc.data["updatedAt"] as? String
@@ -678,7 +679,7 @@ class AppwriteRepository @Inject constructor(
                 databaseId = DBConfig.DATABASE_ID,
                 collectionId = DBConfig.POSTS_COLLECTION_ID,
                 queries = listOf(
-                    Query.equal("visibility", "public"),
+                    Query.equal("visibility", "PUBLIC"),
                     Query.limit(1)
                 )
             )
