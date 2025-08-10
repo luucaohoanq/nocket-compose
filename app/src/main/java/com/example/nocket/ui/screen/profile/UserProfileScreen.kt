@@ -117,9 +117,16 @@ fun UserProfile(
     val data = profileUser?.let { mapToUser(it) }
 
     // Fetch posts for the profile user
-    LaunchedEffect(data?.id) {
+    LaunchedEffect(data?.id, currentUser?.id) {
         data?.id?.let { userIdToFetch ->
-            appwriteViewModel.getPostsOfUser(userIdToFetch)
+            val viewerId = if (userId == null || userId == currentUser?.id) {
+                // Viewing own profile - show all posts
+                userIdToFetch
+            } else {
+                // Viewing another user's profile - apply visibility filtering
+                currentUser?.id
+            }
+            appwriteViewModel.getPostsForUser(userIdToFetch, viewerId)
         }
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -184,6 +185,7 @@ fun MainTopBar(
                 modifier = Modifier
                     .height(avatarWidth)
                     .wrapContentWidth()
+                    .widthIn(max = 250.dp)
                     .background(
                         color = BackgroundPreview,
                         shape = RoundedCornerShape(50)
@@ -203,7 +205,7 @@ fun MainTopBar(
                         }
                 ) {
                     Text(
-                        text = selectedFriend?.username ?: user?.username ?: title,
+                        text = trimUsername(selectedFriend?.username ?: user?.username ?: title),
                         color = Color.White,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.titleMedium

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -164,6 +165,17 @@ fun CirclePreview() {
                 )
             )
 
+            Circle(
+                outerSize = 56.dp,
+                gap = 10.dp,
+                modifier = Modifier.rotate(-45f),
+                backgroundColor = Color(0xFF404137),
+                onClick = {},
+                iconSetting = IconSetting(
+                    icon = Icons.AutoMirrored.Filled.Send
+                )
+            )
+
 
             Circle(
                 outerSize = 56.dp,
@@ -211,6 +223,17 @@ fun CirclePreview() {
                 outerSize = 56.dp,
                 gap = 8.dp,
                 backgroundColor = Color.DarkGray,
+                onClick = {},
+                innerContent = {
+                    androidx.compose.material3.Text("A", color = Color.White)
+                }
+            )
+
+            Circle(
+                outerSize = 56.dp,
+                gap = 8.dp,
+                backgroundColor = Color.DarkGray,
+                modifier = Modifier.rotate(45f),
                 onClick = {},
                 innerContent = {
                     androidx.compose.material3.Text("A", color = Color.White)

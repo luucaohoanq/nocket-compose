@@ -130,10 +130,13 @@ fun PostScreen(
                         user?.let { nonNullUser ->
                             // Fetch posts for selected user if it's not "everyone"
                             if (nonNullUser.id != "everyone" && nonNullUser.id != "you" && authState is AuthState.Authenticated) {
-                                appwriteViewModel.getPostsForUser(nonNullUser.id)
+                                val currentUserId = (authState as AuthState.Authenticated).user.id
+                                appwriteViewModel.getPostsForUser(nonNullUser.id, currentUserId)
                             } else if (nonNullUser.id == "you") {
                                 // Fetch current user's posts
-                                appwriteViewModel.getPostsForUser(data.id)
+                                currentUser?.id?.let { userId ->
+                                    appwriteViewModel.getPostsOfUser(userId)
+                                }
                             } else if (authState is AuthState.Authenticated) {
                                 // Fetch all posts
                                 val authUser = (authState as AuthState.Authenticated).user

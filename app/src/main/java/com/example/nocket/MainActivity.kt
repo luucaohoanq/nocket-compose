@@ -63,8 +63,12 @@ fun NocketApp(
 
     // Only log when user details change
     LaunchedEffect(currentUser) {
-        currentUser?.let {
-            Log.d("UserDebug", "User Details: data=${it}")
+        currentUser?.let { user ->
+            Log.d("UserDebug", "User Details: data=${user}")
+            // Fetch posts for this specific user
+            appwriteViewModel.getPostsOfUser(user.id)
+            // Fetch posts from user and friends for the main feed
+            appwriteViewModel.getAllPostsOfUserAndFriends(user)
         }
     }
 

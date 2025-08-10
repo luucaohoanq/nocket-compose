@@ -62,7 +62,6 @@ import com.example.nocket.utils.mapToUser
 import com.example.nocket.utils.trimCaption
 import com.example.nocket.viewmodels.AppwriteViewModel
 import kotlinx.coroutines.launch
-import kotlin.text.compareTo
 
 val submitButtonSize = 80.dp
 
@@ -96,8 +95,10 @@ fun SubmitPhotoScreen(
     val userPosts by appwriteViewModel.userPosts.collectAsState()
 
     // Trigger the data fetch when screen loads
-    LaunchedEffect(data.id) {
-        appwriteViewModel.getPostsOfUser(data.id)
+    LaunchedEffect(data?.id) {
+        data?.id?.let { userId ->
+            appwriteViewModel.getPostsOfUser(userId)
+        }
     }
 
     val post: Post? = userPosts.firstOrNull()
@@ -135,6 +136,8 @@ fun SubmitPhotoScreen(
         ) {
             // Show camera view or post image based on the localCameraMode state
 
+            Log.d("SubmitPhotoScreen", "Current user: ${data.username}, ID: ${data.id}")
+            Log.d("SubmitPhotoScreen", "Post: ${post?.id}, Type: ${post?.postType}, Caption: ${post?.caption}")
 
             // Post image (full width)
             post?.thumbnailUrl?.let { imageUrl ->

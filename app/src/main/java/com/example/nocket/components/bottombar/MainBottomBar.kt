@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +64,7 @@ data class BottomNavItem(
     val unselectedIcon: ImageVector? = null,
     val route: String,
     val isCenter: Boolean = false, // flag để xác định button special (ví dụ camera)
-    val customSizeCenter: Dp = 56.dp, // Kích thước tùy chỉnh cho button center
+    val customSizeCenter: Dp = 60.dp, // Kích thước tùy chỉnh cho button center
     val onClick: (() -> Unit)? = null // Callback khi nhấn vào item
 )
 
@@ -115,35 +116,72 @@ fun MainBottomBar(
         orderedItems.forEach { item ->
             if (item == centerItem) {
                 // center special button (vd: camera)
-                Circle(
-                    outerSize = centerItem.customSizeCenter,
-                    gap = 7.dp,
-                    backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                        Color.Gray
-                    else Color.Transparent,
-                    borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
-                        Color.Gray
-                    else Color.Yellow,
-                    borderWidth = 3.dp,
-                    onClick = {
-                        if (centerIconNavigation.isNotEmpty()) {
-                            navController.navigate(centerIconNavigation)
+                if (item.title == "Camera" || item.title == "Take a picture") {
+                    Circle(
+                        outerSize = centerItem.customSizeCenter,
+                        gap = 7.dp,
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Transparent,
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Yellow,
+                        borderWidth = 3.dp,
+                        onClick = {
+                            if (centerIconNavigation.isNotEmpty()) {
+                                navController.navigate(centerIconNavigation)
+                            }
+                        },
+                        iconSetting = when {
+                            centerItem.selectedIcon != null -> IconSetting(
+                                icon = centerItem.selectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            centerItem.unselectedIcon != null -> IconSetting(
+                                icon = centerItem.unselectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            else -> null
                         }
-                    },
-                    iconSetting = when {
-                        centerItem.selectedIcon != null -> IconSetting(
-                            icon = centerItem.selectedIcon!!,
-                            tint = Color.White,
-                            contentDescription = item.title
-                        )
-                        centerItem.unselectedIcon != null -> IconSetting(
-                            icon = centerItem.unselectedIcon!!,
-                            tint = Color.White,
-                            contentDescription = item.title
-                        )
-                        else -> null
-                    }
-                )
+                    )
+                } else if (item.title == "Send") {
+                    Circle(
+                        outerSize = centerItem.customSizeCenter,
+                        gap = 20.dp,
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Transparent,
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                            Color.Gray
+                        else Color.Yellow,
+                        modifier = Modifier.rotate(-45F),
+                        borderWidth = 3.dp,
+                        onClick = {
+                            if (centerIconNavigation.isNotEmpty()) {
+                                navController.navigate(centerIconNavigation)
+                            }
+                        },
+                        iconSetting = when {
+                            centerItem.selectedIcon != null -> IconSetting(
+                                icon = centerItem.selectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            centerItem.unselectedIcon != null -> IconSetting(
+                                icon = centerItem.unselectedIcon!!,
+                                tint = Color.White,
+                                contentDescription = item.title
+                            )
+
+                            else -> null
+                        }
+                    )
+                }
             } else if (item.title != null) {
                 NavigationBarItem(
                     icon = {
