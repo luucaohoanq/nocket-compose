@@ -68,6 +68,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
@@ -80,6 +81,8 @@ enum class AuthMode {
     LOGIN, REGISTER, FORGOT_PASSWORD
 }
 
+val cornerShape: Dp = 12.dp
+
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -91,13 +94,13 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val activity = context as ComponentActivity
-    
+
     var authMode by rememberSaveable { mutableStateOf(AuthMode.LOGIN) }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    
+
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
@@ -107,6 +110,7 @@ fun LoginScreen(
             is AuthState.Authenticated -> {
                 onLoginSuccess()
             }
+
             is AuthState.Error -> {
                 snackbarHostState.showSnackbar(
                     message = (authState as AuthState.Error).message,
@@ -114,6 +118,7 @@ fun LoginScreen(
                 )
                 viewModel.clearError()
             }
+
             is AuthState.PasswordResetSent -> {
                 snackbarHostState.showSnackbar(
                     message = "Password reset link sent to your email",
@@ -121,7 +126,9 @@ fun LoginScreen(
                 )
                 authMode = AuthMode.LOGIN
             }
-            else -> { /* No action needed */ }
+
+            else -> { /* No action needed */
+            }
         }
     }
 
@@ -204,7 +211,7 @@ fun LoginScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
@@ -230,7 +237,7 @@ fun LoginScreen(
                             onValueChange = { email = it },
                             modifier = Modifier.fillMaxWidth(),
                             label = { Text("Email") },
-                            leadingIcon = { 
+                            leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Email,
                                     contentDescription = "Email Icon"
@@ -241,7 +248,7 @@ fun LoginScreen(
                                 imeAction = if (authMode == AuthMode.FORGOT_PASSWORD) ImeAction.Done else ImeAction.Next
                             ),
                             keyboardActions = KeyboardActions(
-                                onNext = { 
+                                onNext = {
                                     if (authMode == AuthMode.REGISTER) {
                                         focusManager.moveFocus(FocusDirection.Down)
                                     } else {
@@ -255,9 +262,10 @@ fun LoginScreen(
                                     }
                                 }
                             ),
+                            shape = RoundedCornerShape(cornerShape),
                             singleLine = true
                         )
-                        
+
                         // Name field - only for register
                         if (authMode == AuthMode.REGISTER) {
                             Spacer(modifier = Modifier.height(16.dp))
@@ -266,7 +274,7 @@ fun LoginScreen(
                                 onValueChange = { name = it },
                                 modifier = Modifier.fillMaxWidth(),
                                 label = { Text("Full Name") },
-                                leadingIcon = { 
+                                leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Person,
                                         contentDescription = "Name Icon"
@@ -279,10 +287,11 @@ fun LoginScreen(
                                 keyboardActions = KeyboardActions(
                                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                                 ),
+                                shape = RoundedCornerShape(cornerShape),
                                 singleLine = true
                             )
                         }
-                        
+
                         // Password field - not for forgot password
                         if (authMode != AuthMode.FORGOT_PASSWORD) {
                             Spacer(modifier = Modifier.height(16.dp))
@@ -291,7 +300,7 @@ fun LoginScreen(
                                 onValueChange = { password = it },
                                 modifier = Modifier.fillMaxWidth(),
                                 label = { Text("Password") },
-                                leadingIcon = { 
+                                leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
                                         contentDescription = "Password Icon"
@@ -317,14 +326,18 @@ fun LoginScreen(
                                                 viewModel.login(email, password)
                                                 focusManager.clearFocus()
                                             }
+
                                             AuthMode.REGISTER -> {
                                                 viewModel.register(email, password, name)
                                                 focusManager.clearFocus()
                                             }
-                                            else -> { /* Not used in forgot password */ }
+
+                                            else -> { /* Not used in forgot password */
+                                            }
                                         }
                                     }
                                 ),
+                                shape = RoundedCornerShape(cornerShape),
                                 singleLine = true
                             )
                         }
@@ -350,7 +363,7 @@ fun LoginScreen(
                                         AuthMode.REGISTER -> email.isNotBlank() && password.isNotBlank() && name.isNotBlank()
                                         AuthMode.FORGOT_PASSWORD -> email.isNotBlank()
                                     },
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(cornerShape)
                         ) {
                             if (isLoading || authState is AuthState.Loading) {
                                 CircularProgressIndicator(
@@ -370,10 +383,10 @@ fun LoginScreen(
                                 )
                             }
                         }
-                        
+
                         // Helper links - different based on mode
                         Spacer(modifier = Modifier.height(16.dp))
-                        
+
                         when (authMode) {
                             AuthMode.LOGIN -> {
                                 Row(
@@ -383,27 +396,29 @@ fun LoginScreen(
                                     TextButton(onClick = { authMode = AuthMode.FORGOT_PASSWORD }) {
                                         Text("Forgot Password?")
                                     }
-                                    
+
                                     TextButton(onClick = { authMode = AuthMode.REGISTER }) {
-                                        Text("Sign Up")
+                                        Text("Sign Up", color = Color(0xFFFFD700))
                                     }
                                 }
                             }
+
                             AuthMode.REGISTER -> {
                                 TextButton(onClick = { authMode = AuthMode.LOGIN }) {
                                     Text("Already have an account? Sign In")
                                 }
                             }
+
                             AuthMode.FORGOT_PASSWORD -> {
                                 TextButton(onClick = { authMode = AuthMode.LOGIN }) {
                                     Text("Back to Login")
                                 }
                             }
                         }
-                        
+
                         if (authMode != AuthMode.FORGOT_PASSWORD) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
@@ -425,9 +440,9 @@ fun LoginScreen(
                                     color = DividerDefaults.color
                                 )
                             }
-                            
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            
+
                             // Google Login Button
                             Button(
                                 onClick = { viewModel.loginWithGoogle(activity) },
@@ -444,7 +459,7 @@ fun LoginScreen(
                                     defaultElevation = 2.dp,
                                     pressedElevation = 8.dp
                                 ),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = RoundedCornerShape(cornerShape)
                             ) {
                                 if (isLoading || authState is AuthState.Loading) {
                                     CircularProgressIndicator(
@@ -508,7 +523,8 @@ fun LoginScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    maxLines = 1,
+                    modifier = Modifier.padding(horizontal = 10.dp)
                 )
             }
         }

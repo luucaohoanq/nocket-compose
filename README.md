@@ -154,6 +154,7 @@ font-weight: 500;
 <tr>
       <td align="center"><img src="Sources/assets/logo.png" alt="Logo" width="240"/><br/>Logo</td>
       <td align="center"><img src="Sources/assets/splash_screen.png" alt="Splash Screen" width="240"/><br/>Splash Screen</td>
+      <td align="center"><img src="Sources/assets/login_screen.png" alt="Splash Screen" width="240"/><br/>Login Screen</td>
 </tr>
   </table>
 </div>
