@@ -60,7 +60,7 @@ interface ListItem {
 // Extension for User to implement ListItem
 fun User.asListItem(): ListItem = object : ListItem {
     override val id: String = this@asListItem.id
-    override val displayName: String = this@asListItem.username ?: "Unknown"
+    override val displayName: String = this@asListItem.username
     override val imageUrl: String? = this@asListItem.avatar.ifEmpty { null }
 }
 
@@ -387,7 +387,7 @@ fun FriendListItem(
 
         // Friend's name
         Text(
-            text = friend.username ?: "Unknown",
+            text = friend.username,
             color = Color.White,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f),

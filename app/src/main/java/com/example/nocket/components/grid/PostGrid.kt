@@ -48,12 +48,12 @@ import com.example.nocket.ui.screen.profile.DayPostGroup
 
 @Composable
 fun PostGrid(
+    modifier: Modifier = Modifier,
     posts: List<Post> = emptyList(),
     onPostClick: (Post) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val postsWithImages = posts.filter { true }
-    
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(8.dp),
@@ -88,7 +88,7 @@ fun PostGridItem(
                 .clip(RoundedCornerShape(20.dp)),
             contentScale = ContentScale.Crop
         )
-        
+
         // Video indicator
 //        if (post.postType == PostType.VIDEO) {
 //            Box(
@@ -225,7 +225,7 @@ fun CameraButton(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF121212 )
+@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF121212)
 @Composable
 fun PostGridPreview() {
     // Create sample posts for preview
@@ -239,7 +239,7 @@ fun PostGridPreview() {
             thumbnailUrl = SampleData.imageNotAvailable
         )
     }
-    
+
     PostGrid(
         posts = samplePosts,
         onPostClick = {},

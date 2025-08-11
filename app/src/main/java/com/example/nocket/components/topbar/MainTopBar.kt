@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,57 +63,12 @@ import com.example.nocket.Screen
 import com.example.nocket.components.circle.Circle
 import com.example.nocket.components.circle.IconSetting
 import com.example.nocket.components.circle.ImageSetting
-import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
 import com.example.nocket.ui.theme.BackgroundPreview
 import com.example.nocket.utils.trimUsername
 
 val avatarWidth = 40.dp
 val dropdownWidth = 250.dp
-
-@Preview(showBackground = true, backgroundColor = 0xFF1C1611)
-@Composable
-fun MainTopBarTitle(
-    user: User? = null,
-    onUserSelected: (User?) -> Unit = {}
-) {
-    val users = SampleData.users
-    var isExpanded by remember { mutableStateOf(false) }
-    var selectedUser by remember { mutableStateOf(user) }
-
-    Box(
-        modifier = Modifier
-            .defaultMinSize(minWidth = 80.dp)
-            .wrapContentWidth()
-            .background(
-                color = Color(0xFF404137),
-                shape = RoundedCornerShape(50)
-            )
-            .clip(RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .clickable { /* TODO: Handle click */ },
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 3.dp)
-        ) {
-            Text(
-                text = user?.username ?: "",
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Icon(
-                imageVector = Icons.Filled.ExpandMore,
-                contentDescription = "Dropdown",
-                tint = Color.White,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -332,7 +286,7 @@ fun MainTopBar(
                                         text = when (friend.id) {
                                             "everyone" -> "Everyone"
                                             "you" -> "You"
-                                            else -> trimUsername(friend.username, 20) ?: "Unknown"
+                                            else -> trimUsername(friend.username, 20)
                                         },
                                         color = Color.White,
                                         fontWeight = FontWeight.Medium,
