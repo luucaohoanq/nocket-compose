@@ -21,4 +21,4 @@ val GrayOnSurfaceVariant = Color(0xFFB0B0B0) // Mid-gray text on variant
 val GrayError = Color(0xFFCF6679)          // Keep same red-pink error
 val GrayOnError = Color(0xFFFFFFFF)        // White text on error
 
-val BackgroundPreview = Color(0xFF424242)  // Darker gray for previews
+val BackgroundPreview = Color(0xFF424242).copy(alpha = 0.5f)  // Darker gray for previews

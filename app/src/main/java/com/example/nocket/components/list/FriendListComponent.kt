@@ -244,7 +244,7 @@ val listThirdPartyApp = listOf(
         onClick = {}
     ),
     ThirdPartyApp(
-        name = "Other",
+        name = "Others",
         imageUrl = "https://img.icons8.com/windows/50/link.png",
         icon = R.drawable.ic_connection,
         onClick = {}
@@ -492,7 +492,15 @@ fun ShareYourLinkComponent() {
             )
         }
 
-        listThirdPartyApp.forEach { item ->
+        val index = listThirdPartyApp.indexOfFirst { it.name == "Instagram" }
+        val instagram = listThirdPartyApp[index]
+
+        val uiList = listThirdPartyApp.toMutableList().apply {
+            add(index + 1, instagram.copy(name = "Instagram Story"))
+            this[index] = instagram.copy(name = "Instagram DMs")
+        }
+
+        uiList.forEach { item ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,

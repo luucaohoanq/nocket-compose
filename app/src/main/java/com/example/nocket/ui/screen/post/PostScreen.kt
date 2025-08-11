@@ -14,11 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -106,6 +108,8 @@ fun PostScreen(
                     else -> userPosts to userPostsLoading // Show friend's posts from userPosts StateFlow
                 }
 
+                var topbarHeight by remember { mutableIntStateOf(0) }
+
                 when {
                     isCurrentlyLoading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -140,10 +144,12 @@ fun PostScreen(
                     else -> {
                         PostGrid(
                             posts = displayPosts,
-                            onPostClick = { post -> selectedPost = post }
+                            onPostClick = { post -> selectedPost = post },
+                            modifier = Modifier.padding(top = (50 + 80).dp)
                         )
                     }
                 }
+
 
                 MainTopBar(
                     navController = navController,
@@ -182,7 +188,10 @@ fun PostScreen(
                             }
                         }
                     },
-                    modifier = Modifier.align(Alignment.TopCenter)
+                    modifier = Modifier.align(Alignment.TopCenter).onGloballyPositioned { coordinates ->
+                        // Get the width of the title in pixels
+                        topbarHeight = coordinates.size.height
+                    }
                 )
 
                 MainBottomBar(

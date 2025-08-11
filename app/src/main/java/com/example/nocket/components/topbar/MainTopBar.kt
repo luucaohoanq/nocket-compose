@@ -173,19 +173,22 @@ fun MainTopBar(
     }
 
     CenterAlignedTopAppBar(
-        modifier = modifier.padding(horizontal = 20.dp),
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .padding(top = 5.dp),
         title = {
             Box(
                 modifier = Modifier
                     .height(avatarWidth)
                     .wrapContentWidth()
-                    .widthIn(max = 400.dp)
+//                    .widthIn(max = 400.dp)
                     .background(
                         color = BackgroundPreview,
                         shape = RoundedCornerShape(50)
                     )
                     .clip(RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
+//                    .padding(start = 4.dp, end = 4.dp)
                     .clickable { showFriendDropdown = true },
                 contentAlignment = Alignment.Center
             ) {
@@ -202,6 +205,7 @@ fun MainTopBar(
                         text = trimUsername(selectedFriend?.username ?: user?.username ?: title),
                         color = Color.White,
                         fontWeight = FontWeight.Medium,
+                        letterSpacing = 0.5.sp,
                         style = MaterialTheme.typography.titleMedium
                     )
 

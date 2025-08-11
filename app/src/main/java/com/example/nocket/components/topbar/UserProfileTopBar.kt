@@ -36,8 +36,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
 
 
@@ -46,6 +49,9 @@ val buttons = listOf(
     Triple(Icons.Filled.Settings, Screen.Setting.route, "Settings"),
     Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home")
 )
+
+val roundCorner = RoundedCornerShape(10.dp)
+val borderThickness = 2.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,21 +70,20 @@ fun UserProfileTopBar(
     )
 
     CenterAlignedTopAppBar(
-        modifier = Modifier.padding(horizontal = 20.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         title = {},
         navigationIcon = {
             Card(
                 modifier = Modifier
-                    .padding(bottom = 10.dp)
                     .border(
-                        width = 1.dp,
+                        width = 0.dp,
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(5.dp)
+                        shape = roundCorner
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    containerColor = Color(0xFF74512D).copy(alpha = 0.4f)
                 ),
-                shape = RoundedCornerShape(5.dp)
+                shape = roundCorner
             ) {
                 Box(
                     modifier = Modifier
@@ -94,17 +99,17 @@ fun UserProfileTopBar(
 //                            shape = RoundedCornerShape(5.dp)
 //                        )
                         .border(
-                            width = 2.dp, // border thickness
+                            width = borderThickness, // border thickness
                             brush = Brush.linearGradient(
                                 colors = listOf(
                                     Color(0xFFFFD700),
-                                    Color(0xFFFFA500),
+                                    Color(0xFFFFF380),
                                     Color(0xFFFFD700)
                                 )
                             ),
-                            shape = RoundedCornerShape(5.dp)
+                            shape = roundCorner
                         )
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     // Shimmer overlay
@@ -130,17 +135,13 @@ fun UserProfileTopBar(
                         )
                     }
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Get Locket Gold",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color(0xFFFFD700),
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                    Text(
+                        text = "Get Locket Gold",
+                        style = MaterialTheme.typography.labelLarge,
+                        letterSpacing = 0.5.sp,
+                        color = Color(0xFFFFD700),
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
             }
 
@@ -154,7 +155,7 @@ fun UserProfileTopBar(
                 buttons.forEach { (icon, route, description) ->
                     Button(
                         onClick = {
-                            if(description == "FRIEND") {
+                            if (description == "FRIEND") {
                                 onFriendsClick()
                             } else {
                                 navController.navigate(route)
@@ -180,5 +181,14 @@ fun UserProfileTopBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent
         )
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+fun UserProfileTopBarPreview() {
+    UserProfileTopBar(
+        navController = rememberNavController(),
+        onFriendsClick = {}
     )
 }
