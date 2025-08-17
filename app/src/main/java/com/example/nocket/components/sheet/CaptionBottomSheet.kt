@@ -209,19 +209,22 @@ fun rememberCurrentTime(): String {
     return currentTime
 }
 
+data class CaptionBottomSheetData(
+    val items: List<CaptionItem> = emptyList()
+)
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CaptionBottomSheet(
-    sheetState: SheetState,
+    data: CaptionBottomSheetData,
     onDismiss: () -> Unit
 ) {
-
-    val generalItems = generalCaptions()
-
-    ModalBottomSheet(
+    AnimatedBottomSheet(
+        value = null,
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = { Box(Modifier.padding(vertical = 8.dp)) }
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+        dragHandle = { Box(Modifier.padding(vertical = 8.dp)) },
+        containerColor = Color(0xFF121212)
     ) {
         Column(
             modifier = Modifier
@@ -248,7 +251,7 @@ fun CaptionBottomSheet(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                generalItems.forEach {
+                data.items.forEach {
                     CaptionPill(item = it)
                 }
             }
@@ -336,7 +339,10 @@ fun CaptionDemoScreen() {
         }
     }
 
-    CaptionBottomSheet(sheetState = sheetState, onDismiss = {
-        coroutineScope.launch { sheetState.hide() }
-    })
+    CaptionBottomSheet(
+        data = CaptionBottomSheetData(items = generalCaptions()),
+        onDismiss = {
+            coroutineScope.launch { sheetState.hide() }
+        }
+    )
 }

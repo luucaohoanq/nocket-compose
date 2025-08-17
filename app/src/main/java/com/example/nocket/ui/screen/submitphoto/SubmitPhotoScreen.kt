@@ -55,6 +55,9 @@ import com.example.nocket.components.common.CommonTopBar
 import com.example.nocket.components.indicator.PageIndicator
 import com.example.nocket.components.list.FriendList
 import com.example.nocket.components.sheet.CaptionBottomSheet
+import com.example.nocket.components.sheet.CaptionBottomSheetData
+import com.example.nocket.components.sheet.generalCaptions
+import com.example.nocket.components.sheet.rememberCurrentTime
 import com.example.nocket.models.Post
 import com.example.nocket.models.PostType
 import com.example.nocket.models.User
@@ -88,6 +91,19 @@ fun SubmitPhotoScreen(
     val coroutineScope = rememberCoroutineScope()
     var showCaptionSheet by remember { mutableStateOf(false) }
 
+    // Get current time to use as remember key
+    val currentTime = rememberCurrentTime()
+    
+    // Get captions with current time dependency
+    val captions = generalCaptions()
+    
+    // Optimize by using remember with time dependency - only recreates when time changes
+    val captionBottomSheetData = remember(currentTime) { 
+        CaptionBottomSheetData(
+            items = captions
+        )
+    }
+
     // Get current user from auth state
     val currentUser by appwriteViewModel.currentUser.collectAsState()
     val data = mapToUser(currentUser)
@@ -119,7 +135,7 @@ fun SubmitPhotoScreen(
         // Add CaptionBottomSheet when needed
         if (showCaptionSheet) {
             CaptionBottomSheet(
-                sheetState = sheetState,
+                data = captionBottomSheetData,
                 onDismiss = {
                     showCaptionSheet = false
                     coroutineScope.launch { sheetState.hide() }
