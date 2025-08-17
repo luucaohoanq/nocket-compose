@@ -3,6 +3,8 @@ package com.example.nocket
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -19,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.nocket.configs.statusBarConfig
 import com.example.nocket.extensions.edgeToEdgeWithStyle
 import com.example.nocket.models.auth.AuthState
 import com.example.nocket.ui.theme.AppTheme
@@ -34,7 +37,11 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //replace with using in AndroidManifest.xml
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        statusBarConfig(window)
+
         // Apply edge-to-edge style after super.onCreate to ensure it takes effect
         edgeToEdgeWithStyle()
 
@@ -59,6 +66,7 @@ fun NocketApp(
                 Log.d("UserDebug", "Auth State: Authenticated")
                 appwriteViewModel.fetchCurrentUser()
             }
+
             else -> Log.d("UserDebug", "Auth State: ${authState::class.simpleName}")
         }
     }

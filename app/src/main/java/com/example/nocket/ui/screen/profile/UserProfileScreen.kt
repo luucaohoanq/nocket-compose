@@ -56,6 +56,7 @@ import com.example.nocket.components.circle.ImageSetting
 import com.example.nocket.components.empty.EmptyDayItem
 import com.example.nocket.components.grid.PostGridItemWithBadge
 import com.example.nocket.components.sheet.UserDetailBottomSheet
+import com.example.nocket.components.sheet.UserDetailBottomSheetData
 import com.example.nocket.components.topbar.UserProfileTopBar
 import com.example.nocket.constants.Month
 import com.example.nocket.models.Post
@@ -142,37 +143,32 @@ fun UserProfile(
     // Group posts by month and year
     val groupedPosts = groupPostsByMonthYear(posts)
 
-    // Add bottom sheet state and visibility state
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showUserDetailBottomSheet by remember { mutableStateOf(false) }
+    // Bottom sheet data state for the new AnimatedBottomSheet
+    var userDetailBottomSheetData by remember { mutableStateOf<UserDetailBottomSheetData?>(null) }
 
     // Get friends data
     val friends by appwriteViewModel.friends.collectAsState()
+    var friendsLoading by remember { mutableStateOf(false) }
 
     // Fetch friends for the current user - use the actual currentUser object
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
+            friendsLoading = true
             appwriteViewModel.fetchFriendsOfUser(user)
             // Debug: Check the state after fetching
             kotlinx.coroutines.delay(1000) // Wait for fetch to complete
             appwriteViewModel.debugFriendsState()
+            friendsLoading = false
         }
     }
 
-    // Show the UserDetailBottomSheet when needed
-    if (showUserDetailBottomSheet) {
-        UserDetailBottomSheet(
-            sheetState = sheetState,
-            onDismiss = {
-                showUserDetailBottomSheet = false
-            },
-            friends = friends,
-            onRemoveFriend = { friend ->
-                // Implement friend removal logic
-                // appwriteViewModel.removeFriend(friend.id)
-            }
-        )
-    }
+    // Show the UserDetailBottomSheet using AnimatedBottomSheet
+    UserDetailBottomSheet(
+        data = userDetailBottomSheetData,
+        onDismiss = {
+            userDetailBottomSheetData = null
+        }
+    )
 
     when {
         selectedPost != null -> {
@@ -210,7 +206,14 @@ fun UserProfile(
                     UserProfileTopBar(
                         navController = navController,
                         onFriendsClick = {
-                            showUserDetailBottomSheet = true
+                            userDetailBottomSheetData = com.example.nocket.components.sheet.UserDetailBottomSheetData(
+                                friends = friends,
+                                isLoading = friendsLoading,
+                                onRemoveFriend = { friend ->
+                                    // Implement friend removal logic
+                                    // appwriteViewModel.removeFriend(friend.id)
+                                }
+                            )
                         }
                     )
                 }
