@@ -207,8 +207,8 @@ fun ThirdPartyAppItem(
     Circle(
         outerSize = 56.dp,
         gap = 1.dp,
-        backgroundColor = Color(0xFF404137),
-        borderColor = if (isSelected) Color.Yellow else Color(0xFFB8B8B8),
+        backgroundColor = Color.Gray,
+        borderColor = if (isSelected) Color.Yellow else Color(0xFF404137),
         onClick = onClick,
         imageSetting = ImageSetting(
             imageUrl = app.imageUrl, // Use drawable resource instead
@@ -226,8 +226,8 @@ data class ThirdPartyApp(
 
 val listThirdPartyApp = listOf(
     ThirdPartyApp(
-        name = "Facebook",
-        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/500px-Facebook_Logo_%282019%29.png",
+        name = "Messenger",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/512px-Facebook_Messenger_logo_2020.svg.png",
         icon = R.drawable.fb,
         onClick = {}
     ),

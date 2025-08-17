@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,12 +14,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,20 +31,22 @@ import com.example.nocket.components.list.ShareYourLinkComponent
 import com.example.nocket.components.list.TotalFriendComponent
 import com.example.nocket.components.list.YourFriendAppComponent
 import com.example.nocket.models.User
-import kotlinx.coroutines.launch
+
+data class UserDetailBottomSheetData(
+    val friends: List<User> = emptyList(),
+    val onRemoveFriend: (User) -> Unit = {}
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailBottomSheet(
-    sheetState: SheetState,
-    onDismiss: () -> Unit,
-    friends: List<User> = emptyList(),
-    onRemoveFriend: (User) -> Unit = {}
+    data: UserDetailBottomSheetData?,
+    onDismiss: () -> Unit
 ) {
-
-    ModalBottomSheet(
+    AnimatedBottomSheet(
+        value = data,
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         dragHandle = { 
             // Simple drag handle without excessive padding
             HorizontalDivider(
@@ -53,11 +57,13 @@ fun UserDetailBottomSheet(
                     .background(Color(0xFF121212))
                     .width(40.dp)
             )
-        }
-    ) {
+        },
+        containerColor = Color(0xFF121212)
+    ) { sheetData ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.93f) // Limit height to 90% of the screen
                 .background(Color(0xFF121212))
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 16.dp), // Add bottom padding for scroll end
@@ -65,19 +71,18 @@ fun UserDetailBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            TotalFriendComponent(friends.size, modifier = Modifier.padding(top = 0.dp))
+            TotalFriendComponent(sheetData.friends.size, modifier = Modifier.padding(top = 0.dp))
 
             ExternalAppComponent()
 
             YourFriendAppComponent(
-                friends = friends,
-                onRemoveFriend = onRemoveFriend
+                friends = sheetData.friends,
+                onRemoveFriend = sheetData.onRemoveFriend
             )
 
             ShareYourLinkComponent()
         }
     }
-
 }
 
 
@@ -85,21 +90,21 @@ fun UserDetailBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DemoScreen() {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val coroutineScope = rememberCoroutineScope()
+    var sheetData by remember { mutableStateOf<UserDetailBottomSheetData?>(null) }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(onClick = {
-            coroutineScope.launch {
-                sheetState.show()
-            }
+            sheetData = UserDetailBottomSheetData(
+                friends = emptyList(), // Add sample data if needed
+                onRemoveFriend = { /* Handle remove friend */ }
+            )
         }) {
             Text("Show User Detail Bottom Sheet")
         }
     }
 
-    UserDetailBottomSheet(sheetState = sheetState, onDismiss = {
-        coroutineScope.launch { sheetState.hide() }
-    })
-
+    UserDetailBottomSheet(
+        data = sheetData,
+        onDismiss = { sheetData = null }
+    )
 }
