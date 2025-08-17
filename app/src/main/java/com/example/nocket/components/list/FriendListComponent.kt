@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -294,6 +295,7 @@ fun ExternalAppComponent() {
 fun YourFriendAppComponent(
     friends: List<User> = emptyList(),
     onRemoveFriend: (User) -> Unit = {},
+    isLoading: Boolean = false,
     initialShowCount: Int = 3 // Show only 3 friends initially
 ) {
     var showAll by remember { mutableStateOf(false) }
@@ -328,33 +330,50 @@ fun YourFriendAppComponent(
             )
         }
 
-        if (friends.isEmpty()) {
-            Text(
-                text = "You don't have any friends yet",
-                color = Color.White.copy(alpha = 0.6f),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        } else {
-            // Friends list - use Column since parent is already scrollable
-            Column(
-            ) {
-                friendsToShow.forEach { friend ->
-                    FriendListItem(
-                        friend = friend,
-                        onRemoveFriend = onRemoveFriend
+        when {
+            isLoading -> {
+                // Show loading state
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
-            
-            // Show More/Show Less button
-            if (friends.size > initialShowCount) {
-                ShowMoreShowLessButton(
-                    showAll = showAll,
-                    totalCount = friends.size,
-                    visibleCount = friendsToShow.size,
-                    onToggle = { showAll = !showAll }
+            friends.isEmpty() -> {
+                Text(
+                    text = "You don't have any friends yet",
+                    color = Color.White.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
+            }
+            else -> {
+                // Friends list - use Column since parent is already scrollable
+                Column(
+                ) {
+                    friendsToShow.forEach { friend ->
+                        FriendListItem(
+                            friend = friend,
+                            onRemoveFriend = onRemoveFriend
+                        )
+                    }
+                }
+                
+                // Show More/Show Less button
+                if (friends.size > initialShowCount) {
+                    ShowMoreShowLessButton(
+                        showAll = showAll,
+                        totalCount = friends.size,
+                        visibleCount = friendsToShow.size,
+                        onToggle = { showAll = !showAll }
+                    )
+                }
             }
         }
     }

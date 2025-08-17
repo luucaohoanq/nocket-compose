@@ -148,14 +148,17 @@ fun UserProfile(
 
     // Get friends data
     val friends by appwriteViewModel.friends.collectAsState()
+    var friendsLoading by remember { mutableStateOf(false) }
 
     // Fetch friends for the current user - use the actual currentUser object
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
+            friendsLoading = true
             appwriteViewModel.fetchFriendsOfUser(user)
             // Debug: Check the state after fetching
             kotlinx.coroutines.delay(1000) // Wait for fetch to complete
             appwriteViewModel.debugFriendsState()
+            friendsLoading = false
         }
     }
 
@@ -205,6 +208,7 @@ fun UserProfile(
                         onFriendsClick = {
                             userDetailBottomSheetData = com.example.nocket.components.sheet.UserDetailBottomSheetData(
                                 friends = friends,
+                                isLoading = friendsLoading,
                                 onRemoveFriend = { friend ->
                                     // Implement friend removal logic
                                     // appwriteViewModel.removeFriend(friend.id)

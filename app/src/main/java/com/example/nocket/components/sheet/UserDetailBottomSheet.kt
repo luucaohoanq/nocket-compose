@@ -34,6 +34,7 @@ import com.example.nocket.models.User
 
 data class UserDetailBottomSheetData(
     val friends: List<User> = emptyList(),
+    val isLoading: Boolean = false,
     val onRemoveFriend: (User) -> Unit = {}
 )
 
@@ -77,7 +78,8 @@ fun UserDetailBottomSheet(
 
             YourFriendAppComponent(
                 friends = sheetData.friends,
-                onRemoveFriend = sheetData.onRemoveFriend
+                onRemoveFriend = sheetData.onRemoveFriend,
+                isLoading = sheetData.isLoading
             )
 
             ShareYourLinkComponent()
@@ -96,6 +98,7 @@ private fun DemoScreen() {
         Button(onClick = {
             sheetData = UserDetailBottomSheetData(
                 friends = emptyList(), // Add sample data if needed
+                isLoading = false,
                 onRemoveFriend = { /* Handle remove friend */ }
             )
         }) {
