@@ -7,6 +7,11 @@ sealed class AuthState {
     /**
      * Initial loading state
      */
+    object Initial : AuthState()
+
+    /**
+     * Loading state during authentication process
+     */
     object Loading : AuthState()
 
     /**

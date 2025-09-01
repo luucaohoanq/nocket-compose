@@ -65,14 +65,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.example.nocket.R
 import com.example.nocket.models.auth.AuthState
-import com.example.nocket.ui.theme.AppTheme
 import com.example.nocket.viewmodels.AuthViewModel
 
 enum class AuthMode {
@@ -81,6 +79,28 @@ enum class AuthMode {
 
 val cornerShape: Dp = 12.dp
 
+// Data class to hold the UI state
+data class AuthUIState(
+    val authState: AuthState = AuthState.Initial,
+    val isLoading: Boolean = false,
+    val email: String = "",
+    val password: String = "",
+    val name: String = "",
+    val authMode: AuthMode = AuthMode.LOGIN,
+    val passwordVisible: Boolean = false
+)
+
+// Callback interface for handling UI actions
+interface AuthUIActions {
+    fun onLogin(email: String, password: String)
+    fun onRegister(email: String, password: String, name: String)
+    fun onResetPassword(email: String)
+    fun onGoogleLogin(activity: ComponentActivity)
+    fun onLoginSuccess()
+    fun clearError()
+}
+
+// Main LoginScreen composable with ViewModel
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -89,32 +109,80 @@ fun LoginScreen(
 ) {
     val authState by viewModel.authState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val activity = context as ComponentActivity
 
-    var authMode by rememberSaveable { mutableStateOf(AuthMode.LOGIN) }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var name by rememberSaveable { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val uiState = AuthUIState(
+        authState = authState,
+        isLoading = isLoading
+    )
+
+    val actions = object : AuthUIActions {
+        override fun onLogin(email: String, password: String) {
+            viewModel.login(email, password)
+        }
+
+        override fun onRegister(email: String, password: String, name: String) {
+            viewModel.register(email, password, name)
+        }
+
+        override fun onResetPassword(email: String) {
+            viewModel.resetPassword(email)
+        }
+
+        override fun onGoogleLogin(activity: ComponentActivity) {
+            viewModel.loginWithGoogle(activity)
+        }
+
+        override fun onLoginSuccess() {
+            onLoginSuccess()
+        }
+
+        override fun clearError() {
+            viewModel.clearError()
+        }
+    }
+
+    LoginScreenContent(
+        uiState = uiState,
+        actions = actions,
+        modifier = modifier
+    )
+}
+
+// Pure UI composable without dependencies
+@Composable
+fun LoginScreenContent(
+    uiState: AuthUIState,
+    actions: AuthUIActions,
+    modifier: Modifier = Modifier
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val activity = context as? ComponentActivity
+
+    var authMode by rememberSaveable { mutableStateOf(uiState.authMode) }
+    var email by rememberSaveable { mutableStateOf(uiState.email) }
+    var password by rememberSaveable { mutableStateOf(uiState.password) }
+    var name by rememberSaveable { mutableStateOf(uiState.name) }
+    var passwordVisible by rememberSaveable { mutableStateOf(uiState.passwordVisible) }
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     // Handle auth state changes
-    LaunchedEffect(authState) {
-        when (authState) {
+    LaunchedEffect(uiState.authState) {
+        when (uiState.authState) {
             is AuthState.Authenticated -> {
-                onLoginSuccess()
+                actions.onLoginSuccess()
             }
 
             is AuthState.Error -> {
                 snackbarHostState.showSnackbar(
-                    message = (authState as AuthState.Error).message,
+                    message = (uiState.authState as AuthState.Error).message,
                     actionLabel = "Dismiss"
                 )
-                viewModel.clearError()
+                actions.clearError()
             }
 
             is AuthState.PasswordResetSent -> {
@@ -169,7 +237,6 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        // You can replace this with your app logo
                         AsyncImage(
                             model = R.mipmap.ic_launcher,
                             contentDescription = "Nocket Logo",
@@ -255,7 +322,7 @@ fun LoginScreen(
                                 },
                                 onDone = {
                                     if (authMode == AuthMode.FORGOT_PASSWORD) {
-                                        viewModel.resetPassword(email)
+                                        actions.onResetPassword(email)
                                         focusManager.clearFocus()
                                     }
                                 }
@@ -321,12 +388,12 @@ fun LoginScreen(
                                     onDone = {
                                         when (authMode) {
                                             AuthMode.LOGIN -> {
-                                                viewModel.login(email, password)
+                                                actions.onLogin(email, password)
                                                 focusManager.clearFocus()
                                             }
 
                                             AuthMode.REGISTER -> {
-                                                viewModel.register(email, password, name)
+                                                actions.onRegister(email, password, name)
                                                 focusManager.clearFocus()
                                             }
 
@@ -346,16 +413,16 @@ fun LoginScreen(
                         Button(
                             onClick = {
                                 when (authMode) {
-                                    AuthMode.LOGIN -> viewModel.login(email, password)
-                                    AuthMode.REGISTER -> viewModel.register(email, password, name)
-                                    AuthMode.FORGOT_PASSWORD -> viewModel.resetPassword(email)
+                                    AuthMode.LOGIN -> actions.onLogin(email, password)
+                                    AuthMode.REGISTER -> actions.onRegister(email, password, name)
+                                    AuthMode.FORGOT_PASSWORD -> actions.onResetPassword(email)
                                 }
                                 focusManager.clearFocus()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            enabled = !isLoading && authState !is AuthState.Loading &&
+                            enabled = !uiState.isLoading && uiState.authState !is AuthState.Loading &&
                                     when (authMode) {
                                         AuthMode.LOGIN -> email.isNotBlank() && password.isNotBlank()
                                         AuthMode.REGISTER -> email.isNotBlank() && password.isNotBlank() && name.isNotBlank()
@@ -363,7 +430,7 @@ fun LoginScreen(
                                     },
                             shape = RoundedCornerShape(cornerShape)
                         ) {
-                            if (isLoading || authState is AuthState.Loading) {
+                            if (uiState.isLoading || uiState.authState is AuthState.Loading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(20.dp),
                                     strokeWidth = 2.dp,
@@ -443,11 +510,13 @@ fun LoginScreen(
 
                             // Google Login Button
                             Button(
-                                onClick = { viewModel.loginWithGoogle(activity) },
+                                onClick = {
+                                    activity?.let { actions.onGoogleLogin(it) }
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(56.dp),
-                                enabled = !isLoading && authState !is AuthState.Loading,
+                                enabled = !uiState.isLoading && uiState.authState !is AuthState.Loading,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.White,
                                     contentColor = Color.Black,
@@ -459,7 +528,7 @@ fun LoginScreen(
                                 ),
                                 shape = RoundedCornerShape(cornerShape)
                             ) {
-                                if (isLoading || authState is AuthState.Loading) {
+                                if (uiState.isLoading || uiState.authState is AuthState.Loading) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(20.dp),
                                         strokeWidth = 2.dp,
@@ -489,7 +558,7 @@ fun LoginScreen(
                         }
 
                         // Error state display
-                        if (authState is AuthState.Error) {
+                        if (uiState.authState is AuthState.Error) {
                             Spacer(modifier = Modifier.height(16.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -504,7 +573,7 @@ fun LoginScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = (authState as AuthState.Error).message,
+                                    text = (uiState.authState as AuthState.Error).message,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -526,15 +595,5 @@ fun LoginScreen(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    AppTheme {
-        LoginScreen(
-            onLoginSuccess = { /* Preview */ }
-        )
     }
 }

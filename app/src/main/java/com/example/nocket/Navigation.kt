@@ -79,6 +79,7 @@ fun Navigation(
 
     // Determine start destination based on auth state
     val startDestination = when (authState) {
+        is AuthState.Initial -> Screen.Login.route
         is AuthState.Authenticated -> Screen.Post.route
         is AuthState.Unauthenticated -> Screen.Login.route
         is AuthState.Loading -> Screen.Login.route // Show login while loading
