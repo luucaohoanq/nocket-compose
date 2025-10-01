@@ -1,5 +1,10 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.di
-
 
 import android.content.Context
 import com.example.nocket.constants.AppwriteConfig
@@ -22,40 +27,30 @@ object AppwriteModule {
     @Provides
     @Singleton
     fun provideAppwriteClient(
-        @ApplicationContext context: Context
-    ): Client {
-        return Client(context.applicationContext)
-            .setSelfSigned(true)
-            .setProject(AppwriteConfig.APPWRITE_PROJECT_ID)
-            .setEndpoint(AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT)
-    }
+        @ApplicationContext context: Context,
+    ): Client = Client(context.applicationContext)
+        .setSelfSigned(true)
+        .setProject(AppwriteConfig.APPWRITE_PROJECT_ID)
+        .setEndpoint(AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT)
 
     @Provides
     @Singleton
-    fun provideAccount(client: Client): Account {
-        return Account(client)
-    }
+    fun provideAccount(client: Client): Account = Account(client)
 
     @Provides
     @Singleton
-    fun provideDatabases(client: Client): Databases {
-        return Databases(client)
-    }
+    fun provideDatabases(client: Client): Databases = Databases(client)
 
     @Provides
     @Singleton
     fun provideAppwriteFunctions(
-        client: Client
-    ): Functions {
-        return Functions(client)
-    }
+        client: Client,
+    ): Functions = Functions(client)
 
     @Provides
     @Singleton
     fun provideAuthRepository(
         account: Account,
-        @ApplicationContext context: Context
-    ): AuthRepository {
-        return AuthRepository(account, context)
-    }
+        @ApplicationContext context: Context,
+    ): AuthRepository = AuthRepository(account, context)
 }

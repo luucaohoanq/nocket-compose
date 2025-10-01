@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket
 
 import android.app.ComponentCaller
@@ -6,8 +12,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -22,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.nocket.configs.statusBarConfig
 import com.example.nocket.extensions.edgeToEdgeWithStyle
@@ -40,8 +43,8 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        //replace with using in AndroidManifest.xml
-        //WindowCompat.setDecorFitsSystemWindows(window, false)
+        // replace with using in AndroidManifest.xml
+        // WindowCompat.setDecorFitsSystemWindows(window, false)
 
         statusBarConfig(window)
 
@@ -49,7 +52,6 @@ class MainActivity : ComponentActivity() {
         edgeToEdgeWithStyle()
 
         setContent { NocketApp() }
-
     }
 
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
@@ -72,15 +74,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NocketApp(
     appwriteViewModel: AppwriteViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     val projectInfo = appwriteViewModel.getProjectInfo()
     val authState by authViewModel.authState.collectAsState()
@@ -101,7 +101,7 @@ fun NocketApp(
     // Only log when user details change
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
-            Log.d("UserDebug", "User Details: data=${user}")
+            Log.d("UserDebug", "User Details: data=$user")
             // Fetch posts for this specific user
             appwriteViewModel.getPostsOfUser(user.id)
             // Fetch posts from user and friends for the main feed
@@ -112,7 +112,7 @@ fun NocketApp(
     AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             Navigation(appwriteViewModel, authViewModel)
         }
@@ -127,7 +127,7 @@ fun NocketAppPreview() {
     AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             Navigation()
         }

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.container
 
 import androidx.compose.foundation.background
@@ -18,8 +24,8 @@ import androidx.compose.ui.unit.dp
 val BlurStyle1 = Brush.verticalGradient(
     colors = listOf(
         Color(0xCC424242),
-        Color(0xCC616161)
-    )
+        Color(0xCC616161),
+    ),
 )
 
 @Composable
@@ -27,7 +33,7 @@ fun BlurredContainer(
     modifier: Modifier = Modifier,
     blurShape: RoundedCornerShape = RoundedCornerShape(20.dp),
     brush: Brush = BlurStyle1,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -40,7 +46,7 @@ fun BlurredContainer(
             modifier = Modifier
                 .matchParentSize()
                 .background(brush = brush)
-                .blur(16.dp)
+                .blur(16.dp),
         )
 
         // Content layer (not blurred)
@@ -48,7 +54,7 @@ fun BlurredContainer(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .clip(MaterialTheme.shapes.large)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             content()
         }
@@ -60,7 +66,7 @@ fun NotBlurredContainer(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color(0xCC424242),
     blurShape: RoundedCornerShape = RoundedCornerShape(20.dp),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -74,7 +80,7 @@ fun NotBlurredContainer(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .clip(MaterialTheme.shapes.large)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             content()
         }

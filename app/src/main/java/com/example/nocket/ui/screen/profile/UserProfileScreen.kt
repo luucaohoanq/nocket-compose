@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.profile
 
 import android.os.Build
@@ -32,7 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,12 +80,12 @@ import java.time.LocalDate
 data class MonthPosts(
     val month: Month,
     val year: Int,
-    val posts: List<Post>
+    val posts: List<Post>,
 )
 
 data class DayPostGroup(
     val dayNumber: Int,
-    val posts: List<Post>
+    val posts: List<Post>,
 ) {
     val count: Int get() = posts.size
     val hasMultiplePosts: Boolean get() = posts.size > 1
@@ -167,7 +172,7 @@ fun UserProfile(
         data = userDetailBottomSheetData,
         onDismiss = {
             userDetailBottomSheetData = null
-        }
+        },
     )
 
     when {
@@ -175,14 +180,14 @@ fun UserProfile(
             PostDetailScreen(
                 post = selectedPost!!,
                 onBack = { selectedPost = null },
-                navController = navController
+                navController = navController,
             )
         }
 
         isLoading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator()
             }
@@ -191,7 +196,7 @@ fun UserProfile(
         data == null -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text("User not found")
             }
@@ -212,29 +217,29 @@ fun UserProfile(
                                 onRemoveFriend = { friend ->
                                     // Implement friend removal logic
                                     // appwriteViewModel.removeFriend(friend.id)
-                                }
+                                },
                             )
-                        }
+                        },
                     )
-                }
+                },
             ) { paddingValues ->
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         // Fixed ProfileHeader - never scrolls
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = MaterialTheme.colorScheme.background,
-                            shadowElevation = 8.dp
+                            shadowElevation = 8.dp,
                         ) {
                             ProfileHeader(
                                 user = data,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(16.dp),
                             )
                         }
 
@@ -242,7 +247,7 @@ fun UserProfile(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .weight(1f)
+                                .weight(1f),
                         ) {
                             // Scrollable posts content
                             LazyColumn(
@@ -253,14 +258,14 @@ fun UserProfile(
                                     start = 16.dp,
                                     end = 16.dp,
                                     top = 16.dp,
-                                    bottom = 120.dp // Space for fixed stats
+                                    bottom = 120.dp, // Space for fixed stats
                                 ),
-                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                                verticalArrangement = Arrangement.spacedBy(24.dp),
                             ) {
                                 items(groupedPosts.reversed()) { monthPosts ->
                                     MonthSection(
                                         monthPosts = monthPosts,
-                                        onPostClick = { post -> selectedPost = post }
+                                        onPostClick = { post -> selectedPost = post },
                                     )
                                 }
                             }
@@ -271,7 +276,7 @@ fun UserProfile(
                                     .align(Alignment.BottomCenter)
                                     .fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.background,
-                                shadowElevation = 8.dp
+                                shadowElevation = 8.dp,
                             ) {
                                 Column {
                                     // Gradient fade
@@ -283,16 +288,16 @@ fun UserProfile(
                                                 brush = Brush.verticalGradient(
                                                     colors = listOf(
                                                         Color.Transparent,
-                                                        MaterialTheme.colorScheme.background
-                                                    )
-                                                )
-                                            )
+                                                        MaterialTheme.colorScheme.background,
+                                                    ),
+                                                ),
+                                            ),
                                     )
 
                                     // Stats component
                                     ProfileStats(
                                         posts = posts,
-                                        modifier = Modifier.padding(16.dp)
+                                        modifier = Modifier.padding(16.dp),
                                     )
                                 }
                             }
@@ -308,47 +313,49 @@ fun UserProfile(
 private fun ProfileHeader(
     user: com.example.nocket.models.User,
     authViewModel: AuthViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Get current authenticated user to access email (not in User model)
     val authState by authViewModel.authState.collectAsState()
     val authUser = if (authState is AuthState.Authenticated) {
         (authState as AuthState.Authenticated).user
-    } else null
+    } else {
+        null
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.weight(1f) // Take available space
+            modifier = Modifier.weight(1f), // Take available space
         ) {
             // Username
             Text(
                 text = user.username,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             // Handle with link icon
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = "@${user.email}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.Default.Link,
                     contentDescription = "Link",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
@@ -362,8 +369,8 @@ private fun ProfileHeader(
             onClick = {},
             imageSetting = ImageSetting(
                 imageUrl = user.avatar,
-                contentDescription = "Profile picture"
-            )
+                contentDescription = "Profile picture",
+            ),
         )
     }
 }
@@ -372,7 +379,7 @@ private fun ProfileHeader(
 @Composable
 private fun ProfileStats(
     posts: List<Post>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val currentDate = LocalDate.now()
     val totalLockets = posts.size
@@ -389,12 +396,12 @@ private fun ProfileStats(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Main Stats Row
         Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Box(
                 modifier = Modifier
@@ -402,40 +409,40 @@ private fun ProfileStats(
                     .border(
                         width = 2.dp,
                         brush = Brush.linearGradient(goldColors),
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
                     )
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
                                 Color(0x40FFD700),
-                                Color(0x20FFA500)
-                            )
+                                Color(0x20FFA500),
+                            ),
                         ),
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
                     )
                     .clip(RoundedCornerShape(50))
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     StatItem(
                         icon = "🧡",
                         count = "$totalLockets",
-                        label = "Lockets"
+                        label = "Lockets",
                     )
 
                     VerticalDivider(
                         color = GraySurface,
-                        modifier = Modifier.height(20.dp)
+                        modifier = Modifier.height(20.dp),
                     )
 
                     StatItem(
                         icon = "🔥",
                         count = "${streakDays}d",
-                        label = "streak"
+                        label = "streak",
                     )
                 }
             }
@@ -447,37 +454,35 @@ private fun ProfileStats(
 private fun StatItem(
     icon: String,
     count: String,
-    label: String
+    label: String,
 ) {
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = icon,
-            fontSize = 20.sp
+            fontSize = 20.sp,
         )
         Text(
             text = count,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MonthSection(
     monthPosts: MonthPosts,
-    onPostClick: (Post) -> Unit
+    onPostClick: (Post) -> Unit,
 ) {
     val topRounded = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     val bottomRounded = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
@@ -487,14 +492,14 @@ private fun MonthSection(
             .clip(bottomRounded)
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ),
     ) {
         // Month header
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             // Layer 1: Gradient background with blur
             Box(
@@ -505,11 +510,11 @@ private fun MonthSection(
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xCC424242), // semi-transparent dark gray
-                                Color(0xCC616161)  // semi-transparent medium gray
-                            )
-                        )
+                                Color(0xCC616161), // semi-transparent medium gray
+                            ),
+                        ),
                     )
-                    .blur(16.dp) // only blurs the background layer
+                    .blur(16.dp), // only blurs the background layer
             )
 
             // Layer 2: Text on top
@@ -517,27 +522,26 @@ private fun MonthSection(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier
                     .clip(topRounded)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Text(
                     text = "${monthPosts.month.displayName} ${monthPosts.year}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
             }
         }
 
-
         HorizontalDivider(
             color = GraySurface,
-            modifier = Modifier.height(10.dp)
+            modifier = Modifier.height(10.dp),
         )
 
         // Calendar Grid for this month
         MonthCalendarGrid(
             monthPosts = monthPosts,
-            onPostClick = onPostClick
+            onPostClick = onPostClick,
         )
     }
 }
@@ -546,70 +550,69 @@ private fun MonthSection(
 @Composable
 private fun MonthCalendarGrid(
     monthPosts: MonthPosts,
-    onPostClick: (Post) -> Unit
+    onPostClick: (Post) -> Unit,
 ) {
     val daysInMonth = calculateDaysOfMonthInYear(monthPosts.month, monthPosts.year)
     val postsByDay = groupPostsByDay(monthPosts.posts, daysInMonth)
-    
+
     // Get the first day of the month and calculate offset
     val firstDayOfMonth = LocalDate.of(monthPosts.year, monthPosts.month.ordinal + 1, 1)
     val startDayOffset = (firstDayOfMonth.dayOfWeek.value - 1) % 7 // Monday = 0, Sunday = 6
-    
+
     // Calculate total cells needed (offset + days in month)
     val totalCells = startDayOffset + daysInMonth
     val rows = (totalCells + 6) / 7 // Round up to get number of rows
-    
+
     Log.d("Calendar", "Month: ${monthPosts.month.displayName} ${monthPosts.year}")
     Log.d("Calendar", "First day: ${firstDayOfMonth.dayOfWeek}, Offset: $startDayOffset")
     Log.d("Calendar", "Days in month: $daysInMonth, Total cells: $totalCells, Rows: $rows")
-    
+
     Column(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(20.dp),
             )
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         // Day headers (Mon, Tue, Wed, etc.)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             val dayHeaders = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
             dayHeaders.forEach { dayHeader ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(30.dp)
-                    ,
-                    contentAlignment = Alignment.Center
+                        .height(30.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = dayHeader,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     )
                 }
             }
         }
-        
+
         // Calendar grid rows
         repeat(rows) { rowIndex ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 repeat(7) { columnIndex ->
                     val cellIndex = rowIndex * 7 + columnIndex
-                    
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(65.dp)
+                            .height(65.dp),
                     ) {
                         when {
                             // Empty cell before month starts
@@ -621,11 +624,11 @@ private fun MonthCalendarGrid(
                             cellIndex < startDayOffset + daysInMonth -> {
                                 val dayNumber = cellIndex - startDayOffset + 1
                                 val dayPostGroup = postsByDay[dayNumber]
-                                
+
                                 if (dayPostGroup != null && dayPostGroup.posts.isNotEmpty()) {
                                     PostGridItemWithBadge(
                                         dayPostGroup = dayPostGroup,
-                                        onClick = { onPostClick(dayPostGroup.primaryPost!!) }
+                                        onClick = { onPostClick(dayPostGroup.primaryPost!!) },
                                     )
                                 } else {
                                     EmptyDayItem(dayNumber = dayNumber)
@@ -642,4 +645,3 @@ private fun MonthCalendarGrid(
         }
     }
 }
-

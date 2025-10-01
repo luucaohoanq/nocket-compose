@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.frame
 
 import androidx.compose.foundation.background
@@ -25,7 +31,7 @@ import com.example.nocket.models.User
 
 @Composable
 fun MessageInputPill(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -33,10 +39,10 @@ fun MessageInputPill(
 //            .padding(8.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp),
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = "Send message...",
@@ -44,7 +50,7 @@ fun MessageInputPill(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
 
         Text("😄", modifier = Modifier.padding(horizontal = 4.dp))
@@ -57,7 +63,7 @@ fun MessageInputPill(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .padding(start = 4.dp)
-                .size(20.dp)
+                .size(20.dp),
         )
     }
 }
@@ -72,9 +78,9 @@ fun MessageInputPillPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun BottomPreview(){
+fun BottomPreview() {
     MaterialTheme {
-        Column() {
+        Column {
             MessageInputPill()
 //            MainBottomBar()
         }
@@ -83,19 +89,19 @@ fun BottomPreview(){
 
 data class UserReaction(
     val user: User,
-    val emoji: String
+    val emoji: String,
 )
 
 val userReactions = listOf(
     UserReaction(SampleData.users[0], "😄"),
     UserReaction(SampleData.users[1], "❤️"),
-    UserReaction(SampleData.users[2], "🔥")
+    UserReaction(SampleData.users[2], "🔥"),
 )
 
 @Composable
 fun ReactionPill(
     reactions: List<UserReaction>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
@@ -103,9 +109,9 @@ fun ReactionPill(
             .padding(8.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp),
             )
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         reactions.forEach { reaction ->
             UserPill(
@@ -114,10 +120,10 @@ fun ReactionPill(
                     trailingContent = {
                         Text(
                             text = reaction.emoji,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
-                    }
-                )
+                    },
+                ),
 
             )
         }
@@ -128,9 +134,8 @@ fun ReactionPill(
 fun ReactionFrame() {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Text(
             text = "Reactions",
             style = MaterialTheme.typography.titleMedium,
@@ -139,7 +144,6 @@ fun ReactionFrame() {
         )
 
         ReactionPill(reactions = userReactions, modifier = Modifier.padding(horizontal = 16.dp))
-
     }
 }
 

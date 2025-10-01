@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.topbar
 
 import androidx.compose.animation.core.RepeatMode
@@ -43,11 +49,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.nocket.Screen
 
-
 val buttons = listOf(
     Triple(Icons.Filled.Group, "", "FRIEND"),
     Triple(Icons.Filled.Settings, Screen.Setting.route, "Settings"),
-    Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home")
+    Triple(Icons.AutoMirrored.Filled.KeyboardArrowRight, Screen.Post.route, "Home"),
 )
 
 val roundCorner = RoundedCornerShape(10.dp)
@@ -57,16 +62,15 @@ val borderThickness = 2.dp
 @Composable
 fun UserProfileTopBar(
     navController: NavController,
-    onFriendsClick: () -> Unit = {}
+    onFriendsClick: () -> Unit = {},
 ) {
-
     val shimmerTranslateAnim = animateFloatAsState(
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(1800),
-            repeatMode = RepeatMode.Restart
+            repeatMode = RepeatMode.Restart,
         ),
-        label = "shimmer"
+        label = "shimmer",
     )
 
     CenterAlignedTopAppBar(
@@ -78,12 +82,12 @@ fun UserProfileTopBar(
                     .border(
                         width = 0.dp,
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        shape = roundCorner
+                        shape = roundCorner,
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF74512D).copy(alpha = 0.4f)
+                    containerColor = Color(0xFF74512D).copy(alpha = 0.4f),
                 ),
-                shape = roundCorner
+                shape = roundCorner,
             ) {
                 Box(
                     modifier = Modifier
@@ -104,19 +108,19 @@ fun UserProfileTopBar(
                                 colors = listOf(
                                     Color(0xFFFFD700),
                                     Color(0xFFFFF380),
-                                    Color(0xFFFFD700)
-                                )
+                                    Color(0xFFFFD700),
+                                ),
                             ),
-                            shape = roundCorner
+                            shape = roundCorner,
                         )
                         .padding(horizontal = 10.dp, vertical = 5.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     // Shimmer overlay
                     Canvas(
                         modifier = Modifier
                             .matchParentSize()
-                            .clip(RoundedCornerShape(25.dp))
+                            .clip(RoundedCornerShape(25.dp)),
                     ) {
                         val shimmerWidth = 100.dp.toPx()
                         val shimmerOffset = shimmerTranslateAnim.value - shimmerWidth
@@ -126,12 +130,12 @@ fun UserProfileTopBar(
                                 colors = listOf(
                                     Color.Transparent,
                                     Color.White.copy(alpha = 0.3f),
-                                    Color.Transparent
+                                    Color.Transparent,
                                 ),
                                 start = Offset(shimmerOffset, 0f),
-                                end = Offset(shimmerOffset + shimmerWidth, size.height)
+                                end = Offset(shimmerOffset + shimmerWidth, size.height),
                             ),
-                            size = size
+                            size = size,
                         )
                     }
 
@@ -144,13 +148,12 @@ fun UserProfileTopBar(
                     )
                 }
             }
-
         },
         actions = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp),
             ) {
                 buttons.forEach { (icon, route, description) ->
                     Button(
@@ -163,24 +166,24 @@ fun UserProfileTopBar(
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
-                            contentColor = Color.White
+                            contentColor = Color.White,
                         ),
                         modifier = Modifier.size(40.dp),
-                        contentPadding = PaddingValues(0.dp)
+                        contentPadding = PaddingValues(0.dp),
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = description,
                             tint = Color.White,
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(30.dp),
                         )
                     }
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent
-        )
+            containerColor = Color.Transparent,
+        ),
     )
 }
 
@@ -189,6 +192,6 @@ fun UserProfileTopBar(
 fun UserProfileTopBarPreview() {
     UserProfileTopBar(
         navController = rememberNavController(),
-        onFriendsClick = {}
+        onFriendsClick = {},
     )
 }

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.common
 
 import androidx.compose.foundation.layout.Column
@@ -19,7 +25,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 enum class BackButtonPosition {
-    Start, End
+    Start,
+    End,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +39,7 @@ fun CommonTopBar(
     onStartIconClick: (() -> Unit)? = null,
     endIcon: ImageVector? = null,
     onEndIconClick: (() -> Unit)? = null,
-    bottomContent: @Composable (() -> Unit)? = null
+    bottomContent: @Composable (() -> Unit)? = null,
 ) {
     Column {
         CenterAlignedTopAppBar(
@@ -41,7 +48,7 @@ fun CommonTopBar(
                     text = title,
                     color = titleColor,
                     fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
             },
             navigationIcon = {
@@ -59,8 +66,8 @@ fun CommonTopBar(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent
-            )
+                containerColor = Color.Transparent,
+            ),
         )
 
         bottomContent?.invoke()
@@ -69,8 +76,9 @@ fun CommonTopBar(
 
 @Composable
 private fun BackButton(
-    navController: NavController, backButtonPosition: BackButtonPosition,
-    backButtonIcon: ImageVector
+    navController: NavController,
+    backButtonPosition: BackButtonPosition,
+    backButtonIcon: ImageVector,
 ) {
     IconButton(onClick = {
         if (navController.previousBackStackEntry != null) {
@@ -78,13 +86,12 @@ private fun BackButton(
         }
         // If no previous entry, do nothing (let the system handle it)
     }) {
-
         when (backButtonPosition) {
             BackButtonPosition.Start -> {
                 Icon(
                     imageVector = backButtonIcon,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
                 )
             }
 
@@ -92,11 +99,10 @@ private fun BackButton(
                 Icon(
                     imageVector = backButtonIcon,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
                 )
             }
         }
-
     }
 }
 

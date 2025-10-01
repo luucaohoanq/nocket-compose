@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.preview
 
 import android.os.Build
@@ -41,7 +47,7 @@ fun PostGridItemPreview() {
             Box(modifier = Modifier.fillMaxSize()) {
                 PostGridItem(
                     post = SampleData.samplePosts.first { true },
-                    onClick = {}
+                    onClick = {},
                 )
             }
         }
@@ -68,7 +74,7 @@ fun PostDetailScreenPreview() {
         PostDetailScreen(
             post = SampleData.samplePosts.first { true },
             onBack = {},
-            navController = rememberNavController()
+            navController = rememberNavController(),
         )
     }
 }
@@ -79,7 +85,7 @@ fun PostDetailScreenPreview() {
 fun CameraScreenPreview() {
     AppTheme {
         CameraScreen(
-            rememberNavController()
+            rememberNavController(),
         )
     }
 }

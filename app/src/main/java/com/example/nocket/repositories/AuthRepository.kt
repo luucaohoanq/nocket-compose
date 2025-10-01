@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.repositories
 
 import android.content.Context
@@ -8,10 +14,10 @@ import com.example.nocket.models.auth.AuthUser
 import io.appwrite.enums.OAuthProvider
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.services.Account
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Repository for handling authentication operations with Appwrite
@@ -19,32 +25,28 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepository @Inject constructor(
     private val account: Account,
-    private val context: Context
+    private val context: Context,
 ) {
 
     /**
      * Check if user is currently authenticated
      */
-    suspend fun isAuthenticated(): Boolean {
-        return try {
-            getCurrentUser() != null
-        } catch (e: AppwriteException) {
-            false
-        }
+    suspend fun isAuthenticated(): Boolean = try {
+        getCurrentUser() != null
+    } catch (e: AppwriteException) {
+        false
     }
 
     /**
      * Get current authenticated user
      */
-    suspend fun getCurrentUser(): AuthUser? {
-        return try {
-            withContext(Dispatchers.IO) {
-                val user = account.get()
-                AuthUser.fromAppwriteUser(user)
-            }
-        } catch (e: AppwriteException) {
-            null
+    suspend fun getCurrentUser(): AuthUser? = try {
+        withContext(Dispatchers.IO) {
+            val user = account.get()
+            AuthUser.fromAppwriteUser(user)
         }
+    } catch (e: AppwriteException) {
+        null
     }
 
     /**
@@ -54,9 +56,8 @@ class AuthRepository @Inject constructor(
     suspend fun loginWithGoogle(
         activity: ComponentActivity,
         successUrl: String = "nocket://auth/success",
-        failureUrl: String = "nocket://auth/failure"
+        failureUrl: String = "nocket://auth/failure",
     ) {
-
         Log.d("AuthRepository", "Starting Google OAuth login")
 
         withContext(Dispatchers.IO) {
@@ -64,7 +65,7 @@ class AuthRepository @Inject constructor(
                 provider = OAuthProvider.GOOGLE,
                 success = successUrl,
                 failure = failureUrl,
-                activity = activity
+                activity = activity,
             )
         }
     }
@@ -72,103 +73,91 @@ class AuthRepository @Inject constructor(
     /**
      * Handle OAuth2 callback and create session
      */
-    suspend fun handleOAuthCallback(): AuthUser? {
-        return try {
-            // The session should already be created by the OAuth flow
-            // Just get the current user to confirm authentication
-            getCurrentUser()
-        } catch (e: AppwriteException) {
-            throw e
-        }
+    suspend fun handleOAuthCallback(): AuthUser? = try {
+        // The session should already be created by the OAuth flow
+        // Just get the current user to confirm authentication
+        getCurrentUser()
+    } catch (e: AppwriteException) {
+        throw e
     }
 
     /**
      * Logout user and delete current session
      */
-    suspend fun logout(): Boolean {
-        return try {
-            withContext(Dispatchers.IO) {
-                account.deleteSession("current")
-                true
-            }
-        } catch (e: AppwriteException) {
-            false
+    suspend fun logout(): Boolean = try {
+        withContext(Dispatchers.IO) {
+            account.deleteSession("current")
+            true
         }
+    } catch (e: AppwriteException) {
+        false
     }
 
     /**
      * Delete all sessions for the user
      */
-    suspend fun logoutFromAllDevices(): Boolean {
-        return try {
-            withContext(Dispatchers.IO) {
-                account.deleteSessions()
-                true
-            }
-        } catch (e: AppwriteException) {
-            false
+    suspend fun logoutFromAllDevices(): Boolean = try {
+        withContext(Dispatchers.IO) {
+            account.deleteSessions()
+            true
         }
+    } catch (e: AppwriteException) {
+        false
     }
 
     /**
      * Register a new user with email and password
      */
-    suspend fun register(email: String, password: String, name: String): AuthUser? {
-        return try {
-            withContext(Dispatchers.IO) {
-                Log.d("AuthRepository", "Registering user with email: $email")
-                val user = account.create(
-                    userId = "unique()", 
-                    email = email, 
-                    password = password,
-                    name = name
-                )
-                
-                // After registration, create a session (log in)
-                account.createEmailPasswordSession(email, password)
-                
-                AuthUser.fromAppwriteUser(user)
+    suspend fun register(email: String, password: String, name: String): AuthUser? = try {
+        withContext(Dispatchers.IO) {
+            Log.d("AuthRepository", "Registering user with email: $email")
+            val user = account.create(
+                userId = "unique()",
+                email = email,
+                password = password,
+                name = name,
+            )
 
-                // Manually add user to user_details collection to hold additional info
-            }
-        } catch (e: AppwriteException) {
-            Log.e("AuthRepository", "Registration failed: ${e.message}", e)
-            throw e
+            // After registration, create a session (log in)
+            account.createEmailPasswordSession(email, password)
+
+            AuthUser.fromAppwriteUser(user)
+
+            // Manually add user to user_details collection to hold additional info
         }
+    } catch (e: AppwriteException) {
+        Log.e("AuthRepository", "Registration failed: ${e.message}", e)
+        throw e
     }
 
     /**
      * Login with email and password
      */
-    suspend fun login(email: String, password: String): AuthUser? {
-        return try {
-            withContext(Dispatchers.IO) {
-                Log.d("AuthRepository", "Logging in user with email: $email")
-                account.createEmailPasswordSession(email, password)
-                getCurrentUser()
-            }
-        } catch (e: AppwriteException) {
-            Log.e("AuthRepository", "Login failed: ${e.message}", e)
-            throw e
+    suspend fun login(email: String, password: String): AuthUser? = try {
+        withContext(Dispatchers.IO) {
+            Log.d("AuthRepository", "Logging in user with email: $email")
+            account.createEmailPasswordSession(email, password)
+            getCurrentUser()
         }
+    } catch (e: AppwriteException) {
+        Log.e("AuthRepository", "Login failed: ${e.message}", e)
+        throw e
     }
 
     /**
      * Send password reset email
      */
-    suspend fun resetPassword(email: String): Boolean {
-        return try {
-            withContext(Dispatchers.IO) {
-                Log.d("AuthRepository", "Sending password reset to: $email")
-                account.createRecovery(
-                    email = email,
-                    url = "${AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT}/reset-password"
-                )
-                true
-            }
-        } catch (e: AppwriteException) {
-            Log.e("AuthRepository", "Password reset failed: ${e.message}", e)
-            false
+    suspend fun resetPassword(email: String): Boolean = try {
+        withContext(Dispatchers.IO) {
+            Log.d("AuthRepository", "Sending password reset to: $email")
+            account.createRecovery(
+                email = email,
+                url = "${AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT}/reset-password",
+            )
+            true
         }
+    } catch (e: AppwriteException) {
+        Log.e("AuthRepository", "Password reset failed: ${e.message}", e)
+        false
     }
 }

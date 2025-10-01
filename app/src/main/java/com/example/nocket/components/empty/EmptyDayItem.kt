@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.empty
 
 import androidx.compose.foundation.background
@@ -25,20 +31,20 @@ fun EmptyDayItem(dayNumber: Int? = null) {
             .aspectRatio(1f)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             )
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         if (dayNumber != null) {
             // Show day number for empty days
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopStart
+                contentAlignment = Alignment.TopStart,
             ) {
                 Text(
                     text = dayNumber.toString(),
@@ -46,7 +52,7 @@ fun EmptyDayItem(dayNumber: Int? = null) {
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(4.dp),
                 )
             }
         } else {
@@ -56,8 +62,8 @@ fun EmptyDayItem(dayNumber: Int? = null) {
                     .size(4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        shape = CircleShape
-                    )
+                        shape = CircleShape,
+                    ),
             )
         }
     }

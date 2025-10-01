@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.auth
 
 import androidx.activity.ComponentActivity
@@ -74,7 +80,9 @@ import com.example.nocket.models.auth.AuthState
 import com.example.nocket.viewmodels.AuthViewModel
 
 enum class AuthMode {
-    LOGIN, REGISTER, FORGOT_PASSWORD
+    LOGIN,
+    REGISTER,
+    FORGOT_PASSWORD,
 }
 
 val cornerShape: Dp = 12.dp
@@ -87,7 +95,7 @@ data class AuthUIState(
     val password: String = "",
     val name: String = "",
     val authMode: AuthMode = AuthMode.LOGIN,
-    val passwordVisible: Boolean = false
+    val passwordVisible: Boolean = false,
 )
 
 // Callback interface for handling UI actions
@@ -105,7 +113,7 @@ interface AuthUIActions {
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val authState by viewModel.authState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -114,7 +122,7 @@ fun LoginScreen(
 
     val uiState = AuthUIState(
         authState = authState,
-        isLoading = isLoading
+        isLoading = isLoading,
     )
 
     val actions = object : AuthUIActions {
@@ -146,7 +154,7 @@ fun LoginScreen(
     LoginScreenContent(
         uiState = uiState,
         actions = actions,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -155,7 +163,7 @@ fun LoginScreen(
 fun LoginScreenContent(
     uiState: AuthUIState,
     actions: AuthUIActions,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -180,7 +188,7 @@ fun LoginScreenContent(
             is AuthState.Error -> {
                 snackbarHostState.showSnackbar(
                     message = (uiState.authState as AuthState.Error).message,
-                    actionLabel = "Dismiss"
+                    actionLabel = "Dismiss",
                 )
                 actions.clearError()
             }
@@ -188,19 +196,20 @@ fun LoginScreenContent(
             is AuthState.PasswordResetSent -> {
                 snackbarHostState.showSnackbar(
                     message = "Password reset link sent to your email",
-                    actionLabel = "OK"
+                    actionLabel = "OK",
                 )
                 authMode = AuthMode.LOGIN
             }
 
-            else -> { /* No action needed */
+            else -> {
+                /* No action needed */
             }
         }
     }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -210,10 +219,10 @@ fun LoginScreenContent(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            MaterialTheme.colorScheme.background
-                        )
-                    )
-                )
+                            MaterialTheme.colorScheme.background,
+                        ),
+                    ),
+                ),
         ) {
             Column(
                 modifier = Modifier
@@ -221,7 +230,7 @@ fun LoginScreenContent(
                     .padding(24.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 // App Logo/Branding
                 Card(
@@ -230,18 +239,18 @@ fun LoginScreenContent(
                         .clip(RoundedCornerShape(60.dp)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         AsyncImage(
                             model = R.mipmap.ic_launcher,
                             contentDescription = "Nocket Logo",
                             modifier = Modifier.size(80.dp),
-                            contentScale = ContentScale.Fit
+                            contentScale = ContentScale.Fit,
                         )
                     }
                 }
@@ -254,7 +263,7 @@ fun LoginScreenContent(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -264,7 +273,7 @@ fun LoginScreenContent(
                     text = "Share moments with your friends",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))
@@ -274,13 +283,13 @@ fun LoginScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = MaterialTheme.colorScheme.surface,
                     ),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         // Title changes based on auth mode
                         Text(
@@ -291,7 +300,7 @@ fun LoginScreenContent(
                             },
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -305,12 +314,12 @@ fun LoginScreenContent(
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Email,
-                                    contentDescription = "Email Icon"
+                                    contentDescription = "Email Icon",
                                 )
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
-                                imeAction = if (authMode == AuthMode.FORGOT_PASSWORD) ImeAction.Done else ImeAction.Next
+                                imeAction = if (authMode == AuthMode.FORGOT_PASSWORD) ImeAction.Done else ImeAction.Next,
                             ),
                             keyboardActions = KeyboardActions(
                                 onNext = {
@@ -325,10 +334,10 @@ fun LoginScreenContent(
                                         actions.onResetPassword(email)
                                         focusManager.clearFocus()
                                     }
-                                }
+                                },
                             ),
                             shape = RoundedCornerShape(cornerShape),
-                            singleLine = true
+                            singleLine = true,
                         )
 
                         // Name field - only for register
@@ -342,18 +351,18 @@ fun LoginScreenContent(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Person,
-                                        contentDescription = "Name Icon"
+                                        contentDescription = "Name Icon",
                                     )
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Text,
-                                    imeAction = ImeAction.Next
+                                    imeAction = ImeAction.Next,
                                 ),
                                 keyboardActions = KeyboardActions(
-                                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
                                 ),
                                 shape = RoundedCornerShape(cornerShape),
-                                singleLine = true
+                                singleLine = true,
                             )
                         }
 
@@ -368,21 +377,21 @@ fun LoginScreenContent(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Password Icon"
+                                        contentDescription = "Password Icon",
                                     )
                                 },
                                 trailingIcon = {
                                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                         Icon(
                                             imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                            contentDescription = if (passwordVisible) "Hide Password" else "Show Password"
+                                            contentDescription = if (passwordVisible) "Hide Password" else "Show Password",
                                         )
                                     }
                                 },
                                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Password,
-                                    imeAction = ImeAction.Done
+                                    imeAction = ImeAction.Done,
                                 ),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
@@ -397,13 +406,14 @@ fun LoginScreenContent(
                                                 focusManager.clearFocus()
                                             }
 
-                                            else -> { /* Not used in forgot password */
+                                            else -> {
+                                                /* Not used in forgot password */
                                             }
                                         }
-                                    }
+                                    },
                                 ),
                                 shape = RoundedCornerShape(cornerShape),
-                                singleLine = true
+                                singleLine = true,
                             )
                         }
 
@@ -422,19 +432,20 @@ fun LoginScreenContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            enabled = !uiState.isLoading && uiState.authState !is AuthState.Loading &&
-                                    when (authMode) {
-                                        AuthMode.LOGIN -> email.isNotBlank() && password.isNotBlank()
-                                        AuthMode.REGISTER -> email.isNotBlank() && password.isNotBlank() && name.isNotBlank()
-                                        AuthMode.FORGOT_PASSWORD -> email.isNotBlank()
-                                    },
-                            shape = RoundedCornerShape(cornerShape)
+                            enabled = !uiState.isLoading &&
+                                uiState.authState !is AuthState.Loading &&
+                                when (authMode) {
+                                    AuthMode.LOGIN -> email.isNotBlank() && password.isNotBlank()
+                                    AuthMode.REGISTER -> email.isNotBlank() && password.isNotBlank() && name.isNotBlank()
+                                    AuthMode.FORGOT_PASSWORD -> email.isNotBlank()
+                                },
+                            shape = RoundedCornerShape(cornerShape),
                         ) {
                             if (uiState.isLoading || uiState.authState is AuthState.Loading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(20.dp),
                                     strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             } else {
                                 Text(
@@ -444,7 +455,7 @@ fun LoginScreenContent(
                                         AuthMode.FORGOT_PASSWORD -> "Reset Password"
                                     },
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
                                 )
                             }
                         }
@@ -456,7 +467,7 @@ fun LoginScreenContent(
                             AuthMode.LOGIN -> {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     TextButton(onClick = { authMode = AuthMode.FORGOT_PASSWORD }) {
                                         Text("Forgot Password?")
@@ -486,23 +497,23 @@ fun LoginScreenContent(
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 HorizontalDivider(
                                     modifier = Modifier.weight(1f),
                                     thickness = DividerDefaults.Thickness,
-                                    color = DividerDefaults.color
+                                    color = DividerDefaults.color,
                                 )
                                 Text(
                                     text = "OR",
                                     modifier = Modifier.padding(horizontal = 8.dp),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 HorizontalDivider(
                                     modifier = Modifier.weight(1f),
                                     thickness = DividerDefaults.Thickness,
-                                    color = DividerDefaults.color
+                                    color = DividerDefaults.color,
                                 )
                             }
 
@@ -520,37 +531,37 @@ fun LoginScreenContent(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.White,
                                     contentColor = Color.Black,
-                                    disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                                    disabledContainerColor = Color.Gray.copy(alpha = 0.3f),
                                 ),
                                 elevation = ButtonDefaults.buttonElevation(
                                     defaultElevation = 2.dp,
-                                    pressedElevation = 8.dp
+                                    pressedElevation = 8.dp,
                                 ),
-                                shape = RoundedCornerShape(cornerShape)
+                                shape = RoundedCornerShape(cornerShape),
                             ) {
                                 if (uiState.isLoading || uiState.authState is AuthState.Loading) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(20.dp),
                                         strokeWidth = 2.dp,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.primary,
                                     )
                                 } else {
                                     Row(
                                         horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         // Google Icon
                                         Icon(
                                             painter = painterResource(id = R.drawable.google),
                                             contentDescription = "Google",
                                             modifier = Modifier.size(20.dp),
-                                            tint = Color.Unspecified
+                                            tint = Color.Unspecified,
                                         )
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Text(
                                             text = "Continue with Google",
                                             style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Medium,
                                         )
                                     }
                                 }
@@ -563,19 +574,19 @@ fun LoginScreenContent(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ErrorOutline,
                                     contentDescription = "Error",
                                     tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = (uiState.authState as AuthState.Error).message,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             }
                         }
@@ -591,7 +602,7 @@ fun LoginScreenContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
-                    modifier = Modifier.padding(horizontal = 10.dp)
+                    modifier = Modifier.padding(horizontal = 10.dp),
                 )
             }
         }

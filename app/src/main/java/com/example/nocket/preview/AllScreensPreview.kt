@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.preview
 
 import android.os.Build
@@ -33,15 +39,15 @@ class ScreenTypeProvider : PreviewParameterProvider<String> {
     name = "All Screens",
     showBackground = true,
     backgroundColor = 0xFFF5F5F5,
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun AllScreensPreview(
-    @PreviewParameter(ScreenTypeProvider::class) screenType: String = "Home"
+    @PreviewParameter(ScreenTypeProvider::class) screenType: String = "Home",
 ) {
     AppTheme {
         val navController = rememberNavController()
-        
+
         when (screenType) {
             "Home" -> PostScreen(navController)
             "Messages" -> MessageScreen(navController)
@@ -56,7 +62,7 @@ fun AllScreensPreview(
     name = "Screen Components Overview",
     showBackground = true,
     heightDp = 800,
-    widthDp = 400
+    widthDp = 400,
 )
 @Composable
 fun ScreenComponentsPreview() {
@@ -64,58 +70,58 @@ fun ScreenComponentsPreview() {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             Text(
                 text = "Nocket App - Screen Components",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "✅ Home Screen - Navigation hub with beautiful cards",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "✅ Messages Screen - Chat list with online indicators and unread counts",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "✅ Posts Screen - Social feed with like/share features and media support",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "✅ Settings Screen - Organized by categories with modern UI",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             Text(
                 text = "Features Implemented:",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             val features = listOf(
                 "🎨 Modern Material 3 design",
                 "📱 Responsive layouts",
@@ -127,15 +133,15 @@ fun ScreenComponentsPreview() {
                 "🌙 Dark/Light theme support",
                 "🔧 Comprehensive settings",
                 "📱 Top app bars with navigation",
-                "🎭 Preview support for all screens"
+                "🎭 Preview support for all screens",
             )
-            
+
             features.forEach { feature ->
                 Text(
                     text = feature,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 2.dp)
+                    modifier = Modifier.padding(vertical = 2.dp),
                 )
             }
         }

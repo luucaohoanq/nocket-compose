@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.message
 
 import android.os.Build
@@ -68,7 +74,7 @@ fun ChatScreen(
     navController: NavController,
     recipientId: String,
     authViewModel: AuthViewModel = hiltViewModel(),
-    appwriteViewModel: AppwriteViewModel = hiltViewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
     val authState by authViewModel.authState.collectAsState()
     val messages by appwriteViewModel.messages.collectAsState()
@@ -77,20 +83,22 @@ fun ChatScreen(
     // Get current user from auth state
     val currentUser = if (authState is AuthState.Authenticated) {
         (authState as AuthState.Authenticated).user
-    } else null
+    } else {
+        null
+    }
 
     // Get recipient user from users map
     val recipient = users[recipientId] ?: AuthUser(
         id = recipientId,
         name = "Unknown User",
         email = "",
-        avatar = ""
+        avatar = "",
     )
 
     // Filter messages between current user and recipient
     val chatMessages = messages.filter { message ->
         (message.senderId == recipientId && message.recipientId == currentUser?.id) ||
-                (message.senderId == currentUser?.id && message.recipientId == recipientId)
+            (message.senderId == currentUser?.id && message.recipientId == recipientId)
     }.sortedBy { it.timeSent }
 
     val listState = rememberLazyListState()
@@ -116,20 +124,20 @@ fun ChatScreen(
         topBar = {
             ChatTopBar(
                 navController = navController,
-                recipient = recipient
+                recipient = recipient,
             )
         },
         bottomBar = {
             MessageInputPill(
-                modifier = Modifier.padding(bottom = 15.dp)
+                modifier = Modifier.padding(bottom = 15.dp),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             if (chatMessages.isEmpty()) {
                 // Show empty state
@@ -138,20 +146,20 @@ fun ChatScreen(
                         .fillMaxSize()
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "No messages yet",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Send a message to start a conversation",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             } else {
@@ -162,7 +170,7 @@ fun ChatScreen(
                         .padding(horizontal = 16.dp),
                     state = listState,
                     contentPadding = PaddingValues(vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     itemsIndexed(chatMessages) { index, message ->
                         val isFromCurrentUser = message.senderId == currentUser?.id
@@ -173,7 +181,7 @@ fun ChatScreen(
                         val showAvatar = shouldShowAvatar(
                             currentMessage = message,
                             nextMessage = nextMessage,
-                            isFromCurrentUser = isFromCurrentUser
+                            isFromCurrentUser = isFromCurrentUser,
                         )
 
                         // Determine spacing logic
@@ -190,7 +198,7 @@ fun ChatScreen(
                                 isFromCurrentUser = isFromCurrentUser,
                                 sender = if (isFromCurrentUser) currentUser else recipient,
                                 showAvatar = showAvatar,
-                                isFirstInGroup = isNewSenderGroup
+                                isFirstInGroup = isNewSenderGroup,
                             )
                         }
                     }
@@ -204,7 +212,7 @@ fun ChatScreen(
 private fun shouldShowAvatar(
     currentMessage: Message,
     nextMessage: Message?,
-    isFromCurrentUser: Boolean
+    isFromCurrentUser: Boolean,
 ): Boolean {
     // Never show avatar for current user messages
     if (isFromCurrentUser) return false
@@ -219,7 +227,7 @@ private fun shouldShowAvatar(
 // Helper function to determine if this message starts a new sender group
 private fun isNewSenderGroup(
     currentMessage: Message,
-    previousMessage: Message?
+    previousMessage: Message?,
 ): Boolean {
     // First message is always a new group
     if (previousMessage == null) return true
@@ -232,14 +240,14 @@ private fun isNewSenderGroup(
 @Composable
 fun ChatTopBar(
     navController: NavController,
-    recipient: AuthUser
+    recipient: AuthUser,
 ) {
     TopAppBar(
         title = {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ){
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -248,7 +256,7 @@ fun ChatTopBar(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     ) {
                         AsyncImage(
                             model = recipient.avatar.ifEmpty {
@@ -256,7 +264,7 @@ fun ChatTopBar(
                             },
                             contentDescription = "User avatar",
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
                         )
                     }
 
@@ -266,14 +274,14 @@ fun ChatTopBar(
                         // Recipient name
                         Text(
                             text = takeFirstNameOfUser(recipient.name),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         // Online status (optional)
                         Text(
                             text = "Active now",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(top = 1.dp)
+                            modifier = Modifier.padding(top = 1.dp),
                         )
                     }
                 }
@@ -283,7 +291,7 @@ fun ChatTopBar(
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
         },
@@ -291,14 +299,14 @@ fun ChatTopBar(
             IconButton(onClick = { /* Show options */ }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = "More options"
+                    contentDescription = "More options",
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface
-        )
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+        ),
     )
 }
 
@@ -306,28 +314,28 @@ fun ChatTopBar(
 fun ChatInputBar(
     messageText: String,
     onMessageChange: (String) -> Unit,
-    onSendMessage: () -> Unit
+    onSendMessage: () -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
         shadowElevation = 4.dp,
-        color = MaterialTheme.colorScheme.surface
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Attachment button (placeholder)
             IconButton(
                 onClick = { /* Handle attachment */ },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.AttachFile,
                     contentDescription = "Attach file",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
 
@@ -346,15 +354,16 @@ fun ChatInputBar(
             IconButton(
                 onClick = onSendMessage,
                 enabled = messageText.isNotBlank(),
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send message",
-                    tint = if (messageText.isNotBlank())
+                    tint = if (messageText.isNotBlank()) {
                         MaterialTheme.colorScheme.primary
-                    else
+                    } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    },
                 )
             }
         }
@@ -368,24 +377,32 @@ fun MessageBubble(
     isFromCurrentUser: Boolean,
     sender: AuthUser?,
     showAvatar: Boolean = false,
-    isFirstInGroup: Boolean = false
+    isFirstInGroup: Boolean = false,
 ) {
-    val bubbleColor = if (isFromCurrentUser)
+    val bubbleColor = if (isFromCurrentUser) {
         MaterialTheme.colorScheme.primary
-    else
+    } else {
         MaterialTheme.colorScheme.secondaryContainer
+    }
 
-    val textColor = if (isFromCurrentUser)
+    val textColor = if (isFromCurrentUser) {
         MaterialTheme.colorScheme.onPrimary
-    else
+    } else {
         MaterialTheme.colorScheme.onSecondaryContainer
+    }
 
     // Dynamic bubble shape based on position in conversation
     val bubbleShape = RoundedCornerShape(
         topStart = if (!isFromCurrentUser && isFirstInGroup) 20.dp else 16.dp,
         topEnd = if (isFromCurrentUser && isFirstInGroup) 20.dp else 16.dp,
-        bottomStart = if (isFromCurrentUser) 16.dp else if (showAvatar) 20.dp else 6.dp,
-        bottomEnd = if (isFromCurrentUser) if (showAvatar) 20.dp else 6.dp else 16.dp
+        bottomStart = if (isFromCurrentUser) {
+            16.dp
+        } else if (showAvatar) {
+            20.dp
+        } else {
+            6.dp
+        },
+        bottomEnd = if (isFromCurrentUser) if (showAvatar) 20.dp else 6.dp else 16.dp,
     )
 
     val formattedTime = try {
@@ -398,7 +415,7 @@ fun MessageBubble(
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (isFromCurrentUser) Arrangement.End else Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.Bottom,
     ) {
         // Avatar space for non-user messages
         if (!isFromCurrentUser) {
@@ -408,7 +425,7 @@ fun MessageBubble(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 ) {
                     AsyncImage(
                         model = sender.avatar.ifEmpty {
@@ -416,7 +433,7 @@ fun MessageBubble(
                         },
                         contentDescription = "User avatar",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                 }
             } else {
@@ -427,7 +444,7 @@ fun MessageBubble(
         }
 
         Column(
-            horizontalAlignment = if (isFromCurrentUser) Alignment.End else Alignment.Start
+            horizontalAlignment = if (isFromCurrentUser) Alignment.End else Alignment.Start,
         ) {
             // Sender name for first message in group (only for non-current user)
             if (!isFromCurrentUser && isFirstInGroup && sender != null) {
@@ -437,8 +454,8 @@ fun MessageBubble(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(
                         start = if (!isFromCurrentUser) 12.dp else 0.dp,
-                        bottom = 4.dp
-                    )
+                        bottom = 4.dp,
+                    ),
                 )
             }
 
@@ -448,12 +465,12 @@ fun MessageBubble(
                     .widthIn(max = 280.dp)
                     .clip(bubbleShape)
                     .background(bubbleColor)
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
                 Text(
                     text = message.content,
                     color = textColor,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
@@ -464,8 +481,8 @@ fun MessageBubble(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.padding(
-                        top = 4.dp
-                    ).padding(horizontal = 16.dp)
+                        top = 4.dp,
+                    ).padding(horizontal = 16.dp),
                 )
             }
         }

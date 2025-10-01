@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.input
 
 import androidx.compose.foundation.background
@@ -34,7 +40,7 @@ fun InputCaptionPill(
     Box(
         modifier = Modifier
             .width(width)
-            .height(IntrinsicSize.Min) // optional: để chiều cao theo content
+            .height(IntrinsicSize.Min), // optional: để chiều cao theo content
     ) {
         // ✅ Layer 1: Background blur
         Box(
@@ -42,9 +48,9 @@ fun InputCaptionPill(
                 .matchParentSize()
                 .background(
                     color = Color(0x80F0F0F0),
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(50),
                 )
-                .blur(10.dp) // chỉ làm mờ nền
+                .blur(10.dp), // chỉ làm mờ nền
         )
 
         // ✅ Layer 2: Text input on top
@@ -56,33 +62,31 @@ fun InputCaptionPill(
             singleLine = true,
             textStyle = TextStyle(
                 color = Color.Black,
-                fontSize = 16.sp
+                fontSize = 16.sp,
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             decorationBox = { innerTextField ->
                 Box(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     if (text.isEmpty()) {
                         Text(
                             text = "Add a message...",
                             color = Color.White,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
                         )
                     }
                     innerTextField()
                 }
-            }
+            },
         )
     }
-
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1C1611)
 @Composable
-fun InputCaptionPillWithPreview(
-) {
+fun InputCaptionPillWithPreview() {
     InputCaptionPill(width = 250.dp)
 }

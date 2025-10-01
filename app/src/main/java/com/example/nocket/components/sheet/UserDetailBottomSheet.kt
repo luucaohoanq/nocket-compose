@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.sheet
 
 import androidx.compose.foundation.background
@@ -35,20 +41,20 @@ import com.example.nocket.models.User
 data class UserDetailBottomSheetData(
     val friends: List<User> = emptyList(),
     val isLoading: Boolean = false,
-    val onRemoveFriend: (User) -> Unit = {}
+    val onRemoveFriend: (User) -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailBottomSheet(
     data: UserDetailBottomSheetData?,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AnimatedBottomSheet(
         value = data,
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { 
+        dragHandle = {
             // Simple drag handle without excessive padding
             HorizontalDivider(
                 color = Color.White,
@@ -56,10 +62,10 @@ fun UserDetailBottomSheet(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .background(Color(0xFF121212))
-                    .width(40.dp)
+                    .width(40.dp),
             )
         },
-        containerColor = Color(0xFF121212)
+        containerColor = Color(0xFF121212),
     ) { sheetData ->
         Column(
             modifier = Modifier
@@ -69,9 +75,8 @@ fun UserDetailBottomSheet(
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 16.dp), // Add bottom padding for scroll end
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             TotalFriendComponent(sheetData.friends.size, modifier = Modifier.padding(top = 0.dp))
 
             ExternalAppComponent()
@@ -79,14 +84,13 @@ fun UserDetailBottomSheet(
             YourFriendAppComponent(
                 friends = sheetData.friends,
                 onRemoveFriend = sheetData.onRemoveFriend,
-                isLoading = sheetData.isLoading
+                isLoading = sheetData.isLoading,
             )
 
             ShareYourLinkComponent()
         }
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +103,7 @@ private fun DemoScreen() {
             sheetData = UserDetailBottomSheetData(
                 friends = emptyList(), // Add sample data if needed
                 isLoading = false,
-                onRemoveFriend = { /* Handle remove friend */ }
+                onRemoveFriend = { /* Handle remove friend */ },
             )
         }) {
             Text("Show User Detail Bottom Sheet")
@@ -108,6 +112,6 @@ private fun DemoScreen() {
 
     UserDetailBottomSheet(
         data = sheetData,
-        onDismiss = { sheetData = null }
+        onDismiss = { sheetData = null },
     )
 }

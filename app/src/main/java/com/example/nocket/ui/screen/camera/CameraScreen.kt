@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.camera
 
 import android.os.Build
@@ -50,7 +56,7 @@ import com.example.nocket.viewmodels.AppwriteViewModel
 @Composable
 fun CameraScreen(
     navController: NavController,
-    appwriteViewModel: AppwriteViewModel = hiltViewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var capturedPhotoPath by remember { mutableStateOf<String?>(null) }
@@ -60,8 +66,8 @@ fun CameraScreen(
             User(
                 id = "everyone",
                 username = "Everyone",
-                avatar = ""
-            )
+                avatar = "",
+            ),
         )
     }
     // Use the passed onCameraClick instead of navigating to CameraXScreen
@@ -76,21 +82,23 @@ fun CameraScreen(
                 navController = navController,
                 user = data, // Using user 14 as the current user
                 onMessageClick = { navController.navigate(Screen.Message.route) },
-                onProfileClick = { {
-                    data?.id?.let { userId ->
-                        navController.navigate("profile?userId=$userId")
-                    } ?: navController.navigate("profile")
-                } },
-                onUserSelected = { user -> selectedUser = user }
+                onProfileClick = {
+                    {
+                        data?.id?.let { userId ->
+                            navController.navigate("profile?userId=$userId")
+                        } ?: navController.navigate("profile")
+                    }
+                },
+                onUserSelected = { user -> selectedUser = user },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             // Show camera view or post image based on the localCameraMode state
 
@@ -98,8 +106,8 @@ fun CameraScreen(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.Transparent // removes gray background
-                )
+                    containerColor = Color.Transparent, // removes gray background
+                ),
             ) {
                 CameraPreviewWithZoom(
                     lifecycleOwner = lifecycleOwner,
@@ -110,31 +118,29 @@ fun CameraScreen(
                     showControls = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(50.dp))
+                        .clip(RoundedCornerShape(50.dp)),
                 )
             }
 
             MainBottomBar(
                 navController,
-                items = takePhotoBar
+                items = takePhotoBar,
             )
-
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-
                 IconButton(
                     onClick = { },
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(48.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = "Open Camera",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     )
                 }
 
@@ -142,32 +148,23 @@ fun CameraScreen(
                     text = "History",
                     color = Color.White,
                     fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
-
-
             }
-
 
             IconButton(
                 onClick = { },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.KeyboardArrowDown,
                     contentDescription = "Open Camera",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(32.dp),
                 )
             }
-
-
         }
-
-
     }
-
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -175,6 +172,6 @@ fun CameraScreen(
 @Composable
 fun CameraScreenPreview() {
     CameraScreen(
-        navController = rememberNavController()
+        navController = rememberNavController(),
     )
 }

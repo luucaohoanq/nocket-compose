@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.theme
 
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +36,7 @@ private val BrownDarkColorScheme = darkColorScheme(
     onSurfaceVariant = GrayOnSurfaceVariant,
 
     error = GrayError,
-    onError = GrayOnError
+    onError = GrayOnError,
 )
 
 @Composable
@@ -38,16 +44,15 @@ fun AppTheme(
     darkTheme: Boolean = true, // Force dark theme
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // Disable dynamic colors to use our brown theme
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     // Always use brown dark theme
     val colorScheme = BrownDarkColorScheme
 //    val systemUiController = rememberSystemUiController()
 
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

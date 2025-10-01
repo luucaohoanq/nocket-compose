@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.grid
 
 import android.os.Build
@@ -7,7 +13,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,12 +64,12 @@ fun PostGrid(
 //        contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         items(postsWithImages) { post ->
             PostGridItem(
                 post = post,
-                onClick = { onPostClick(post) }
+                onClick = { onPostClick(post) },
             )
         }
     }
@@ -73,12 +78,12 @@ fun PostGrid(
 @Composable
 fun PostGridItem(
     post: Post,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         AsyncImage(
             model = post.thumbnailUrl,
@@ -86,7 +91,7 @@ fun PostGridItem(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(20.dp)),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
         // Video indicator
@@ -116,7 +121,7 @@ fun PostGridItem(
 @Composable
 fun PostGridItemWithBadge(
     dayPostGroup: DayPostGroup,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     BadgedBox(
         badge = {
@@ -124,23 +129,23 @@ fun PostGridItemWithBadge(
                 Badge(
                     containerColor = Color(0xFFFFD700),
                     contentColor = Color.Black,
-                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp)
+                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp),
                 ) {
                     Text(
                         text = "${dayPostGroup.count}",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
-        }
+        },
     ) {
         Card(
             modifier = Modifier
                 .aspectRatio(1f)
                 .clickable { onClick() },
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         ) {
             Box {
                 // Main post image
@@ -148,7 +153,7 @@ fun PostGridItemWithBadge(
                     model = dayPostGroup.primaryPost?.thumbnailUrl,
                     contentDescription = "Post image",
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
 
                 // Blur overlay for multiple posts
@@ -160,10 +165,10 @@ fun PostGridItemWithBadge(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
                                         Color.Transparent,
-                                        Color.Black.copy(alpha = 0.3f)
-                                    )
-                                )
-                            )
+                                        Color.Black.copy(alpha = 0.3f),
+                                    ),
+                                ),
+                            ),
                     )
 
                     // Stack indicator
@@ -173,15 +178,15 @@ fun PostGridItemWithBadge(
                             .padding(4.dp)
                             .background(
                                 color = Color.Black.copy(alpha = 0.7f),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
                             )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
                     ) {
                         Text(
                             text = "+${dayPostGroup.count - 1}",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 }
@@ -192,7 +197,7 @@ fun PostGridItemWithBadge(
 
 @Composable
 fun CameraButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -200,25 +205,25 @@ fun CameraButton(
             .clickable { onClick() }
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
                 imageVector = Icons.Default.CameraAlt,
                 contentDescription = "Camera",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Camera",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -236,7 +241,7 @@ fun PostGridPreview() {
             user = sampleUser,
             postType = PostType.IMAGE,
             caption = "Sample post $index",
-            thumbnailUrl = SampleData.imageNotAvailable
+            thumbnailUrl = SampleData.IMAGE_NOT_AVAILABLE,
         )
     }
 

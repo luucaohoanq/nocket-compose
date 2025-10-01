@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.models
 
 import android.os.Build
@@ -14,21 +20,24 @@ data class Post(
     val thumbnailUrl: String = "https://picsum.photos/400/300?random=${(0..1000).random()}",
     val isArchived: Boolean = false,
     val createdAt: String = LocalDateTime.now().toString(),
-    // New fields for enhanced functionality
-    val visibility: String = Visibility.FRIEND.toString(), // "PUBLIC", "FRIEND", "PRIVATE"
-    val friendsOnly: Boolean = false, // Quick boolean check
-    val tags: List<String> = emptyList(), // Tags for categorization
-    val updatedAt: String? = null // Track modifications
+    // "PUBLIC", "FRIEND", "PRIVATE"
+    val visibility: String = Visibility.FRIEND.toString(),
+    // Quick boolean check
+    val friendsOnly: Boolean = false,
+    // Tags for categorization
+    val tags: List<String> = emptyList(),
+    // Track modifications
+    val updatedAt: String? = null,
 )
 
 enum class PostType {
     IMAGE,
     VIDEO,
-    TEXT
+    TEXT,
 }
 
 enum class Visibility {
     PUBLIC,
     FRIEND,
-    PRIVATE
+    PRIVATE,
 }

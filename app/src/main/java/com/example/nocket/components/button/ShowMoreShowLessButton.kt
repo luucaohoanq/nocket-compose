@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.button
 
 import androidx.compose.foundation.background
@@ -30,21 +36,21 @@ fun ShowMoreShowLessButton(
     totalCount: Int,
     visibleCount: Int,
     trailingIcon: Boolean = true,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         // line trái
         HorizontalDivider(
             color = Color.White.copy(alpha = 0.3f),
             modifier = Modifier
                 .weight(1f)
-                .height(1.dp)
+                .height(1.dp),
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -56,22 +62,24 @@ fun ShowMoreShowLessButton(
                 .clickable(onClick = onToggle)
                 .background(
                     color = Color.DarkGray,
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(50),
                 )
-                .padding(horizontal = 16.dp, vertical = 6.dp)
+                .padding(horizontal = 16.dp, vertical = 6.dp),
         ) {
             Text(
                 text = if (showAll) "Show less" else "Show more",
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(end = 4.dp)
+                modifier = Modifier.padding(end = 4.dp),
             )
 
-            if (trailingIcon) Icon(
-                imageVector = if (showAll) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = "Show more or less",
-                tint = Color.White
-            )
+            if (trailingIcon) {
+                Icon(
+                    imageVector = if (showAll) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = "Show more or less",
+                    tint = Color.White,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -81,7 +89,7 @@ fun ShowMoreShowLessButton(
             color = Color.White.copy(alpha = 0.3f),
             modifier = Modifier
                 .weight(1f)
-                .height(1.dp)
+                .height(1.dp),
         )
     }
 }

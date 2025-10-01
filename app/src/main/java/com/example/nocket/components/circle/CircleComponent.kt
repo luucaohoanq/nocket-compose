@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.circle
 
 import androidx.compose.foundation.background
@@ -30,7 +36,7 @@ import com.example.nocket.R
 data class IconSetting(
     val icon: ImageVector,
     val tint: Color = Color.White,
-    val contentDescription: String? = null
+    val contentDescription: String? = null,
 )
 
 sealed class ImageSource {
@@ -40,7 +46,7 @@ sealed class ImageSource {
 
 data class ImageSetting(
     val imageUrl: String? = "https://images.unsplash.com/photo-1710987812255-f8aaa57b96eb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    val contentDescription: String? = null
+    val contentDescription: String? = null,
 )
 
 @Composable
@@ -54,7 +60,7 @@ fun Circle(
     modifier: Modifier = Modifier,
     iconSetting: IconSetting? = null,
     imageSetting: ImageSetting? = null,
-    innerContent: (@Composable () -> Unit)? = null
+    innerContent: (@Composable () -> Unit)? = null,
 ) {
     // Assert: only 1 type of content allowed
     val contentCount = listOfNotNull(iconSetting, imageSetting, innerContent).size
@@ -69,15 +75,15 @@ fun Circle(
             .size(outerSize)
             .background(
                 color = backgroundColor,
-                shape = CircleShape
+                shape = CircleShape,
             )
             .border(
                 width = borderWidth,
                 color = borderColor,
-                shape = CircleShape
+                shape = CircleShape,
             )
             .clickable { onClick() },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         when {
             innerContent != null -> {
@@ -85,7 +91,7 @@ fun Circle(
                     modifier = Modifier
                         .size(innerSize.coerceAtLeast(0.dp))
                         .clip(CircleShape),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     innerContent()
                 }
@@ -96,7 +102,7 @@ fun Circle(
                     imageVector = iconSetting.icon,
                     contentDescription = iconSetting.contentDescription,
                     modifier = Modifier.size(innerSize.coerceAtLeast(0.dp)),
-                    tint = iconSetting.tint
+                    tint = iconSetting.tint,
                 )
             }
 
@@ -108,7 +114,7 @@ fun Circle(
                         .size(innerSize.coerceAtLeast(0.dp))
                         .fillMaxSize() // để ảnh lấp toàn bộ vùng chứa
                         .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
 
@@ -116,13 +122,12 @@ fun Circle(
                 Box(
                     modifier = Modifier
                         .size(innerSize.coerceAtLeast(0.dp))
-                        .background(color = Color.White, shape = CircleShape)
+                        .background(color = Color.White, shape = CircleShape),
                 )
             }
         }
     }
 }
-
 
 @Preview(showBackground = true, backgroundColor = 0xFF404137)
 @Composable
@@ -130,20 +135,20 @@ fun CirclePreview() {
     MaterialTheme {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Circle(
                 outerSize = 56.dp,
                 gap = 5.dp,
                 backgroundColor = Color(0xFF404137),
-                onClick = {}
+                onClick = {},
             )
 
             Circle(
                 outerSize = 40.dp,
                 gap = 4.dp,
                 backgroundColor = Color(0xFF404137),
-                onClick = {}
+                onClick = {},
             )
 
             Circle(
@@ -151,7 +156,7 @@ fun CirclePreview() {
                 gap = 6.dp,
                 backgroundColor = Color(0xFF404137),
                 borderColor = Color(0xFFB8B8B8),
-                onClick = {}
+                onClick = {},
             )
 
             Circle(
@@ -160,8 +165,8 @@ fun CirclePreview() {
                 backgroundColor = Color(0xFF404137),
                 onClick = {},
                 iconSetting = IconSetting(
-                    icon = Icons.AutoMirrored.Filled.Send
-                )
+                    icon = Icons.AutoMirrored.Filled.Send,
+                ),
             )
 
             Circle(
@@ -171,10 +176,9 @@ fun CirclePreview() {
                 backgroundColor = Color(0xFF404137),
                 onClick = {},
                 iconSetting = IconSetting(
-                    icon = Icons.AutoMirrored.Filled.Send
-                )
+                    icon = Icons.AutoMirrored.Filled.Send,
+                ),
             )
-
 
             Circle(
                 outerSize = 56.dp,
@@ -183,8 +187,8 @@ fun CirclePreview() {
                 onClick = {},
                 imageSetting = ImageSetting(
                     imageUrl = "https://images.unsplash.com/photo-1710988238169-12c5c2474652?q=80&w=1329&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    contentDescription = "Example Image"
-                )
+                    contentDescription = "Example Image",
+                ),
             )
 
             Circle(
@@ -198,7 +202,7 @@ fun CirclePreview() {
                         contentDescription = "Avatar",
                         contentScale = ContentScale.Crop,
                     )
-                }
+                },
             )
 
             Circle(
@@ -213,9 +217,8 @@ fun CirclePreview() {
                         contentDescription = "Avatar",
                         contentScale = ContentScale.Crop,
                     )
-                }
+                },
             )
-
 
             // Custom content: text or anything
             Circle(
@@ -225,7 +228,7 @@ fun CirclePreview() {
                 onClick = {},
                 innerContent = {
                     androidx.compose.material3.Text("A", color = Color.White)
-                }
+                },
             )
 
             Circle(
@@ -236,7 +239,7 @@ fun CirclePreview() {
                 onClick = {},
                 innerContent = {
                     androidx.compose.material3.Text("A", color = Color.White)
-                }
+                },
             )
         }
     }

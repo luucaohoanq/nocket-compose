@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.message
 
 import android.os.Build
@@ -59,7 +65,7 @@ import java.time.format.DateTimeFormatter
 fun MessageScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel = hiltViewModel(),
-    appWriteViewModel: AppwriteViewModel = hiltViewModel()
+    appWriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
     val authState by authViewModel.authState.collectAsState()
     val messages by appWriteViewModel.messages.collectAsState()
@@ -105,7 +111,7 @@ fun MessageScreen(
                     Log.d("MessageScreen", "Search icon clicked")
                 },
             )
-        }
+        },
     ) { paddingValues ->
         if (groupedConversations.isEmpty()) {
             // Empty state when no conversations are available
@@ -115,30 +121,30 @@ fun MessageScreen(
                     .padding(paddingValues)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "No messages",
                     modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = "No messages yet",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = "Your conversations will appear here",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 // Remove test conversation card since we're in production mode
@@ -150,7 +156,7 @@ fun MessageScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(groupedConversations) { message ->
                     MessageItem(
@@ -159,7 +165,7 @@ fun MessageScreen(
                         onClick = {
                             // Navigate to chat detail screen with this sender
                             navController.navigate("chat/${message.senderId}")
-                        }
+                        },
                     )
                 }
 
@@ -177,7 +183,7 @@ fun MessageScreen(
 fun MessageItem(
     message: Message,
     sender: AuthUser? = null,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     val senderName = sender?.name ?: "Unknown User"
     val senderAvatar = sender?.avatar ?: ""
@@ -187,25 +193,25 @@ fun MessageItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(12.dp),
-        onClick = onClick
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Profile picture with online indicator
             Box {
                 Circle(
                     imageSetting = ImageSetting(
-                        imageUrl = senderAvatar.ifEmpty { SampleData.imageNotAvailable },
-                        contentDescription = "Profile picture"
+                        imageUrl = senderAvatar.ifEmpty { SampleData.IMAGE_NOT_AVAILABLE },
+                        contentDescription = "Profile picture",
                     ),
                     gap = 0.dp,
                     outerSize = 50.dp,
                     backgroundColor = Color(0xFF404137),
-                    onClick = onClick
+                    onClick = onClick,
                 )
             }
 
@@ -213,26 +219,26 @@ fun MessageItem(
 
             // Message content
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 // Sender name and time
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = senderName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Text(
                         text = formatTime(message.timeSent),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -244,7 +250,7 @@ fun MessageItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -254,44 +260,42 @@ fun MessageItem(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = "Open conversation",
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.onBackground,
             )
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatTime(timeString: String): String {
-    return try {
-        val time = if (timeString.contains("T")) {
-            LocalDateTime.parse(timeString)
-        } else {
-            // Handle ISO-8601 format without T separator
-            val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            LocalDateTime.parse(timeString, formatter)
-        }
-        
-        val now = LocalDateTime.now()
-
-        when {
-            time.toLocalDate() == now.toLocalDate() -> {
-                time.format(DateTimeFormatter.ofPattern("HH:mm"))
-            }
-
-            time.toLocalDate() == now.toLocalDate().minusDays(1) -> {
-                "Yesterday"
-            }
-
-            time.year == now.year -> {
-                time.format(DateTimeFormatter.ofPattern("MMM d"))
-            }
-
-            else -> {
-                time.format(DateTimeFormatter.ofPattern("yyyy MMM d"))
-            }
-        }
-    } catch (e: Exception) {
-        // If we can't parse the time string, just return "Now"
-        "Now"
+fun formatTime(timeString: String): String = try {
+    val time = if (timeString.contains("T")) {
+        LocalDateTime.parse(timeString)
+    } else {
+        // Handle ISO-8601 format without T separator
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        LocalDateTime.parse(timeString, formatter)
     }
+
+    val now = LocalDateTime.now()
+
+    when {
+        time.toLocalDate() == now.toLocalDate() -> {
+            time.format(DateTimeFormatter.ofPattern("HH:mm"))
+        }
+
+        time.toLocalDate() == now.toLocalDate().minusDays(1) -> {
+            "Yesterday"
+        }
+
+        time.year == now.year -> {
+            time.format(DateTimeFormatter.ofPattern("MMM d"))
+        }
+
+        else -> {
+            time.format(DateTimeFormatter.ofPattern("yyyy MMM d"))
+        }
+    }
+} catch (e: Exception) {
+    // If we can't parse the time string, just return "Now"
+    "Now"
 }

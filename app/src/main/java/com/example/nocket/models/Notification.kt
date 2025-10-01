@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.models
 
 import androidx.compose.material.icons.Icons
@@ -16,24 +22,27 @@ data class Notification(
     val icon: ImageVector,
     val iconColor: Color,
     val userId: String = "",
-){
+) {
     companion object {
-        fun fromMap(data: Map<String, Any>): Notification {
-            return Notification(
-                id = data["\$id"] as String,
-                type = data["type"] as NotificationType,
-                title = data["title"] as? String ?: "",
-                description = data["description"] as? String ?: "",
-                time = data["createdAt"] as? String ?: "",
-                isRead = data["isRead"] as? Boolean ?: false,
-                icon = Icons.Default.Favorite,
-                iconColor = Color(0xFFE91E63),
-                userId = data["userId"] as? String ?: "",
-            )
-        }
+        fun fromMap(data: Map<String, Any>): Notification = Notification(
+            id = data["\$id"] as String,
+            type = data["type"] as NotificationType,
+            title = data["title"] as? String ?: "",
+            description = data["description"] as? String ?: "",
+            time = data["createdAt"] as? String ?: "",
+            isRead = data["isRead"] as? Boolean ?: false,
+            icon = Icons.Default.Favorite,
+            iconColor = Color(0xFFE91E63),
+            userId = data["userId"] as? String ?: "",
+        )
     }
 }
 
 enum class NotificationType {
-    LIKE, COMMENT, FOLLOW, MESSAGE, FRIEND_REQUEST, SYSTEM_ALERT
+    LIKE,
+    COMMENT,
+    FOLLOW,
+    MESSAGE,
+    FRIEND_REQUEST,
+    SYSTEM_ALERT,
 }

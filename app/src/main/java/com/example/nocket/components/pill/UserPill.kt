@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.pill
 
 import androidx.compose.foundation.border
@@ -34,7 +40,9 @@ import com.example.nocket.data.SampleData
 import com.example.nocket.models.User
 
 enum class TextAlign {
-    LEFT, RIGHT, CENTER
+    LEFT,
+    RIGHT,
+    CENTER,
 }
 
 data class UserPillConfig(
@@ -46,10 +54,10 @@ data class UserPillConfig(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Navigate",
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
     },
-    val borderColor: Color? = null
+    val borderColor: Color? = null,
 )
 
 @Composable
@@ -57,25 +65,26 @@ fun UserPill(
     user: User? = null,
     isEveryoneOption: Boolean = false,
     config: UserPillConfig = UserPillConfig(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .padding(vertical = 4.dp, horizontal = 8.dp),
     ) {
         // Avatar
         AsyncImage(
-            model = if (isEveryoneOption)
+            model = if (isEveryoneOption) {
                 "https://www.shutterstock.com/image-vector/everyone-welcome-here-hand-lettering-600w-2255939479.jpg"
-            else
-                user?.avatar,
+            } else {
+                user?.avatar
+            },
             contentDescription = "Profile picture",
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -88,11 +97,11 @@ fun UserPill(
                 .border(
                     width = 1.dp,
                     color = config.borderColor ?: MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(50),
                 )
                 .clip(RoundedCornerShape(50))
                 .padding(horizontal = 16.dp, vertical = 6.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = if (isEveryoneOption) "Everyone" else user?.username ?: "",
@@ -105,7 +114,7 @@ fun UserPill(
                 },
                 modifier = Modifier.align(Alignment.Center),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -118,13 +127,12 @@ fun UserPill(
     }
 }
 
-
 // Convenience composables using the main UserPill with different configurations
 @Composable
 fun UserPillWithIcon(
     user: User? = null,
     isEveryoneOption: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserPill(
         user = user,
@@ -135,11 +143,11 @@ fun UserPillWithIcon(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Message,
                     contentDescription = "Message",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
-            }
+            },
         ),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -147,13 +155,13 @@ fun UserPillWithIcon(
 fun UserPillWithArrow(
     user: User? = null,
     isEveryoneOption: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserPill(
         user = user,
         isEveryoneOption = isEveryoneOption,
         config = UserPillConfig(), // Uses default arrow
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -161,13 +169,13 @@ fun UserPillWithArrow(
 fun UserPillNoTrailing(
     user: User? = null,
     isEveryoneOption: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserPill(
         user = user,
         isEveryoneOption = isEveryoneOption,
         config = UserPillConfig(showTrailingContent = false),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -176,20 +184,20 @@ fun UserList(
     users: List<User>,
     showEveryone: Boolean = false,
     config: UserPillConfig = UserPillConfig(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         if (showEveryone) {
             UserPill(
                 isEveryoneOption = true,
-                config = config
+                config = config,
             )
         }
 
         users.forEach { user ->
             UserPill(
                 user = user,
-                config = config
+                config = config,
             )
         }
     }
@@ -200,13 +208,13 @@ fun UserList(
 fun UserListWithArrows(
     users: List<User>,
     showEveryone: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserList(
         users = users,
         showEveryone = showEveryone,
         config = UserPillConfig(), // Default arrow configuration
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -214,7 +222,7 @@ fun UserListWithArrows(
 fun UserListWithIcons(
     users: List<User>,
     showEveryone: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserList(
         users = users,
@@ -224,11 +232,11 @@ fun UserListWithIcons(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Message,
                     contentDescription = "Message",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
-            }
+            },
         ),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -236,13 +244,13 @@ fun UserListWithIcons(
 fun UserListNoTrailing(
     users: List<User>,
     showEveryone: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     UserList(
         users = users,
         showEveryone = showEveryone,
         config = UserPillConfig(showTrailingContent = false),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

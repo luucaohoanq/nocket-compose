@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.post
 
 import android.os.Build
@@ -43,13 +49,13 @@ import com.example.nocket.viewmodels.AuthViewModel
 fun PostScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel = hiltViewModel(),
-    appwriteViewModel: AppwriteViewModel = hiltViewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
     val authState by authViewModel.authState.collectAsState()
     val posts by appwriteViewModel.posts.collectAsState()
     val userPosts by appwriteViewModel.userPosts.collectAsState() // For specific user posts
     val friends by appwriteViewModel.friends.collectAsState()
-    
+
     // Use ViewModel loading states instead of local loading state
     val postsLoading by appwriteViewModel.postsLoading.collectAsState()
     val userPostsLoading by appwriteViewModel.userPostsLoading.collectAsState()
@@ -64,8 +70,8 @@ fun PostScreen(
                 id = "everyone",
                 username = "Everyone",
                 email = "",
-                avatar = ""
-            )
+                avatar = "",
+            ),
         )
     }
 
@@ -94,7 +100,7 @@ fun PostScreen(
                 post = selectedPost!!,
                 onBack = { selectedPost = null },
                 navController = navController,
-                friends = friends
+                friends = friends,
             )
         }
 
@@ -118,7 +124,7 @@ fun PostScreen(
                         // Show empty state
                         Column(
                             modifier = Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = when (selectedUser?.id) {
@@ -128,7 +134,7 @@ fun PostScreen(
                                 },
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(16.dp),
                             )
                             if (selectedUser?.id == "you") {
                                 Text(
@@ -136,7 +142,7 @@ fun PostScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp),
                                 )
                             }
                         }
@@ -145,11 +151,10 @@ fun PostScreen(
                         PostGrid(
                             posts = displayPosts,
                             onPostClick = { post -> selectedPost = post },
-                            modifier = Modifier.padding(top = (50 + 80).dp)
+                            modifier = Modifier.padding(top = (50 + 80).dp),
                         )
                     }
                 }
-
 
                 MainTopBar(
                     navController = navController,
@@ -191,7 +196,7 @@ fun PostScreen(
                     modifier = Modifier.align(Alignment.TopCenter).onGloballyPositioned { coordinates ->
                         // Get the width of the title in pixels
                         topbarHeight = coordinates.size.height
-                    }
+                    },
                 )
 
                 MainBottomBar(

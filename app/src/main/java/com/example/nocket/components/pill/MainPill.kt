@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.pill
 
 import androidx.compose.foundation.background
@@ -31,18 +37,17 @@ import com.example.nocket.components.topbar.avatarWidth
 import com.example.nocket.ui.theme.BackgroundPreview
 import com.example.nocket.utils.trimUsername
 
-
 @Composable
 fun PillIcon(
     modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit
+    icon: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
             .size(avatarWidth)
             .clip(RoundedCornerShape(50))
             .background(Color(0xFF404137)),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         icon()
     }
@@ -56,7 +61,6 @@ fun Pill(
     gap: Dp = 8.dp,
     modifier: Modifier = Modifier,
 ) {
-
     var width: Int = 100
 
     Box(
@@ -65,11 +69,11 @@ fun Pill(
             .wrapContentWidth()
             .background(
                 color = BackgroundPreview,
-                shape = RoundedCornerShape(50)
+                shape = RoundedCornerShape(50),
             )
             .clip(RoundedCornerShape(50))
             .padding(horizontal = 12.dp, vertical = 6.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -79,9 +83,8 @@ fun Pill(
                 .onGloballyPositioned { coordinates ->
                     // Get the width of the title in pixels
                     width = coordinates.size.width
-                }
+                },
         ) {
-
             if (startIcon != null) {
                 startIcon()
             }
@@ -90,7 +93,7 @@ fun Pill(
                 text = trimUsername(data.toString()) ?: "Everyone",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
 
             if (endIcon != null) {
@@ -103,7 +106,6 @@ fun Pill(
 @Preview(showBackground = true)
 @Composable
 fun PillPreview() {
-
     Scaffold(
         modifier = Modifier.padding(16.dp),
 
@@ -113,15 +115,14 @@ fun PillPreview() {
             modifier = Modifier
                 .padding(paddingValues)
                 .background(Color(0xFF1A1A1A)) // Dark background for the column
-                .padding(16.dp)
-        )
-        {
+                .padding(16.dp),
+        ) {
             Pill(data = "Sample Data", endIcon = {
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,
                     contentDescription = "Dropdown",
                     tint = Color.White,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             })
 
@@ -130,7 +131,7 @@ fun PillPreview() {
                     imageVector = Icons.Filled.ExpandMore,
                     contentDescription = "Dropdown",
                     tint = Color.White,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             }, data = "Sample Data")
 
@@ -143,5 +144,4 @@ fun PillPreview() {
             }, data = "45 Friends")
         }
     }
-
 }

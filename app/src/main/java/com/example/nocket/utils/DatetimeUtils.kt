@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.utils
 
 import android.os.Build
@@ -11,18 +17,16 @@ import java.time.LocalDate
 
 fun calculateDaysOfMonthInYear(
     month: Month,
-    year: Int
-): Int {
-    return when (month) {
-        Month.JANUARY, Month.MARCH, Month.MAY, Month.JULY, Month.AUGUST, Month.OCTOBER, Month.DECEMBER -> 31
-        Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER -> 30
-        Month.FEBRUARY -> if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) 29 else 28
-    }
+    year: Int,
+): Int = when (month) {
+    Month.JANUARY, Month.MARCH, Month.MAY, Month.JULY, Month.AUGUST, Month.OCTOBER, Month.DECEMBER -> 31
+    Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER -> 30
+    Month.FEBRUARY -> if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) 29 else 28
 }
 
 // Helper function to group posts by month and year
-//@RequiresApi(Build.VERSION_CODES.O)
-//fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
+// @RequiresApi(Build.VERSION_CODES.O)
+// fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
 //    val currentDate = LocalDate.now()
 //
 //    // Create a more realistic distribution that demonstrates badge functionality
@@ -39,7 +43,7 @@ fun calculateDaysOfMonthInYear(
 //            posts = posts.take(2) // Some posts in July
 //        )
 //    ).filter { it.posts.isNotEmpty() }
-//}
+// }
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
@@ -63,7 +67,7 @@ fun groupPostsByMonthYear(posts: List<Post>): List<MonthPosts> {
         MonthPosts(
             month = month,
             year = year,
-            posts = postsInMonth
+            posts = postsInMonth,
         )
     }.sortedByDescending { monthPost ->
         // Sort by year and month (newest first)
@@ -89,13 +93,14 @@ fun groupPostsByDay(posts: List<Post>, daysInMonth: Int): Map<Int, DayPostGroup>
     return postsByDay.mapValues { (dayNumber, postsOnDay) ->
         DayPostGroup(
             dayNumber = dayNumber,
-            posts = postsOnDay
+            posts = postsOnDay,
         )
     }
 }
 
 enum class StartDateStyle {
-    MONDAY, SUNDAY
+    MONDAY,
+    SUNDAY,
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

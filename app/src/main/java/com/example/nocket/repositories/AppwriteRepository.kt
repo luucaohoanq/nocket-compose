@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.repositories
 
 import android.os.Build
@@ -17,7 +23,6 @@ import com.example.nocket.models.SettingType
 import com.example.nocket.models.User
 import com.example.nocket.models.Visibility
 import com.example.nocket.models.appwrite.Log
-
 import com.example.nocket.models.auth.AuthUser
 import com.example.nocket.utils.mapToResponse
 import io.appwrite.Client
@@ -28,14 +33,14 @@ import io.appwrite.models.DocumentList
 import io.appwrite.services.Account
 import io.appwrite.services.Databases
 import io.appwrite.services.Functions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 /**
  * [AppwriteRepository] is responsible for handling network interactions with the Appwrite server.
@@ -50,9 +55,9 @@ class AppwriteRepository @Inject constructor(
     private val client: Client,
     private val account: Account,
     private val databases: Databases,
-    private val functions: Functions
+    private val functions: Functions,
 ) {
-    
+
     // Cache for user data to prevent duplicate API calls
     private val userCache = mutableMapOf<String, AuthUser>()
     private var currentUserCache: AuthUser? = null
@@ -60,34 +65,34 @@ class AppwriteRepository @Inject constructor(
     suspend fun getCurrentUser(): AuthUser? {
         // Return cached current user if available
         currentUserCache?.let { return it }
-        
+
         return try {
             val user = account.get()
             val authUser = AuthUser(
                 id = user.id,
                 email = user.email,
                 name = user.name,
-                avatar = (user.prefs.data["avatarUrl"] ?: "") as String
+                avatar = (user.prefs.data["avatarUrl"] ?: "") as String,
             )
-            
+
             // Cache the current user
             currentUserCache = authUser
             userCache[authUser.id] = authUser
-            
+
             authUser
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}")
-             null
+            null
         }
     }
 
     suspend fun getUserByIdCustom(userId: String): AuthUser? {
         // Check cache first
-        userCache[userId]?.let { 
+        userCache[userId]?.let {
             android.util.Log.d("AppwriteRepository", "Returning cached user for ID: $userId")
-            return it 
+            return it
         }
-        
+
         // First check if it's the current user
         val currentUser = getCurrentUser()
         if (currentUser?.id == userId) {
@@ -109,11 +114,11 @@ class AppwriteRepository @Inject constructor(
     // using Appwrite Functions to get user info by ID
     suspend fun getUserById(userId: String): AuthUser? {
         // Check cache first (but not current user cache since that's handled in getUserByIdCustom)
-        userCache[userId]?.let { 
+        userCache[userId]?.let {
             android.util.Log.d("AppwriteRepository", "Returning cached user from getUserById for ID: $userId")
-            return it 
+            return it
         }
-        
+
         val functionId = FunctionsConfig.GET_USERS_FUNCTION_ID
 
         return try {
@@ -121,7 +126,7 @@ class AppwriteRepository @Inject constructor(
             val execution = functions.createExecution(
                 functionId = functionId,
                 path = "?userId=$userId",
-                method = ExecutionMethod.GET
+                method = ExecutionMethod.GET,
             )
 
             // Parse the response string
@@ -133,12 +138,12 @@ class AppwriteRepository @Inject constructor(
                 id = json.getString("id"),
                 email = json.optString("email"),
                 name = json.optString("name"),
-                avatar = json.optString("avatarUrl")
+                avatar = json.optString("avatarUrl"),
             )
-            
+
             // Cache the result
             userCache[userId] = authUser
-            
+
             authUser
         } catch (e: Exception) {
             android.util.Log.e("AppwriteRepository", "Error fetching user: ${e.message}", e)
@@ -153,13 +158,13 @@ class AppwriteRepository @Inject constructor(
             collectionId = DBConfig.MESSAGES_COLLECTION_ID,
             queries = listOf(
                 Query.equal("recipientId", userId),
-                Query.limit(50)
-            )
+                Query.limit(50),
+            ),
         )
 
         android.util.Log.d(
             "AppwriteRepository",
-            "Fetched messages: ${res.documents} documents"
+            "Fetched messages: ${res.documents} documents",
         )
 
         return mapToResponse(res, Message::fromMap)
@@ -172,13 +177,13 @@ class AppwriteRepository @Inject constructor(
             collectionId = DBConfig.MESSAGES_COLLECTION_ID,
             queries = listOf(
                 Query.equal("userId", userId),
-                Query.limit(50)
-            )
+                Query.limit(50),
+            ),
         )
 
         android.util.Log.d(
             "AppwriteRepository",
-            "Fetched messages: ${res.documents.size} documents"
+            "Fetched messages: ${res.documents.size} documents",
         )
 
         return mapToResponse(res, Message::fromMap)
@@ -197,20 +202,20 @@ class AppwriteRepository @Inject constructor(
                 queries = listOf(
                     Query.contains("combinedUserIds", user.id),
                     Query.equal("status", "ACCEPTED"),
-                    Query.limit(100)
-                )
+                    Query.limit(100),
+                ),
             )
-            
+
             // Extract friend IDs from friendships
             val friendIds = friendships.documents.mapNotNull { doc ->
                 val combinedIds = doc.data["combinedUserIds"] as? List<String>
                 combinedIds?.find { it != user.id } // Get the other user ID
             }
-            
+
             android.util.Log.d("AppwriteRepository", "Fetched ${friendIds.size} friend IDs for user ${user.id}")
-            
+
             // Step 2: Fetch posts with optimized queries using new visibility fields
-            
+
             // Get user's own posts (all visibility levels)
             val userPosts = databases.listDocuments(
                 databaseId = DBConfig.DATABASE_ID,
@@ -219,45 +224,51 @@ class AppwriteRepository @Inject constructor(
                     Query.equal("userId", user.id),
                     Query.equal("isArchived", false),
                     Query.orderDesc("\$createdAt"),
-                    Query.limit(25)
-                )
+                    Query.limit(25),
+                ),
             )
-            
+
             // Get friends' posts (only public and friends-only posts)
             val friendsPosts = if (friendIds.isNotEmpty()) {
                 databases.listDocuments(
                     databaseId = DBConfig.DATABASE_ID,
                     collectionId = DBConfig.POSTS_COLLECTION_ID,
                     queries = listOf(
-                        Query.or(friendIds.map { friendId ->
-                            Query.equal("userId", friendId)
-                        }),
+                        Query.or(
+                            friendIds.map { friendId ->
+                                Query.equal("userId", friendId)
+                            },
+                        ),
                         Query.equal("isArchived", false),
-                        Query.or(listOf(
-                            Query.equal("visibility", "PUBLIC"),
-                            Query.equal("visibility", "FRIEND")
-                        )),
+                        Query.or(
+                            listOf(
+                                Query.equal("visibility", "PUBLIC"),
+                                Query.equal("visibility", "FRIEND"),
+                            ),
+                        ),
                         Query.orderDesc("\$createdAt"),
-                        Query.limit(25)
-                    )
+                        Query.limit(25),
+                    ),
                 )
-            } else null
-            
+            } else {
+                null
+            }
+
             // Combine all posts
             val combinedPosts = (userPosts.documents + (friendsPosts?.documents ?: emptyList()))
                 .sortedByDescending { it.data["\$createdAt"] as String }
                 .take(50) // Limit total results
-            
+
             android.util.Log.d("AppwriteRepository", "Fetched ${combinedPosts.size} total posts (${userPosts.documents.size} user + ${friendsPosts?.documents?.size ?: 0} friends)")
-            
+
             // Extract all unique user IDs from posts
             val postUserIds = combinedPosts.map { doc ->
                 doc.data["userId"] as String
             }.distinct()
-            
+
             // Batch fetch all users
             val usersMap = getUsersByIds(postUserIds)
-            
+
             // Convert documents to Post objects with new fields
             return combinedPosts.mapNotNull { doc ->
                 try {
@@ -276,7 +287,7 @@ class AppwriteRepository @Inject constructor(
                         visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
-                        updatedAt = doc.data["updatedAt"] as? String
+                        updatedAt = doc.data["updatedAt"] as? String,
                     )
                 } catch (e: Exception) {
                     android.util.Log.e("AppwriteRepository", "Error mapping post document: ${e.message}")
@@ -293,45 +304,51 @@ class AppwriteRepository @Inject constructor(
     suspend fun getPostsForUser(userId: String, viewerId: String? = null): List<Post> {
         try {
             val queries = mutableListOf<String>()
-            
+
             // Base queries
-            queries.addAll(listOf(
-                Query.equal("userId", userId),
-                Query.equal("isArchived", false),
-                Query.orderDesc("\$createdAt")
-            ))
-            
+            queries.addAll(
+                listOf(
+                    Query.equal("userId", userId),
+                    Query.equal("isArchived", false),
+                    Query.orderDesc("\$createdAt"),
+                ),
+            )
+
             // Add visibility filter if viewer is not the post owner
             if (viewerId != null && viewerId != userId) {
                 // Check if viewer is a friend
                 val areFriends = checkIfUsersAreFriends(viewerId, userId)
-                
+
                 if (areFriends) {
                     // Friends can see public and friends-only posts
-                    queries.add(Query.or(listOf(
-                        Query.equal("visibility", "PUBLIC"),
-                        Query.equal("visibility", "FRIEND")
-                    )))
+                    queries.add(
+                        Query.or(
+                            listOf(
+                                Query.equal("visibility", "PUBLIC"),
+                                Query.equal("visibility", "FRIEND"),
+                            ),
+                        ),
+                    )
                 } else {
                     // Non-friends can only see public posts
                     queries.add(Query.equal("visibility", "PUBLIC"))
                 }
             }
             // If no viewerId or viewer is the owner, show all posts (no visibility filter)
-            
+
             queries.add(Query.limit(50))
-            
+
             val posts = databases.listDocuments(
                 databaseId = DBConfig.DATABASE_ID,
                 collectionId = DBConfig.POSTS_COLLECTION_ID,
-                queries = queries
+                queries = queries,
             )
 
             // Extract all unique user IDs from posts
             val postUserIds = posts.documents.map { doc ->
                 doc.data["userId"] as String
             }.distinct()
-            
+
             // Batch fetch all users
             val usersMap = getUsersByIds(postUserIds)
 
@@ -352,7 +369,7 @@ class AppwriteRepository @Inject constructor(
                         visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
-                        updatedAt = doc.data["updatedAt"] as? String
+                        updatedAt = doc.data["updatedAt"] as? String,
                     )
                 } catch (e: Exception) {
                     android.util.Log.e("AppwriteRepository", "Error mapping post: ${e.message}")
@@ -368,26 +385,26 @@ class AppwriteRepository @Inject constructor(
     /**
      * Check if two users are friends (optimized with combinedUserIds)
      */
-    suspend fun checkIfUsersAreFriends(userId1: String, userId2: String): Boolean {
-        return try {
-            val friendship = databases.listDocuments(
-                databaseId = DBConfig.DATABASE_ID,
-                collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
-                queries = listOf(
-                    Query.and(listOf(
+    suspend fun checkIfUsersAreFriends(userId1: String, userId2: String): Boolean = try {
+        val friendship = databases.listDocuments(
+            databaseId = DBConfig.DATABASE_ID,
+            collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
+            queries = listOf(
+                Query.and(
+                    listOf(
                         Query.contains("combinedUserIds", userId1),
-                        Query.contains("combinedUserIds", userId2)
-                    )),
-                    Query.equal("status", "ACCEPTED"),
-                    Query.limit(1)
-                )
-            )
-            
-            friendship.documents.isNotEmpty()
-        } catch (e: Exception) {
-            android.util.Log.e("AppwriteRepository", "Error checking friendship: ${e.message}")
-            false
-        }
+                        Query.contains("combinedUserIds", userId2),
+                    ),
+                ),
+                Query.equal("status", "ACCEPTED"),
+                Query.limit(1),
+            ),
+        )
+
+        friendship.documents.isNotEmpty()
+    } catch (e: Exception) {
+        android.util.Log.e("AppwriteRepository", "Error checking friendship: ${e.message}")
+        false
     }
 
     /**
@@ -397,35 +414,41 @@ class AppwriteRepository @Inject constructor(
     suspend fun getPostsByTags(tags: List<String>, viewerId: String?, limit: Int = 50): List<Post> {
         try {
             val queries = mutableListOf<String>()
-            
+
             // Add tag filters
             if (tags.isNotEmpty()) {
-                queries.add(Query.or(tags.map { tag ->
-                    Query.contains("tags", tag)
-                }))
+                queries.add(
+                    Query.or(
+                        tags.map { tag ->
+                            Query.contains("tags", tag)
+                        },
+                    ),
+                )
             }
-            
+
             // Base filters
-            queries.addAll(listOf(
-                Query.equal("isArchived", false),
-                Query.equal("visibility", Visibility.PUBLIC.toString()), // Only public posts for tag searches
-                Query.orderDesc("\$createdAt"),
-                Query.limit(limit)
-            ))
-            
+            queries.addAll(
+                listOf(
+                    Query.equal("isArchived", false),
+                    Query.equal("visibility", Visibility.PUBLIC.toString()), // Only public posts for tag searches
+                    Query.orderDesc("\$createdAt"),
+                    Query.limit(limit),
+                ),
+            )
+
             val posts = databases.listDocuments(
                 databaseId = DBConfig.DATABASE_ID,
                 collectionId = DBConfig.POSTS_COLLECTION_ID,
-                queries = queries
+                queries = queries,
             )
-            
+
             // Extract and batch fetch users
             val postUserIds = posts.documents.map { doc ->
                 doc.data["userId"] as String
             }.distinct()
-            
+
             val usersMap = getUsersByIds(postUserIds)
-            
+
             return posts.documents.mapNotNull { doc ->
                 try {
                     val userId = doc.data["userId"] as String
@@ -442,7 +465,7 @@ class AppwriteRepository @Inject constructor(
                         visibility = doc.data["visibility"] as? String ?: "PUBLIC",
                         friendsOnly = (doc.data["friendsOnly"] as? Boolean) ?: false,
                         tags = (doc.data["tags"] as? List<String>) ?: emptyList(),
-                        updatedAt = doc.data["updatedAt"] as? String
+                        updatedAt = doc.data["updatedAt"] as? String,
                     )
                 } catch (e: Exception) {
                     android.util.Log.e("AppwriteRepository", "Error mapping tagged post: ${e.message}")
@@ -461,7 +484,7 @@ class AppwriteRepository @Inject constructor(
     suspend fun getFriendsOfUser(user: AuthUser): List<User> {
         return try {
             android.util.Log.d("AppwriteRepository", "Fetching friends for user: ${user.id}")
-            
+
             val friendships = databases.listDocuments(
                 databaseId = DBConfig.DATABASE_ID,
                 collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
@@ -469,34 +492,34 @@ class AppwriteRepository @Inject constructor(
                     Query.contains("combinedUserIds", user.id),
                     Query.equal("status", "ACCEPTED"),
                     Query.orderDesc("\$createdAt"), // Show newest friendships first
-                    Query.limit(100)
-                )
+                    Query.limit(100),
+                ),
             )
-            
+
             android.util.Log.d("AppwriteRepository", "Found ${friendships.documents.size} friendship documents for user ${user.id}")
-            
+
             // Extract friend IDs using the new combinedUserIds field
             val friendIds = friendships.documents.mapNotNull { doc ->
                 val combinedIds = doc.data["combinedUserIds"] as? List<String>
                 android.util.Log.d("AppwriteRepository", "Friendship document combinedUserIds: $combinedIds")
                 combinedIds?.find { it != user.id } // Get the other user ID
             }
-            
+
             android.util.Log.d("AppwriteRepository", "Extracted ${friendIds.size} friend IDs for user ${user.id}: $friendIds")
-            
+
             if (friendIds.isEmpty()) {
                 android.util.Log.d("AppwriteRepository", "No friend IDs found, returning empty list")
                 return emptyList()
             }
-            
+
             // Batch fetch all friends
             val friendsMap = getUsersByIds(friendIds)
             android.util.Log.d("AppwriteRepository", "Fetched ${friendsMap.size} friend details from getUsersByIds")
-            
+
             val friendsList = friendsMap.values.map { authUser ->
                 User.mapToUser(authUser)
             }
-            
+
             android.util.Log.d("AppwriteRepository", "Returning ${friendsList.size} friends: ${friendsList.map { it.username }}")
             return friendsList
         } catch (e: Exception) {
@@ -511,13 +534,13 @@ class AppwriteRepository @Inject constructor(
             collectionId = DBConfig.NOTIFICATIONS_COLLECTION_ID,
             queries = listOf(
                 Query.equal("userId", user.id),
-                Query.limit(50)
-            )
+                Query.limit(50),
+            ),
         )
 
         android.util.Log.d(
             "AppwriteRepository",
-            "Fetched notifications: ${res.documents.size} documents"
+            "Fetched notifications: ${res.documents.size} documents",
         )
 
         return mapToResponse(res, Notification::fromMap)
@@ -525,14 +548,14 @@ class AppwriteRepository @Inject constructor(
 
     suspend fun setReadNotification(notificationId: String): Notification {
         val updatedData = mapOf(
-            "isRead" to true
+            "isRead" to true,
         )
 
         val updatedDocument = databases.updateDocument(
             databaseId = DBConfig.DATABASE_ID,
             collectionId = DBConfig.NOTIFICATIONS_COLLECTION_ID,
             documentId = notificationId,
-            data = updatedData
+            data = updatedData,
         )
 
         return Notification(
@@ -544,7 +567,7 @@ class AppwriteRepository @Inject constructor(
             isRead = true,
             icon = Icons.Default.Favorite,
             iconColor = Color(0xFFE91E63),
-            userId = updatedDocument.data["userId"] as String
+            userId = updatedDocument.data["userId"] as String,
         )
     }
 
@@ -553,13 +576,13 @@ class AppwriteRepository @Inject constructor(
             databaseId = DBConfig.DATABASE_ID,
             collectionId = DBConfig.SETTINGS_COLLECTION_ID,
             queries = listOf(
-                Query.limit(50)
-            )
+                Query.limit(50),
+            ),
         )
 
         android.util.Log.d(
             "AppwriteRepository",
-            "Fetched settings: ${res.documents.size} documents"
+            "Fetched settings: ${res.documents.size} documents",
         )
 
         return mapToResponse(res, Setting::fromMap)
@@ -572,14 +595,14 @@ class AppwriteRepository @Inject constructor(
             "icon" to setting.icon,
             "type" to setting.type.name,
             "isToggleable" to setting.isToggleable,
-            "isToggled" to setting.isToggled
+            "isToggled" to setting.isToggled,
         )
 
         val updatedDocument = databases.updateDocument(
             databaseId = DBConfig.DATABASE_ID,
             collectionId = DBConfig.SETTINGS_COLLECTION_ID,
             documentId = setting.id,
-            data = updatedData
+            data = updatedData,
         )
 
         return Setting(
@@ -589,7 +612,7 @@ class AppwriteRepository @Inject constructor(
             icon = updatedDocument.data["icon"] as String,
             type = SettingType.valueOf(updatedDocument.data["type"] as String),
             isToggleable = updatedDocument.data["isToggleable"] as Boolean,
-            isToggled = updatedDocument.data["isToggled"] as Boolean
+            isToggled = updatedDocument.data["isToggled"] as Boolean,
         )
     }
 
@@ -611,7 +634,7 @@ class AppwriteRepository @Inject constructor(
                 method = "GET",
                 path = "/ping",
                 status = "${exception.code}",
-                response = "${exception.message}"
+                response = "${exception.message}",
             )
         }
     }
@@ -634,7 +657,7 @@ class AppwriteRepository @Inject constructor(
         currentUserCache = null
         android.util.Log.d("AppwriteRepository", "User cache cleared")
     }
-    
+
     /**
      * Clear cache for a specific user. Useful when user data has been updated.
      */
@@ -652,7 +675,7 @@ class AppwriteRepository @Inject constructor(
     suspend fun getUsersByIds(userIds: List<String>): Map<String, AuthUser> {
         val result = mutableMapOf<String, AuthUser>()
         val uncachedUserIds = mutableListOf<String>()
-        
+
         // First, collect all cached users
         userIds.forEach { userId ->
             userCache[userId]?.let { cachedUser ->
@@ -661,14 +684,14 @@ class AppwriteRepository @Inject constructor(
                 uncachedUserIds.add(userId)
             }
         }
-        
+
         // Fetch uncached users
         uncachedUserIds.forEach { userId ->
             getUserById(userId)?.let { user ->
                 result[userId] = user
             }
         }
-        
+
         android.util.Log.d("AppwriteRepository", "Batch fetched ${userIds.size} users: ${result.size} found, ${uncachedUserIds.size} were not cached")
         return result
     }
@@ -676,33 +699,31 @@ class AppwriteRepository @Inject constructor(
     /**
      * Test method to verify the new database schema works
      */
-    suspend fun testNewSchemaCompatibility(user: AuthUser): Boolean {
-        return try {
-            // Test friendship query with combinedUserIds
-            val friendships = databases.listDocuments(
-                databaseId = DBConfig.DATABASE_ID,
-                collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
-                queries = listOf(
-                    Query.contains("combinedUserIds", user.id),
-                    Query.limit(1)
-                )
-            )
-            
-            // Test post query with new visibility fields
-            val posts = databases.listDocuments(
-                databaseId = DBConfig.DATABASE_ID,
-                collectionId = DBConfig.POSTS_COLLECTION_ID,
-                queries = listOf(
-                    Query.equal("visibility", "PUBLIC"),
-                    Query.limit(1)
-                )
-            )
-            
-            android.util.Log.d("AppwriteRepository", "Schema compatibility test passed - friendships: ${friendships.documents.size}, posts: ${posts.documents.size}")
-            true
-        } catch (e: Exception) {
-            android.util.Log.e("AppwriteRepository", "Schema compatibility test failed: ${e.message}")
-            false
-        }
+    suspend fun testNewSchemaCompatibility(user: AuthUser): Boolean = try {
+        // Test friendship query with combinedUserIds
+        val friendships = databases.listDocuments(
+            databaseId = DBConfig.DATABASE_ID,
+            collectionId = DBConfig.FRIENDSHIPS_COLLECTION_ID,
+            queries = listOf(
+                Query.contains("combinedUserIds", user.id),
+                Query.limit(1),
+            ),
+        )
+
+        // Test post query with new visibility fields
+        val posts = databases.listDocuments(
+            databaseId = DBConfig.DATABASE_ID,
+            collectionId = DBConfig.POSTS_COLLECTION_ID,
+            queries = listOf(
+                Query.equal("visibility", "PUBLIC"),
+                Query.limit(1),
+            ),
+        )
+
+        android.util.Log.d("AppwriteRepository", "Schema compatibility test passed - friendships: ${friendships.documents.size}, posts: ${posts.documents.size}")
+        true
+    } catch (e: Exception) {
+        android.util.Log.e("AppwriteRepository", "Schema compatibility test failed: ${e.message}")
+        false
     }
 }

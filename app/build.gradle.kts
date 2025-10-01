@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.plugin.compose)
     id("com.google.devtools.ksp")
-    //id("kotlin-kapt")
+    // id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
 
@@ -38,34 +38,70 @@ android {
         val error = "variable not found in local.properties"
 
         // Define BuildConfig fields without revealing fallback values
-        buildConfigField("String", "APPWRITE_VERSION",
-        "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "APPWRITE_PROJECT_ID",
-        "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "APPWRITE_PROJECT_NAME",
-        "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "APPWRITE_PUBLIC_ENDPOINT",
-        "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException(error)}\"")
+        buildConfigField(
+            "String",
+            "APPWRITE_VERSION",
+            "\"${properties.getProperty("appwrite.version") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "APPWRITE_PROJECT_ID",
+            "\"${properties.getProperty("appwrite.project.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "APPWRITE_PROJECT_NAME",
+            "\"${properties.getProperty("appwrite.project.name") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "APPWRITE_PUBLIC_ENDPOINT",
+            "\"${properties.getProperty("appwrite.endpoint") ?: throw RuntimeException(error)}\"",
+        )
 
-        buildConfigField("String", "DATABASE_ID",
-            "\"${properties.getProperty("appwrite.database.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "SETTINGS_COLLECTION_ID",
-            "\"${properties.getProperty("appwrite.settings.collection.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "NOTIFICATIONS_COLLECTION_ID",
-            "\"${properties.getProperty("appwrite.notifications.collection.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "MESSAGES_COLLECTION_ID",
-            "\"${properties.getProperty("appwrite.messages.collection.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "FRIENDSHIPS_COLLECTION_ID",
-            "\"${properties.getProperty("appwrite.friendships.collection.id") ?: throw RuntimeException(error)}\"")
-        buildConfigField("String", "POSTS_COLLECTION_ID",
-            "\"${properties.getProperty("appwrite.posts.collection.id") ?: throw RuntimeException(error)}\"")
+        buildConfigField(
+            "String",
+            "DATABASE_ID",
+            "\"${properties.getProperty("appwrite.database.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "SETTINGS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.settings.collection.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "NOTIFICATIONS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.notifications.collection.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "MESSAGES_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.messages.collection.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "FRIENDSHIPS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.friendships.collection.id") ?: throw RuntimeException(error)}\"",
+        )
+        buildConfigField(
+            "String",
+            "POSTS_COLLECTION_ID",
+            "\"${properties.getProperty("appwrite.posts.collection.id") ?: throw RuntimeException(error)}\"",
+        )
 
-        buildConfigField("String", "APPWRITE_API_KEY",
-            "\"${properties.getProperty("appwrite.api.key") ?: throw RuntimeException(error)}\"")
+        buildConfigField(
+            "String",
+            "APPWRITE_API_KEY",
+            "\"${properties.getProperty("appwrite.api.key") ?: throw RuntimeException(error)}\"",
+        )
 
-        //GET_USERS_FUNCTION_ID
-        buildConfigField("String", "GET_USERS_FUNCTION_ID",
-            "\"${properties.getProperty("appwrite.get.users.function.id") ?: throw RuntimeException(error)}\"")
+        // GET_USERS_FUNCTION_ID
+        buildConfigField(
+            "String",
+            "GET_USERS_FUNCTION_ID",
+            "\"${properties.getProperty("appwrite.get.users.function.id") ?: throw RuntimeException(error)}\"",
+        )
     }
 
     buildTypes {
@@ -73,7 +109,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -99,7 +135,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation (libs.play.services.auth) // hoặc bản mới nhất
+    implementation(libs.play.services.auth) // hoặc bản mới nhất
     implementation(libs.kotlinx.coroutines.play.services)
 
     // compose platform
@@ -133,8 +169,8 @@ dependencies {
     implementation(libs.okhttp)
 
     implementation(libs.gson)
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     implementation(libs.okhttp.urlconnection)
 
     // accompanist
@@ -148,10 +184,10 @@ dependencies {
 
     // QR Code Scanning
     implementation(libs.androidx.camera.view)
-    implementation (libs.androidx.camera.camera2)
-    implementation (libs.androidx.camera.lifecycle)
-    implementation (libs.androidx.camera.view.v131)
-    implementation (libs.barcode.scanning)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view.v131)
+    implementation(libs.barcode.scanning)
 
     // appwrite
     implementation(libs.appwrite)

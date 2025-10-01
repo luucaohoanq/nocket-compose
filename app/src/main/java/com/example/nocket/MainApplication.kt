@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket
 
 import android.app.Application
@@ -9,9 +15,9 @@ import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 import okhttp3.OkHttpClient
 import okio.Path.Companion.toPath
-import javax.inject.Inject
 
 @HiltAndroidApp
 class MainApplication : Application() {
@@ -44,5 +50,4 @@ class MainApplication : Application() {
                 .build()
         }
     }
-
 }

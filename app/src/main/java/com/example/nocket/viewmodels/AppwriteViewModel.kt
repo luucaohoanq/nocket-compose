@@ -1,6 +1,13 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.viewmodels
 
 import android.os.Build
+import android.util.Log as AndroidLog
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,13 +22,12 @@ import com.example.nocket.repositories.AppwriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appwrite.starterkit.data.models.ProjectInfo
 import io.appwrite.starterkit.data.models.Status
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import android.util.Log as AndroidLog
 
 /**
  * A ViewModel class that serves as the central hub for managing and storing the state
@@ -29,7 +35,7 @@ import android.util.Log as AndroidLog
  */
 @HiltViewModel
 class AppwriteViewModel @Inject constructor(
-    private val repository: AppwriteRepository
+    private val repository: AppwriteRepository,
 ) : ViewModel() {
 
     private val _status = MutableStateFlow<Status>(Status.Idle)
@@ -94,13 +100,11 @@ class AppwriteViewModel @Inject constructor(
     /**
      * Get a user by ID and return it directly (suspend function)
      */
-    suspend fun getUserByIdSuspend(userId: String): AuthUser? {
-        return try {
-            repository.getUserByIdCustom(userId)
-        } catch (e: Exception) {
-            AndroidLog.e("AppwriteViewModel", "Error fetching user by ID: ${e.message}")
-            null
-        }
+    suspend fun getUserByIdSuspend(userId: String): AuthUser? = try {
+        repository.getUserByIdCustom(userId)
+    } catch (e: Exception) {
+        AndroidLog.e("AppwriteViewModel", "Error fetching user by ID: ${e.message}")
+        null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -168,14 +172,12 @@ class AppwriteViewModel @Inject constructor(
      *
      * @return [ProjectInfo] An object containing project details.
      */
-    fun getProjectInfo(): ProjectInfo {
-        return ProjectInfo(
-            version = AppwriteConfig.APPWRITE_VERSION,
-            projectId = AppwriteConfig.APPWRITE_PROJECT_ID,
-            endpoint = AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT,
-            projectName = AppwriteConfig.APPWRITE_PROJECT_NAME
-        )
-    }
+    fun getProjectInfo(): ProjectInfo = ProjectInfo(
+        version = AppwriteConfig.APPWRITE_VERSION,
+        projectId = AppwriteConfig.APPWRITE_PROJECT_ID,
+        endpoint = AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT,
+        projectName = AppwriteConfig.APPWRITE_PROJECT_NAME,
+    )
 
     /**
      * Executes a ping operation to verify connectivity and logs the result.
@@ -211,7 +213,7 @@ class AppwriteViewModel @Inject constructor(
             try {
                 AndroidLog.d("AppwriteViewModel", "Fetching posts for user: ${user.id}")
                 val result = repository.getAllPostsOfUserAndFriends(user)
-                
+
                 // Update the posts state with results from database
                 _posts.value = result
                 AndroidLog.d("AppwriteViewModel", "Fetched ${result.size} posts for user")
@@ -291,13 +293,11 @@ class AppwriteViewModel @Inject constructor(
     /**
      * Check if two users are friends
      */
-    suspend fun checkIfUsersAreFriends(userId1: String, userId2: String): Boolean {
-        return try {
-            repository.checkIfUsersAreFriends(userId1, userId2)
-        } catch (e: Exception) {
-            AndroidLog.e("AppwriteViewModel", "Error checking friendship: ${e.message}")
-            false
-        }
+    suspend fun checkIfUsersAreFriends(userId1: String, userId2: String): Boolean = try {
+        repository.checkIfUsersAreFriends(userId1, userId2)
+    } catch (e: Exception) {
+        AndroidLog.e("AppwriteViewModel", "Error checking friendship: ${e.message}")
+        false
     }
 
     /**
@@ -308,10 +308,10 @@ class AppwriteViewModel @Inject constructor(
             try {
                 AndroidLog.d("AppwriteViewModel", "Starting to fetch friends for user: ${user.id}")
                 AndroidLog.d("AppwriteViewModel", "User details: username=${user.name}, email=${user.email}")
-                
+
                 val friendsList = repository.getFriendsOfUser(user)
                 _friends.value = friendsList
-                
+
                 AndroidLog.d("AppwriteViewModel", "fetchFriendsOfUser: Successfully fetched ${friendsList.size} friends for user ${user.id}")
                 if (friendsList.isNotEmpty()) {
                     AndroidLog.d("AppwriteViewModel", "Friends list: ${friendsList.map { it.username }}")
@@ -355,7 +355,7 @@ class AppwriteViewModel @Inject constructor(
         viewModelScope.launch {
             val currentFriends = _friends.value
             val currentUserData = _currentUser.value
-            
+
             AndroidLog.d("AppwriteViewModel", "=== FRIENDS DEBUG ===")
             AndroidLog.d("AppwriteViewModel", "Current user: ${currentUserData?.id} (${currentUserData?.name})")
             AndroidLog.d("AppwriteViewModel", "Friends count: ${currentFriends.size}")

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.settings
 
 import androidx.compose.foundation.background
@@ -66,7 +72,7 @@ import com.example.nocket.viewmodels.AuthViewModel
 fun SettingScreen(
     navController: NavHostController = rememberNavController(),
     appwriteViewModel: AppwriteViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     // Collect data from viewModel
     val settings by appwriteViewModel.settings.collectAsState()
@@ -84,7 +90,7 @@ fun SettingScreen(
         },
         onLogout = {
             authViewModel.logout()
-        }
+        },
     )
 }
 
@@ -94,19 +100,19 @@ fun SettingScreenContent(
     settings: List<Setting>,
     navController: NavHostController = rememberNavController(),
     onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
             SettingScreenTopBar(navController)
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -124,7 +130,7 @@ fun SettingScreenContent(
                     SettingItem(
                         setting = setting,
                         onToggleChanged = onToggleChanged,
-                        onLogout = if (setting.title.contains("Sign out", ignoreCase = true)) onLogout else null
+                        onLogout = if (setting.title.contains("Sign out", ignoreCase = true)) onLogout else null,
                     )
                 }
 
@@ -150,19 +156,19 @@ fun SettingSectionHeader(settingType: SettingType) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(vertical = 8.dp),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -172,7 +178,7 @@ fun SettingSectionHeader(settingType: SettingType) {
 fun SettingItem(
     setting: Setting,
     onToggleChanged: (String, Boolean) -> Unit = { _, _ -> },
-    onLogout: (() -> Unit)? = null
+    onLogout: (() -> Unit)? = null,
 ) {
     val isDangerZone = setting.type == SettingType.DANGER_ZONE
     var isToggled = setting.isToggled
@@ -181,10 +187,11 @@ fun SettingItem(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDangerZone)
+            containerColor = if (isDangerZone) {
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-            else
+            } else {
                 MaterialTheme.colorScheme.surface
+            },
         ),
         shape = RoundedCornerShape(8.dp),
         onClick = {
@@ -196,35 +203,37 @@ fun SettingItem(
                 onLogout()
             }
             // Handle other settings click
-        }
+        },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Setting icon
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = if (isDangerZone)
+                        color = if (isDangerZone) {
                             MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                        else
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                        shape = CircleShape
+                        } else {
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        },
+                        shape = CircleShape,
                     ),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = getSettingIcon(setting),
                     contentDescription = setting.title,
-                    tint = if (isDangerZone)
+                    tint = if (isDangerZone) {
                         MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    modifier = Modifier.size(20.dp),
                 )
             }
 
@@ -232,16 +241,17 @@ fun SettingItem(
 
             // Setting details
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = setting.title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = if (isDangerZone)
+                    color = if (isDangerZone) {
                         MaterialTheme.colorScheme.error
-                    else
+                    } else {
                         MaterialTheme.colorScheme.onSurface
+                    },
                 )
 
                 Text(
@@ -249,7 +259,7 @@ fun SettingItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -266,7 +276,7 @@ fun SettingItem(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Navigate",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
@@ -274,22 +284,20 @@ fun SettingItem(
 }
 
 @Composable
-fun getSettingIcon(setting: Setting): ImageVector {
-    return when {
-        setting.type == SettingType.WIDGET -> Icons.Default.Settings
-        setting.type == SettingType.CUSTOMIZE && setting.title.contains("icon") -> Icons.Default.Palette
-        setting.type == SettingType.CUSTOMIZE -> Icons.Default.Palette
-        setting.title.contains("profile picture") -> Icons.Default.AccountCircle
-        setting.title.contains("phone") -> Icons.Default.Phone
-        setting.title.contains("email") -> Icons.Default.Email
-        setting.title.contains("Block") -> Icons.Default.Block
-        setting.title.contains("privacy") || setting.title.contains("visibility") -> Icons.Default.Lock
-        setting.title.contains("Report") || setting.title.contains("suggestion") -> Icons.AutoMirrored.Filled.Help
-        setting.title.contains("Share") -> Icons.Default.Share
-        setting.title.contains("Rate") -> Icons.Default.Star
-        setting.title.contains("Terms") || setting.title.contains("Privacy Policy") -> Icons.Default.Info
-        setting.title.contains("Delete") -> Icons.Default.Delete
-        setting.title.contains("Sign out") -> Icons.AutoMirrored.Filled.Logout
-        else -> Icons.Default.Settings
-    }
+fun getSettingIcon(setting: Setting): ImageVector = when {
+    setting.type == SettingType.WIDGET -> Icons.Default.Settings
+    setting.type == SettingType.CUSTOMIZE && setting.title.contains("icon") -> Icons.Default.Palette
+    setting.type == SettingType.CUSTOMIZE -> Icons.Default.Palette
+    setting.title.contains("profile picture") -> Icons.Default.AccountCircle
+    setting.title.contains("phone") -> Icons.Default.Phone
+    setting.title.contains("email") -> Icons.Default.Email
+    setting.title.contains("Block") -> Icons.Default.Block
+    setting.title.contains("privacy") || setting.title.contains("visibility") -> Icons.Default.Lock
+    setting.title.contains("Report") || setting.title.contains("suggestion") -> Icons.AutoMirrored.Filled.Help
+    setting.title.contains("Share") -> Icons.Default.Share
+    setting.title.contains("Rate") -> Icons.Default.Star
+    setting.title.contains("Terms") || setting.title.contains("Privacy Policy") -> Icons.Default.Info
+    setting.title.contains("Delete") -> Icons.Default.Delete
+    setting.title.contains("Sign out") -> Icons.AutoMirrored.Filled.Logout
+    else -> Icons.Default.Settings
 }

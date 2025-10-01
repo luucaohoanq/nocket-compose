@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.preview
 
 import android.os.Build
@@ -30,11 +36,9 @@ fun HomeScreenPreview() {
     Scaffold(
         topBar = {
             SettingScreenTopBar(rememberNavController())
-        }
+        },
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize()) {
-
-
             UserListWithArrows(users = SampleData.users.take(3), showEveryone = true)
             PostGrid(
                 modifier = Modifier.padding(paddingValues),

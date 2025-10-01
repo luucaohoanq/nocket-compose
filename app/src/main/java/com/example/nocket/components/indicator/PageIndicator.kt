@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.indicator
 
 import androidx.compose.animation.animateColorAsState
@@ -23,27 +29,27 @@ fun PageIndicator(
     currentPage: Int,
     modifier: Modifier = Modifier,
     activeColor: Color = Color.White,
-    inactiveColor: Color = Color.Gray.copy(alpha = 0.3f)
+    inactiveColor: Color = Color.Gray.copy(alpha = 0.3f),
 ) {
     if (totalPages <= 1 || currentPage !in 0 until totalPages) return
 
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(totalPages) { index ->
 
             val animatedColor = animateColorAsState(
                 targetValue = if (index == currentPage) activeColor else inactiveColor,
-                animationSpec = tween(durationMillis = 300)
+                animationSpec = tween(durationMillis = 300),
             )
 
             Box(
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(animatedColor.value)
+                    .background(animatedColor.value),
             )
         }
     }
@@ -57,21 +63,21 @@ fun PageIndicatorPreview() {
             .size(200.dp)
             .background(Color(0xFF1C1611)), // Dark background for contrast
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PageIndicator(
             totalPages = 5,
             currentPage = 2,
             modifier = Modifier.size(100.dp),
             activeColor = Color(0xFFFF9800), // LightOrange
-            inactiveColor = Color.Gray.copy(alpha = 0.3f)
+            inactiveColor = Color.Gray.copy(alpha = 0.3f),
         )
 
         PageIndicator(
             totalPages = 5,
             currentPage = 2,
             modifier = Modifier.size(100.dp),
-            inactiveColor = Color.Gray.copy(alpha = 0.3f)
+            inactiveColor = Color.Gray.copy(alpha = 0.3f),
         )
     }
 }

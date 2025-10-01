@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.topbar
 
 import android.os.Build
@@ -88,7 +94,7 @@ fun MainTopBar(
     },
     onNotificationClick: () -> Unit = {},
     onUserSelected: (User?) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var titleWidth by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current.density
@@ -116,8 +122,8 @@ fun MainTopBar(
             User(
                 id = "everyone",
                 username = "Everyone",
-                avatar = ""
-            )
+                avatar = "",
+            ),
         )
     }
 
@@ -135,16 +141,14 @@ fun MainTopBar(
                 modifier = Modifier
                     .height(avatarWidth)
                     .wrapContentWidth()
-//                    .widthIn(max = 400.dp)
                     .background(
                         color = BackgroundPreview,
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
                     )
                     .clip(RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
-//                    .padding(start = 4.dp, end = 4.dp)
                     .clickable { showFriendDropdown = true },
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -153,21 +157,21 @@ fun MainTopBar(
                         .onGloballyPositioned { coordinates ->
                             // Get the width of the title in pixels
                             titleWidth = coordinates.size.width
-                        }
+                        },
                 ) {
                     Text(
                         text = trimUsername(selectedFriend?.username ?: user?.username ?: title),
                         color = Color.White,
                         fontWeight = FontWeight.Medium,
                         letterSpacing = 0.5.sp,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
 
                     Icon(
                         imageVector = Icons.Filled.ExpandMore,
                         contentDescription = "Dropdown",
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                 }
 
@@ -176,18 +180,17 @@ fun MainTopBar(
                     shape = RoundedCornerShape(24.dp),
                     expanded = showFriendDropdown,
                     onDismissRequest = { showFriendDropdown = false },
-                    // Calculate the offset to center the dropdown
                     offset = DpOffset(
                         // Convert pixels to dp and calculate centering offset
                         x = ((dropdownWidth.value - (titleWidth / density)) / 2 * -1).dp,
-                        y = 10.dp
+                        y = 10.dp,
                     ),
                     modifier = Modifier
                         .width(dropdownWidth)
                         .heightIn(max = 450.dp)
                         .background(
                             color = BackgroundPreview,
-                            shape = RoundedCornerShape(24.dp)
+                            shape = RoundedCornerShape(24.dp),
                         ),
                 ) {
                     friendsList.forEachIndexed { index, friend ->
@@ -202,19 +205,18 @@ fun MainTopBar(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-
                                     if (friend.avatar.isNotEmpty()) {
                                         Box(
                                             modifier = Modifier
                                                 .size(avatarWidth)
                                                 .clip(CircleShape)
-                                                .background(Color.LightGray)
+                                                .background(Color.LightGray),
                                         ) {
                                             AsyncImage(
                                                 model = friend.avatar,
                                                 contentDescription = "Friend Avatar",
                                                 contentScale = ContentScale.Crop,
-                                                modifier = Modifier.size(avatarWidth)
+                                                modifier = Modifier.size(avatarWidth),
                                             )
                                         }
                                     } else if (friend.id == "everyone") {
@@ -226,8 +228,8 @@ fun MainTopBar(
                                             onClick = {},
                                             iconSetting = IconSetting(
                                                 icon = Icons.Filled.Group,
-                                                contentDescription = "Everyone"
-                                            )
+                                                contentDescription = "Everyone",
+                                            ),
                                         )
                                     } else if (friend.id == "you") {
                                         // "You" item - show user avatar or fallback icon
@@ -236,28 +238,28 @@ fun MainTopBar(
                                                 modifier = Modifier
                                                     .size(avatarWidth)
                                                     .clip(CircleShape)
-                                                    .background(Color.LightGray)
+                                                    .background(Color.LightGray),
                                             ) {
                                                 AsyncImage(
                                                     model = user.avatar,
                                                     contentDescription = "Your Avatar",
                                                     contentScale = ContentScale.Crop,
-                                                    modifier = Modifier.size(avatarWidth)
+                                                    modifier = Modifier.size(avatarWidth),
                                                 )
                                             }
                                         } else {
                                             Button(
                                                 onClick = { },
                                                 colors = ButtonDefaults.buttonColors(
-                                                    containerColor = Color(0xFF6AAF4B)
+                                                    containerColor = Color(0xFF6AAF4B),
                                                 ),
                                                 modifier = Modifier.size(avatarWidth),
-                                                contentPadding = PaddingValues(0.dp)
+                                                contentPadding = PaddingValues(0.dp),
                                             ) {
                                                 Text(
                                                     text = "You",
                                                     color = Color.White,
-                                                    style = MaterialTheme.typography.labelMedium
+                                                    style = MaterialTheme.typography.labelMedium,
                                                 )
                                             }
                                         }
@@ -266,15 +268,15 @@ fun MainTopBar(
                                         Button(
                                             onClick = { },
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = BackgroundPreview
+                                                containerColor = BackgroundPreview,
                                             ),
                                             modifier = Modifier.size(avatarWidth),
-                                            contentPadding = PaddingValues(0.dp)
+                                            contentPadding = PaddingValues(0.dp),
                                         ) {
                                             Text(
-                                                text = friend.username?.take(1)?.uppercase() ?: "?",
+                                                text = friend.username.take(1)?.uppercase() ?: "?",
                                                 color = Color.White,
-                                                style = MaterialTheme.typography.titleMedium
+                                                style = MaterialTheme.typography.titleMedium,
                                             )
                                         }
                                     }
@@ -290,7 +292,7 @@ fun MainTopBar(
                                         },
                                         color = Color.White,
                                         fontWeight = FontWeight.Medium,
-                                        style = MaterialTheme.typography.titleMedium
+                                        style = MaterialTheme.typography.titleMedium,
                                     )
 
                                     // Flexible spacer to push the arrow to the end
@@ -301,22 +303,21 @@ fun MainTopBar(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                                         contentDescription = "Select",
                                         tint = Color.White,
-                                        modifier = Modifier.size(16.dp)
+                                        modifier = Modifier.size(16.dp),
                                     )
-
                                 }
                             },
                             onClick = {
                                 selectedFriend = friend
                                 showFriendDropdown = false
-                            }
+                            },
                         )
                         // Add divider after each item except the last one
                         if (index < friendsList.size - 1) {
                             HorizontalDivider(
                                 modifier = Modifier.fillMaxWidth(),
                                 thickness = 1.dp,
-                                color = Color.White.copy(alpha = 0.2f) // Light color with transparency
+                                color = Color.White.copy(alpha = 0.2f),
                             )
                         }
                     }
@@ -328,24 +329,26 @@ fun MainTopBar(
             Circle(
                 imageSetting = ImageSetting(
                     imageUrl = user?.avatar,
-                    contentDescription = "Profile picture"
+                    contentDescription = "Profile picture",
                 ),
                 gap = 0.dp,
                 outerSize = avatarWidth,
                 backgroundColor = BackgroundPreview,
                 borderColor = Color(0xFFB8B8B8),
-                onClick = onProfileClick
+                onClick = onProfileClick,
             )
         },
         actions = {
-
             val isLargeText = unreadMessages > 9
 
-            val badgeSize = if (isLargeText) Modifier
-                .defaultMinSize(minWidth = 24.dp, minHeight = 20.dp)
-                .padding(horizontal = 4.dp)
-            else Modifier
-                .size(20.dp)
+            val badgeSize = if (isLargeText) {
+                Modifier
+                    .defaultMinSize(minWidth = 24.dp, minHeight = 20.dp)
+                    .padding(horizontal = 4.dp)
+            } else {
+                Modifier
+                    .size(20.dp)
+            }
 
             BadgedBox(
                 badge = {
@@ -355,17 +358,17 @@ fun MainTopBar(
                             contentColor = Color.Black,
                             modifier = Modifier
                                 .offset(x = 0.dp, y = (-4).dp)
-                                .then(badgeSize)
+                                .then(badgeSize),
                         ) {
                             Text(
                                 text = if (unreadMessages > 99) "99+" else unreadMessages.toString(),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
-                }
+                },
             ) {
                 Button(
                     onClick = { onMessageClick() },
@@ -374,20 +377,20 @@ fun MainTopBar(
                     ),
                     modifier = Modifier.size(avatarWidth),
                     contentPadding = PaddingValues(0.dp),
-                    shape = CircleShape
+                    shape = CircleShape,
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ChatBubbleOutline,
                         contentDescription = "Messages",
                         tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent
-        )
+            containerColor = Color.Transparent,
+        ),
     )
 }
 
@@ -399,13 +402,13 @@ fun MainTopBarPreview() {
     val previewUser = User(
         id = "preview_user",
         username = "Preview User",
-        avatar = "https://i.pravatar.cc/150?img=3"
+        avatar = "https://i.pravatar.cc/150?img=3",
     )
     val previewFriends = List(3) { index ->
         User(
             id = "friend_$index",
             username = "Friend ${index + 1}",
-            avatar = if (index % 2 == 0) "https://i.pravatar.cc/150?img=${index + 5}" else ""
+            avatar = if (index % 2 == 0) "https://i.pravatar.cc/150?img=${index + 5}" else "",
         )
     }
 
@@ -419,6 +422,6 @@ fun MainTopBarPreview() {
         onProfileClick = {},
         onNotificationClick = {},
         onUserSelected = {},
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
 }

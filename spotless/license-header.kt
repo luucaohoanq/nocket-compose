@@ -4,11 +4,3 @@
  * You shall not disclose such confidential information and shall use it only in
  * accordance with the terms of the license agreement you entered into with lcaohoanq.
  */
-package com.example.nocket.common.enum
-
-sealed class LoadStatus(val description: String = "") {
-    class Init : LoadStatus()
-    class Loading : LoadStatus()
-    class Success : LoadStatus()
-    class Error(val error: String) : LoadStatus(error)
-}

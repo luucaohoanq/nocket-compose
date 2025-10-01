@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.pill
 
 import androidx.compose.foundation.background
@@ -22,7 +28,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MessageInputPill(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -30,10 +36,10 @@ fun MessageInputPill(
             .padding(15.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp),
             )
             .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = "Send message...",
@@ -42,23 +48,23 @@ fun MessageInputPill(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
 
         Text(
             "😄",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp),
         )
         Text(
             "❤️",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp),
         )
         Text(
             "🔥",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp),
         )
 
         Icon(
@@ -66,7 +72,7 @@ fun MessageInputPill(
             contentDescription = "More",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
-                .size(40.dp)
+                .size(40.dp),
         )
     }
 }
@@ -83,7 +89,7 @@ fun MessageInputPillPreview() {
 @Composable
 fun BottomPreview() {
     MaterialTheme {
-        Column() {
+        Column {
             MessageInputPill()
 //            MainBottomBar()
         }

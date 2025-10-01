@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.preview
 
 import android.Manifest
@@ -81,9 +87,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import kotlin.math.sqrt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.sqrt
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -92,7 +98,7 @@ fun CameraPreviewWithZoom(
     modifier: Modifier = Modifier,
     height: Dp = 300.dp,
     onPhotoTaken: ((String) -> Unit)? = null,
-    showControls: Boolean = true
+    showControls: Boolean = true,
 ) {
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -107,13 +113,13 @@ fun CameraPreviewWithZoom(
         mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
+                Manifest.permission.CAMERA,
+            ) == PackageManager.PERMISSION_GRANTED,
         )
     }
 
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { granted ->
         hasPermission = granted
         if (!granted) {
@@ -184,7 +190,7 @@ fun CameraPreviewWithZoom(
                                         control.startFocusAndMetering(action)
                                     }
                                 }
-                            }
+                            },
                         )
                     },
                 factory = { ctx ->
@@ -213,17 +219,18 @@ fun CameraPreviewWithZoom(
 
                             imageCapture = imageCaptureUseCase
 
-                            val cameraSelector = if (isFrontCamera)
+                            val cameraSelector = if (isFrontCamera) {
                                 CameraSelector.DEFAULT_FRONT_CAMERA
-                            else
+                            } else {
                                 CameraSelector.DEFAULT_BACK_CAMERA
+                            }
 
                             cameraProvider.unbindAll()
                             val camera = cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 cameraSelector,
                                 preview,
-                                imageCaptureUseCase
+                                imageCaptureUseCase,
                             )
                             cameraControl = camera.cameraControl
                             cameraInfo = camera.cameraInfo
@@ -277,7 +284,7 @@ fun CameraPreviewWithZoom(
                     }, ContextCompat.getMainExecutor(ctx))
 
                     localPreviewView
-                }
+                },
             )
 
             // Loading indicator
@@ -308,23 +315,27 @@ fun CameraPreviewWithZoom(
             if (showControls) {
                 val flashScale by animateFloatAsState(
                     targetValue = if (isFlashAnimating) 1.2f else 1f,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
                 )
 
                 Box(
                     modifier = Modifier
                         .padding(16.dp)
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart),
                 ) {
                     Surface(
                         modifier = Modifier
                             .size(48.dp)
                             .scale(flashScale),
                         shape = CircleShape,
-                        color = if (flashEnabled) Color.Yellow.copy(alpha = 0.9f) else Color.Black.copy(
-                            alpha = 0.6f
-                        ),
-                        shadowElevation = if (flashEnabled) 8.dp else 2.dp
+                        color = if (flashEnabled) {
+                            Color.Yellow.copy(alpha = 0.9f)
+                        } else {
+                            Color.Black.copy(
+                                alpha = 0.6f,
+                            )
+                        },
+                        shadowElevation = if (flashEnabled) 8.dp else 2.dp,
                     ) {
                         IconButton(
                             onClick = {
@@ -339,13 +350,13 @@ fun CameraPreviewWithZoom(
                                     delay(200)
                                     isFlashAnimating = false
                                 }
-                            }
+                            },
                         ) {
                             Icon(
                                 imageVector = if (flashEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
                                 contentDescription = "Flash",
                                 tint = if (flashEnabled) Color.Black else Color.White,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                     }
@@ -359,19 +370,19 @@ fun CameraPreviewWithZoom(
                         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
                         modifier = Modifier
                             .padding(16.dp)
-                            .align(Alignment.TopEnd)
+                            .align(Alignment.TopEnd),
                     ) {
                         Surface(
                             shape = RoundedCornerShape(20.dp),
                             color = Color.Black.copy(alpha = 0.8f),
-                            shadowElevation = 4.dp
+                            shadowElevation = 4.dp,
                         ) {
                             Text(
                                 text = "${String.format("%.1f", zoomRatio)}x",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
                     }
@@ -382,7 +393,7 @@ fun CameraPreviewWithZoom(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .align(Alignment.TopEnd)
-                                .offset(y = 60.dp)
+                                .offset(y = 60.dp),
                         ) {
                             Surface(
                                 modifier = Modifier.clickable {
@@ -395,22 +406,26 @@ fun CameraPreviewWithZoom(
                                     showZoomValue = true
                                 },
                                 shape = CircleShape,
-                                color = if (isWideMode) Color.Blue.copy(alpha = 0.8f) else Color.Black.copy(
-                                    alpha = 0.6f
-                                ),
-                                shadowElevation = 2.dp
+                                color = if (isWideMode) {
+                                    Color.Blue.copy(alpha = 0.8f)
+                                } else {
+                                    Color.Black.copy(
+                                        alpha = 0.6f,
+                                    )
+                                },
+                                shadowElevation = 2.dp,
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .size(40.dp)
                                         .padding(8.dp),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = if (isWideMode) "W" else "N",
                                         color = Color.White,
                                         fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -424,20 +439,20 @@ fun CameraPreviewWithZoom(
                                 exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
-                                    .padding(bottom = 32.dp)
+                                    .padding(bottom = 32.dp),
                             ) {
                                 Surface(
                                     shape = RoundedCornerShape(25.dp),
                                     color = Color.Black.copy(alpha = 0.8f),
-                                    shadowElevation = 8.dp
+                                    shadowElevation = 8.dp,
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(
                                             horizontal = 20.dp,
-                                            vertical = 12.dp
+                                            vertical = 12.dp,
                                         ),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                                     ) {
                                         ZoomButton(
                                             icon = Icons.Default.Remove,
@@ -446,18 +461,18 @@ fun CameraPreviewWithZoom(
                                                     (zoomRatio - 0.2f).coerceAtLeast(minZoom)
                                                 cameraControl?.setZoomRatio(newZoom)
                                                 hapticFeedback.performHapticFeedback(
-                                                    HapticFeedbackType.TextHandleMove
+                                                    HapticFeedbackType.TextHandleMove,
                                                 )
                                                 showZoomValue = true
                                                 lastInteractionTime = System.currentTimeMillis()
-                                            }
+                                            },
                                         )
 
                                         Text(
                                             text = "${String.format("%.1f", zoomRatio)}x",
                                             color = Color.White,
                                             fontSize = 18.sp,
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Medium,
                                         )
 
                                         ZoomButton(
@@ -467,11 +482,11 @@ fun CameraPreviewWithZoom(
                                                     (zoomRatio + 0.2f).coerceAtMost(maxZoom)
                                                 cameraControl?.setZoomRatio(newZoom)
                                                 hapticFeedback.performHapticFeedback(
-                                                    HapticFeedbackType.TextHandleMove
+                                                    HapticFeedbackType.TextHandleMove,
                                                 )
                                                 showZoomValue = true
                                                 lastInteractionTime = System.currentTimeMillis()
-                                            }
+                                            },
                                         )
                                     }
                                 }
@@ -481,36 +496,36 @@ fun CameraPreviewWithZoom(
                             AnimatedVisibility(
                                 visible = showFocusIndicator,
                                 enter = scaleIn() + fadeIn(),
-                                exit = scaleOut() + fadeOut()
+                                exit = scaleOut() + fadeOut(),
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .offset(
                                             x = (focusPoint.first - 40).dp,
-                                            y = (focusPoint.second - 40).dp
+                                            y = (focusPoint.second - 40).dp,
                                         )
                                         .size(80.dp)
                                         .clip(CircleShape)
                                         .background(Color.Transparent)
-                                        .padding(8.dp)
+                                        .padding(8.dp),
                                 ) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .background(
                                                 Color.White.copy(alpha = 0.8f),
-                                                shape = CircleShape
+                                                shape = CircleShape,
                                             )
-                                            .padding(4.dp)
+                                            .padding(4.dp),
                                     ) {
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .background(
                                                     Color.Transparent,
-                                                    shape = CircleShape
+                                                    shape = CircleShape,
                                                 )
-                                                .clip(CircleShape)
+                                                .clip(CircleShape),
                                         ) {
                                             // Focus ring animation
                                             repeat(2) { index ->
@@ -523,8 +538,8 @@ fun CameraPreviewWithZoom(
                                                             0f at delay
                                                             1f at (delay + 400)
                                                             0f at 1000
-                                                        }
-                                                    )
+                                                        },
+                                                    ),
                                                 )
                                                 Box(
                                                     modifier = Modifier
@@ -532,8 +547,8 @@ fun CameraPreviewWithZoom(
                                                         .scale(animatedScale)
                                                         .background(
                                                             Color.White.copy(alpha = 0.5f),
-                                                            shape = CircleShape
-                                                        )
+                                                            shape = CircleShape,
+                                                        ),
                                                 )
                                             }
                                         }
@@ -555,44 +570,44 @@ fun CameraPreviewWithZoom(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Black),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Surface(
                                 modifier = Modifier.padding(32.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 color = Color.White,
-                                shadowElevation = 8.dp
+                                shadowElevation = 8.dp,
                             ) {
                                 Column(
                                     modifier = Modifier.padding(24.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Camera,
                                         contentDescription = "Camera",
                                         tint = Color.Gray,
-                                        modifier = Modifier.size(64.dp)
+                                        modifier = Modifier.size(64.dp),
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
                                         text = "Camera Access Required",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black
+                                        color = Color.Black,
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = "Please grant camera permission to use this feature",
                                         fontSize = 14.sp,
                                         color = Color.Gray,
-                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
                                     Button(
                                         onClick = {
                                             launcher.launch(Manifest.permission.CAMERA)
                                         },
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth(),
                                     ) {
                                         Text("Grant Permission")
                                     }
@@ -609,44 +624,44 @@ fun CameraPreviewWithZoom(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Surface(
                 modifier = Modifier.padding(32.dp),
                 shape = RoundedCornerShape(16.dp),
                 color = Color.White,
-                shadowElevation = 8.dp
+                shadowElevation = 8.dp,
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Camera,
                         contentDescription = "Camera",
                         tint = Color.Gray,
-                        modifier = Modifier.size(64.dp)
+                        modifier = Modifier.size(64.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Camera Access Required",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.Black,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Please grant camera permission to use this feature",
                         fontSize = 14.sp,
                         color = Color.Gray,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = {
                             launcher.launch(Manifest.permission.CAMERA)
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text("Grant Permission")
                     }
@@ -656,17 +671,16 @@ fun CameraPreviewWithZoom(
     }
 }
 
-
 @Composable
 private fun ZoomButton(
     icon: ImageVector,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.9f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
     )
 
     IconButton(
@@ -676,15 +690,15 @@ private fun ZoomButton(
             .scale(scale)
             .background(
                 Color.White.copy(alpha = 0.2f),
-                shape = CircleShape
+                shape = CircleShape,
             ),
-        interactionSource = remember { MutableInteractionSource() }
+        interactionSource = remember { MutableInteractionSource() },
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
     }
 }

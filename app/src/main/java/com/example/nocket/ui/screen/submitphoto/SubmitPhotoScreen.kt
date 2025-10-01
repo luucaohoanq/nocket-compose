@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.submitphoto
 
 import android.os.Build
@@ -73,15 +79,15 @@ val submitButtonSize = 80.dp
 @Composable
 fun SubmitPhotoScreen(
     navController: NavController,
-    appwriteViewModel: AppwriteViewModel = hiltViewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
     var selectedUser by remember {
         mutableStateOf<User?>(
             User(
                 id = "everyone",
                 username = "Everyone",
-                avatar = ""
-            )
+                avatar = "",
+            ),
         )
     }
     // Use the passed onCameraClick instead of navigating to CameraXScreen
@@ -93,14 +99,14 @@ fun SubmitPhotoScreen(
 
     // Get current time to use as remember key
     val currentTime = rememberCurrentTime()
-    
+
     // Get captions with current time dependency
     val captions = generalCaptions()
-    
+
     // Optimize by using remember with time dependency - only recreates when time changes
-    val captionBottomSheetData = remember(currentTime) { 
+    val captionBottomSheetData = remember(currentTime) {
         CaptionBottomSheetData(
-            items = captions
+            items = captions,
         )
     }
 
@@ -128,9 +134,9 @@ fun SubmitPhotoScreen(
                 endIcon = Icons.Outlined.Download,
                 onEndIconClick = {
                     Log.d("SubmitPhotoScreen", "Download icon clicked")
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         // Add CaptionBottomSheet when needed
         if (showCaptionSheet) {
@@ -139,7 +145,7 @@ fun SubmitPhotoScreen(
                 onDismiss = {
                     showCaptionSheet = false
                     coroutineScope.launch { sheetState.hide() }
-                }
+                },
             )
         }
 
@@ -148,7 +154,7 @@ fun SubmitPhotoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             // Show camera view or post image based on the localCameraMode state
 
@@ -156,11 +162,11 @@ fun SubmitPhotoScreen(
             Log.d("SubmitPhotoScreen", "Post: ${post?.id}, Type: ${post?.postType}, Caption: ${post?.caption}")
 
             // Post image (full width)
-            if(post?.thumbnailUrl != null) {
+            if (post?.thumbnailUrl != null) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .aspectRatio(1f),
                 ) {
                     AsyncImage(
                         model = post.thumbnailUrl,
@@ -168,7 +174,7 @@ fun SubmitPhotoScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp)),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
 
                     // Video indicator for video posts
@@ -179,15 +185,15 @@ fun SubmitPhotoScreen(
                                 .size(72.dp)
                                 .background(
                                     color = Color.Black.copy(alpha = 0.6f),
-                                    shape = CircleShape
+                                    shape = CircleShape,
                                 ),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = "Play video",
                                 tint = Color.White,
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(36.dp),
                             )
                         }
                     }
@@ -210,16 +216,16 @@ fun SubmitPhotoScreen(
                                 .padding(bottom = 24.dp) // Add padding to move it up from bottom
                                 .background(
                                     Color.Black.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(24.dp)
+                                    shape = RoundedCornerShape(24.dp),
                                 )
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 text = trimCaption(caption, maxCaptionLength),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.White,
                                 lineHeight = 20.sp,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
@@ -231,12 +237,12 @@ fun SubmitPhotoScreen(
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .background(Color.LightGray.copy(alpha = 0.5f)),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "No image selected",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.DarkGray
+                        color = Color.DarkGray,
                     )
                 }
             }
@@ -245,7 +251,7 @@ fun SubmitPhotoScreen(
                 totalPages = 5,
                 currentPage = 2,
                 modifier = Modifier.size(100.dp),
-                inactiveColor = Color.Gray.copy(alpha = 0.3f)
+                inactiveColor = Color.Gray.copy(alpha = 0.3f),
             )
 
             MainBottomBar(
@@ -256,12 +262,12 @@ fun SubmitPhotoScreen(
                         showCaptionSheet = true
                         coroutineScope.launch { sheetState.show() }
                     }
-                }
+                },
             )
 
             // Friend list centered with submit button
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 var containerWidth by remember { mutableIntStateOf(0) }
                 var itemWidth by remember { mutableIntStateOf(0) }
@@ -281,18 +287,15 @@ fun SubmitPhotoScreen(
                         .onGloballyPositioned { coordinates ->
                             containerWidth = coordinates.size.width
                         }
-                        .horizontalScroll(scrollState)
+                        .horizontalScroll(scrollState),
                 ) {
-
                     FriendList(
                         user = data,
                         selectedFriendId = selectedUser?.id ?: "everyone",
-                        onFriendSelected = { selectedUser = it }
+                        onFriendSelected = { selectedUser = it },
                     )
                 }
             }
         }
     }
-
-
 }

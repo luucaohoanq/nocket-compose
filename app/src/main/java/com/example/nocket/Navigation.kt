@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket
 
 import android.annotation.SuppressLint
@@ -30,7 +36,7 @@ import com.example.nocket.ui.screen.submitphoto.SubmitPhotoScreen
 import com.example.nocket.viewmodels.AppwriteViewModel
 import com.example.nocket.viewmodels.AuthViewModel
 
-sealed class Screen(val route: String) {  //enum
+sealed class Screen(val route: String) { // enum
     object Login : Screen("login")
     object Message : Screen("message")
     object Chat : Screen("chat/{recipientId}")
@@ -43,31 +49,31 @@ sealed class Screen(val route: String) {  //enum
     object Detail : Screen("detail")
     object Camera : Screen("camera")
 
-    object TestCamera : Screen("test_camera")  // For testing camera functionality
+    object TestCamera : Screen("test_camera") // For testing camera functionality
 }
 
-//https://developer.android.com/topic/architecture
-//https://developer.android.com/topic/libraries/architecture/viewmodel
-//https://developer.android.com/training/dependency-injection
-//https://developer.android.com/develop/ui/compose/libraries#hilt
-//https://github.com/android/architecture-samples
+// https://developer.android.com/topic/architecture
+// https://developer.android.com/topic/libraries/architecture/viewmodel
+// https://developer.android.com/training/dependency-injection
+// https://developer.android.com/develop/ui/compose/libraries#hilt
+// https://github.com/android/architecture-samples
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(
     appwriteViewModel: AppwriteViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
-    val authState by authViewModel.authState.collectAsState()        // Define routes where bottom bar should be hidden
+    val authState by authViewModel.authState.collectAsState() // Define routes where bottom bar should be hidden
     val hideBottomBarRoutes = setOf(
         Screen.Message.route,
         Screen.Profile.route,
         Screen.Setting.route,
         Screen.Login.route,
         Screen.Chat.route,
-        Screen.TestCamera.route
+        Screen.TestCamera.route,
     )
 
     // Track current route as state that updates with navigation changes
@@ -93,7 +99,7 @@ fun Navigation(
     ) {
         NavHost(
             navController = navController,
-            startDestination = startDestination
+            startDestination = startDestination,
         ) {
             composable(Screen.Login.route) {
                 LoginScreen(
@@ -101,7 +107,7 @@ fun Navigation(
                         navController.navigate(Screen.Post.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
-                    }
+                    },
                 )
             }
 
@@ -112,13 +118,13 @@ fun Navigation(
             composable(
                 route = Screen.Chat.route,
                 arguments = listOf(
-                    navArgument("recipientId") { type = NavType.StringType }
-                )
+                    navArgument("recipientId") { type = NavType.StringType },
+                ),
             ) { backStackEntry ->
                 val recipientId = backStackEntry.arguments?.getString("recipientId") ?: ""
                 ChatScreen(
                     navController = navController,
-                    recipientId = recipientId
+                    recipientId = recipientId,
                 )
             }
 
@@ -128,7 +134,7 @@ fun Navigation(
 
             composable(
                 route = "profile?userId={userId}",
-                arguments = listOf(navArgument("userId") { nullable = true })
+                arguments = listOf(navArgument("userId") { nullable = true }),
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 UserProfile(navController = navController, userId = userId)

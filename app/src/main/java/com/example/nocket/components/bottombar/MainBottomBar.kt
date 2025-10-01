@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.components.bottombar
 
 import androidx.compose.foundation.layout.Box
@@ -54,9 +60,12 @@ data class BottomNavItem(
     val selectedIcon: ImageVector? = null,
     val unselectedIcon: ImageVector? = null,
     val route: String,
-    val isCenter: Boolean = false, // flag để xác định button special (ví dụ camera)
-    val customSizeCenter: Dp = 60.dp, // Kích thước tùy chỉnh cho button center
-    val onClick: (() -> Unit)? = null // Callback khi nhấn vào item
+    // flag để xác định button special (ví dụ camera)
+    val isCenter: Boolean = false,
+    // Kích thước tùy chỉnh cho button center
+    val customSizeCenter: Dp = 60.dp,
+    // Callback khi nhấn vào item
+    val onClick: (() -> Unit)? = null,
 )
 
 private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavItem>, BottomNavItem?> {
@@ -75,13 +84,11 @@ private fun normalizeItems(original: List<BottomNavItem>): Pair<List<BottomNavIt
 /**
  * Determines which bottom navigation items to show based on the current route
  */
-private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> {
-    return when (currentRoute) {
-        Screen.Post.route -> sampleItems2 // Use sampleItems2 for Home screen
-        Screen.Profile.route -> sampleItems // Use full items for Profile screen
-        Screen.Setting.route -> sampleItems3 // Use sampleItems3 for Settings screen
-        else -> sampleItems2 // Default to sampleItems2 for other screens
-    }
+private fun getBottomNavItems(currentRoute: String?): List<BottomNavItem> = when (currentRoute) {
+    Screen.Post.route -> sampleItems2
+    Screen.Profile.route -> sampleItems
+    Screen.Setting.route -> sampleItems3
+    else -> sampleItems2
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,19 +97,19 @@ fun MainBottomBar(
     navController: NavController,
     items: List<BottomNavItem>,
     modifier: Modifier = Modifier,
-    onItemClick: (BottomNavItem) -> Unit = { }
+    onItemClick: (BottomNavItem) -> Unit = { },
 ) {
     // Use provided items or determine items based on current route
     val (orderedItems, centerItem) = normalizeItems(items)
     val centerIconNavigation = items.find { it.isCenter }?.route ?: Screen.Post.route
 
-    //bottom sheet
+    // bottom sheet
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
     NavigationBar(
         containerColor = Color.Transparent,
-        modifier = modifier
+        modifier = modifier,
     ) {
         orderedItems.forEach { item ->
             if (item == centerItem) {
@@ -111,12 +118,16 @@ fun MainBottomBar(
                     Circle(
                         outerSize = centerItem.customSizeCenter,
                         gap = 7.dp,
-                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
                             Color.Gray
-                        else Color.Transparent,
-                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        } else {
+                            Color.Transparent
+                        },
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
                             Color.Gray
-                        else Color.Yellow,
+                        } else {
+                            Color.Yellow
+                        },
                         borderWidth = 3.dp,
                         onClick = {
                             if (centerIconNavigation.isNotEmpty()) {
@@ -127,28 +138,32 @@ fun MainBottomBar(
                             centerItem.selectedIcon != null -> IconSetting(
                                 icon = centerItem.selectedIcon!!,
                                 tint = Color.White,
-                                contentDescription = item.title
+                                contentDescription = item.title,
                             )
 
                             centerItem.unselectedIcon != null -> IconSetting(
                                 icon = centerItem.unselectedIcon!!,
                                 tint = Color.White,
-                                contentDescription = item.title
+                                contentDescription = item.title,
                             )
 
                             else -> null
-                        }
+                        },
                     )
                 } else if (item.title == "Send") {
                     Circle(
                         outerSize = centerItem.customSizeCenter,
                         gap = 20.dp,
-                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        backgroundColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
                             Color.Gray
-                        else Color.Transparent,
-                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null)
+                        } else {
+                            Color.Transparent
+                        },
+                        borderColor = if (centerItem.selectedIcon != null || centerItem.unselectedIcon != null) {
                             Color.Gray
-                        else Color.Yellow,
+                        } else {
+                            Color.Yellow
+                        },
                         modifier = Modifier.rotate(-45F),
                         borderWidth = 3.dp,
                         onClick = {
@@ -160,17 +175,17 @@ fun MainBottomBar(
                             centerItem.selectedIcon != null -> IconSetting(
                                 icon = centerItem.selectedIcon!!,
                                 tint = Color.White,
-                                contentDescription = item.title
+                                contentDescription = item.title,
                             )
 
                             centerItem.unselectedIcon != null -> IconSetting(
                                 icon = centerItem.unselectedIcon!!,
                                 tint = Color.White,
-                                contentDescription = item.title
+                                contentDescription = item.title,
                             )
 
                             else -> null
-                        }
+                        },
                     )
                 }
             } else if (item.title != null) {
@@ -180,7 +195,7 @@ fun MainBottomBar(
                             // Determine which icon to use, defaulting to whichever is not null
                             val iconToUse = when {
                                 item.unselectedIcon != null -> item.unselectedIcon
-                                else -> item.selectedIcon // Fallback (won't be null due to our condition)
+                                else -> item.selectedIcon
                             }
 
                             // Only show icon if we have a non-null icon to display
@@ -189,21 +204,21 @@ fun MainBottomBar(
                                     imageVector = it,
                                     contentDescription = item.title,
                                     tint = Color.White,
-                                    modifier = Modifier.size(40.dp)
+                                    modifier = Modifier.size(40.dp),
                                 )
                             }
                         }
                     },
                     selected = false,
                     onClick = {
-                        onItemClick(item) // Call the callback first
+                        onItemClick(item)
                         if (item.route.isNotEmpty()) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId)
                                 launchSingleTop = true
                             }
                         }
-                    }
+                    },
                 )
             } else {
                 // Empty box placeholder with same size as navigation items
@@ -218,33 +233,33 @@ private val sampleItems = listOf(
         title = "Home",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
-        route = Screen.Post.route
+        route = Screen.Post.route,
     ),
     BottomNavItem(
         title = "Messages",
         selectedIcon = Icons.AutoMirrored.Filled.Message,
         unselectedIcon = Icons.AutoMirrored.Outlined.Message,
-        route = Screen.Message.route
+        route = Screen.Message.route,
     ),
     BottomNavItem(
         title = "Camera",
         selectedIcon = Icons.Filled.CameraAlt,
         unselectedIcon = Icons.Filled.CameraAlt,
         route = "",
-        isCenter = true
+        isCenter = true,
     ),
     BottomNavItem(
         title = "Profile",
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
-        route = Screen.Profile.route
+        route = Screen.Profile.route,
     ),
     BottomNavItem(
         title = "Settings",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings,
-        route = Screen.Setting.route
-    )
+        route = Screen.Setting.route,
+    ),
 )
 
 val sampleItems2 = listOf(
@@ -252,21 +267,21 @@ val sampleItems2 = listOf(
         title = null,
         selectedIcon = null,
         unselectedIcon = null,
-        route = Screen.Post.route
+        route = Screen.Post.route,
     ),
     BottomNavItem(
         title = "Camera",
         selectedIcon = null,
         unselectedIcon = null,
         route = Screen.Camera.route,
-        isCenter = true
+        isCenter = true,
     ),
     BottomNavItem(
         title = "Share",
         selectedIcon = Icons.Filled.SmartDisplay,
         unselectedIcon = Icons.Outlined.SmartDisplay,
-        route = Screen.Setting.route
-    )
+        route = Screen.Setting.route,
+    ),
 )
 
 val sampleItems3 = listOf(
@@ -274,21 +289,21 @@ val sampleItems3 = listOf(
         title = "Home",
         selectedIcon = Icons.Filled.ViewCozy,
         unselectedIcon = Icons.Outlined.ViewCozy,
-        route = Screen.Post.route
+        route = Screen.Post.route,
     ),
     BottomNavItem(
         title = "Camera",
         selectedIcon = null,
         unselectedIcon = null,
         route = Screen.Camera.route,
-        isCenter = true
+        isCenter = true,
     ),
     BottomNavItem(
         title = "Share",
         selectedIcon = Icons.Filled.IosShare,
         unselectedIcon = Icons.Outlined.IosShare,
-        route = Screen.Setting.route
-    )
+        route = Screen.Setting.route,
+    ),
 )
 
 val takePhotoBar = listOf(
@@ -296,22 +311,22 @@ val takePhotoBar = listOf(
         title = "Photo Library",
         selectedIcon = Icons.Filled.PhotoLibrary,
         unselectedIcon = Icons.Outlined.PhotoLibrary,
-        route = Screen.Post.route
+        route = Screen.Post.route,
     ),
     BottomNavItem(
         title = "Take a picture",
         selectedIcon = null,
         unselectedIcon = null,
-        route = "submit_photo",  // Using string directly to ensure consistency
+        route = "submit_photo",
         customSizeCenter = 80.dp,
-        isCenter = true
+        isCenter = true,
     ),
     BottomNavItem(
         title = "Change camera",
         selectedIcon = Icons.Filled.Cached,
         unselectedIcon = Icons.Outlined.Cached,
-        route = ""
-    )
+        route = "",
+    ),
 )
 
 val submitPhotoBar = listOf(
@@ -319,7 +334,7 @@ val submitPhotoBar = listOf(
         title = "Cancel",
         selectedIcon = Icons.Filled.Close,
         unselectedIcon = Icons.Outlined.Close,
-        route = Screen.Post.route
+        route = Screen.Post.route,
     ),
     BottomNavItem(
         title = "Send",
@@ -327,14 +342,14 @@ val submitPhotoBar = listOf(
         unselectedIcon = Icons.AutoMirrored.Outlined.Send,
         route = "",
         customSizeCenter = 80.dp,
-        isCenter = true
+        isCenter = true,
     ),
     BottomNavItem(
         title = "Captions List",
         selectedIcon = Icons.Filled.MotionPhotosAuto,
         unselectedIcon = Icons.Outlined.MotionPhotosAuto,
         route = "",
-    )
+    ),
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFF1C1611)

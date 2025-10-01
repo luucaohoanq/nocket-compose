@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.preview
 
 import androidx.activity.ComponentActivity
@@ -22,7 +28,7 @@ private fun LoginScreenPreview() {
                 authMode = AuthMode.LOGIN,
                 email = "user@example.com",
                 password = "",
-                passwordVisible = false
+                passwordVisible = false,
             ),
             actions = object : AuthUIActions {
                 override fun onLogin(email: String, password: String) {}
@@ -31,7 +37,7 @@ private fun LoginScreenPreview() {
                 override fun onGoogleLogin(activity: ComponentActivity) {}
                 override fun onLoginSuccess() {}
                 override fun clearError() {}
-            }
+            },
         )
     }
 }
@@ -48,7 +54,7 @@ private fun RegisterScreenPreview() {
                 email = "user@example.com",
                 password = "password123",
                 name = "John Doe",
-                passwordVisible = false
+                passwordVisible = false,
             ),
             actions = object : AuthUIActions {
                 override fun onLogin(email: String, password: String) {}
@@ -57,7 +63,7 @@ private fun RegisterScreenPreview() {
                 override fun onGoogleLogin(activity: ComponentActivity) {}
                 override fun onLoginSuccess() {}
                 override fun clearError() {}
-            }
+            },
         )
     }
 }
@@ -73,7 +79,7 @@ private fun LoadingScreenPreview() {
                 authMode = AuthMode.LOGIN,
                 email = "user@example.com",
                 password = "password123",
-                passwordVisible = false
+                passwordVisible = false,
             ),
             actions = object : AuthUIActions {
                 override fun onLogin(email: String, password: String) {}
@@ -82,7 +88,7 @@ private fun LoadingScreenPreview() {
                 override fun onGoogleLogin(activity: ComponentActivity) {}
                 override fun onLoginSuccess() {}
                 override fun clearError() {}
-            }
+            },
         )
     }
 }
@@ -98,7 +104,7 @@ private fun ErrorScreenPreview() {
                 authMode = AuthMode.LOGIN,
                 email = "user@example.com",
                 password = "wrongpassword",
-                passwordVisible = false
+                passwordVisible = false,
             ),
             actions = object : AuthUIActions {
                 override fun onLogin(email: String, password: String) {}
@@ -107,7 +113,7 @@ private fun ErrorScreenPreview() {
                 override fun onGoogleLogin(activity: ComponentActivity) {}
                 override fun onLoginSuccess() {}
                 override fun clearError() {}
-            }
+            },
         )
     }
 }
@@ -122,7 +128,7 @@ private fun ForgotPasswordScreenPreview() {
                 isLoading = false,
                 authMode = AuthMode.FORGOT_PASSWORD,
                 email = "user@example.com",
-                passwordVisible = false
+                passwordVisible = false,
             ),
             actions = object : AuthUIActions {
                 override fun onLogin(email: String, password: String) {}
@@ -131,7 +137,7 @@ private fun ForgotPasswordScreenPreview() {
                 override fun onGoogleLogin(activity: ComponentActivity) {}
                 override fun onLoginSuccess() {}
                 override fun clearError() {}
-            }
+            },
         )
     }
 }

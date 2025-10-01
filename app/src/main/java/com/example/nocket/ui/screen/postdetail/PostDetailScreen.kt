@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2025 lcaohoanq. All rights reserved.
+ * This software is the confidential and proprietary information of lcaohoanq.
+ * You shall not disclose such confidential information and shall use it only in
+ * accordance with the terms of the license agreement you entered into with lcaohoanq.
+ */
 package com.example.nocket.ui.screen.postdetail
 
 import android.os.Build
@@ -57,17 +63,16 @@ fun PostDetailScreen(
     onBack: () -> Unit,
     navController: NavController,
     friends: List<User> = emptyList(),
-    appwriteViewModel: AppwriteViewModel = hiltViewModel()
+    appwriteViewModel: AppwriteViewModel = hiltViewModel(),
 ) {
-
     var showNotifications by remember { mutableStateOf(false) }
     var selectedUser by remember {
         mutableStateOf<User?>(
             User(
                 id = "everyone",
                 username = "Everyone",
-                avatar = ""
-            )
+                avatar = "",
+            ),
         )
     }
     // Use the passed onCameraClick instead of navigating to CameraXScreen
@@ -90,9 +95,9 @@ fun PostDetailScreen(
                         } ?: navController.navigate("profile")
                     },
                     onNotificationClick = { showNotifications = true },
-                    onUserSelected = { user -> selectedUser = user }
+                    onUserSelected = { user -> selectedUser = user },
                 )
-            }
+            },
         ) { paddingValues ->
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -100,7 +105,7 @@ fun PostDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 70.dp)
-                    .padding(paddingValues)
+                    .padding(paddingValues),
             ) {
                 // Show camera view or post image based on the localCameraMode state
 
@@ -110,7 +115,7 @@ fun PostDetailScreen(
                         modifier = Modifier
                             .height(400.dp)
                             .fillMaxWidth()
-                            .aspectRatio(1f)
+                            .aspectRatio(1f),
                     ) {
                         AsyncImage(
                             model = imageUrl,
@@ -118,7 +123,7 @@ fun PostDetailScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(20.dp)),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
                         )
 
                         // Video indicator for video posts
@@ -129,15 +134,15 @@ fun PostDetailScreen(
                                     .size(72.dp)
                                     .background(
                                         color = Color.Black.copy(alpha = 0.6f),
-                                        shape = CircleShape
+                                        shape = CircleShape,
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
                                     contentDescription = "Play video",
                                     tint = Color.White,
-                                    modifier = Modifier.size(36.dp)
+                                    modifier = Modifier.size(36.dp),
                                 )
                             }
                         }
@@ -150,33 +155,32 @@ fun PostDetailScreen(
                                     .padding(bottom = 24.dp) // Add padding to move it up from bottom
                                     .background(
                                         Color.Black.copy(alpha = 0.5f),
-                                        shape = RoundedCornerShape(24.dp)
+                                        shape = RoundedCornerShape(24.dp),
                                     )
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                             ) {
                                 Text(
-                                    //if the caption length is more than 30 characters, truncate it and add "..."
+                                    // if the caption length is more than 30 characters, truncate it and add "..."
                                     text = caption.take(30) + if (caption.length > 30) "..." else "",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color.White,
                                     lineHeight = 20.sp,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
                             }
                         }
                     }
                 }
 
-
                 // User info and actions
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 60.dp),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp) // Consistent spacing between items
+                        horizontalArrangement = Arrangement.spacedBy(12.dp), // Consistent spacing between items
                     ) {
                         AsyncImage(
                             model = post.user.avatar,
@@ -184,27 +188,26 @@ fun PostDetailScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
                         )
 
                         Text(
                             text = post.user.username,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
 
                         Text(
                             text = post.createdAt,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-
                     }
                 }
 
                 // Message Pill
                 MessageInputPill(
-                    modifier = Modifier.padding(15.dp)
+                    modifier = Modifier.padding(15.dp),
                 )
             }
         }
@@ -212,7 +215,7 @@ fun PostDetailScreen(
         MainBottomBar(
             navController,
             modifier = Modifier.align(Alignment.BottomCenter),
-            items = sampleItems3
+            items = sampleItems3,
         )
     }
 }
