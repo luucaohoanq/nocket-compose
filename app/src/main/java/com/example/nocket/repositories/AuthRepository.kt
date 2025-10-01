@@ -53,8 +53,8 @@ class AuthRepository @Inject constructor(
      */
     suspend fun loginWithGoogle(
         activity: ComponentActivity,
-        successUrl: String = "${AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT}/account/sessions/oauth2/callback/google/success",
-        failureUrl: String = "${AppwriteConfig.APPWRITE_PUBLIC_ENDPOINT}/account/sessions/oauth2/callback/google/failure"
+        successUrl: String = "nocket://auth/success",
+        failureUrl: String = "nocket://auth/failure"
     ) {
 
         Log.d("AuthRepository", "Starting Google OAuth login")
